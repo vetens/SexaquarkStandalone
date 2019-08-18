@@ -1,0 +1,37 @@
+DEBUG 2019-04-28 18:33:50,215: 	 Executing command: 'submit'
+DEBUG 2019-04-28 18:33:50,216: 	 Found CRAB cache file /user/jdeclerc/.crab3
+DEBUG 2019-04-28 18:33:50,225: 	 Checking credentials
+DEBUG 2019-04-28 18:33:50,226: 	 Found proxy file /tmp/x509up_u20641
+DEBUG 2019-04-28 18:33:50,226: 	 Getting proxy life time left
+DEBUG 2019-04-28 18:33:51,131: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u20641 -timeleft
+ output : 29670
+
+ error: 
+ retcode : 0
+DEBUG 2019-04-28 18:33:52,037: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u20641 -actimeleft
+ output : 29670
+
+ error: 
+ retcode : 0
+DEBUG 2019-04-28 18:33:52,038: 	 Proxy valid for 08:14:30 hours
+INFO 2019-04-28 18:33:52,038: 	 Will use CRAB configuration file crabConfig_MC_Step1_step.py
+DEBUG 2019-04-28 18:33:52,038: 	 Loading CRAB configuration file.
+DEBUG 2019-04-28 18:33:52,083: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2019-04-28 18:33:52,084: 	 Working area '/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30/src/STEP1_Sexaq_NO_PU/crabSlimmedFEVT/crab_Step1Sexaq_28042019_v2' already exists 
+Please change the requestName in the config file
+ERROR 2019-04-28 18:33:52,084: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 161, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/ClientUtilities.py", line 404, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30/src/STEP1_Sexaq_NO_PU/crabSlimmedFEVT/crab_Step1Sexaq_28042019_v2' already exists 
+Please change the requestName in the config file

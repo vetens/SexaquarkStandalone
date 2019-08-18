@@ -1,0 +1,42 @@
+DEBUG 2019-08-07 22:16:10,619: 	 Executing command: 'submit'
+DEBUG 2019-08-07 22:16:10,619: 	 Found CRAB cache file /user/jdeclerc/.crab3
+DEBUG 2019-08-07 22:16:10,647: 	 Checking credentials
+DEBUG 2019-08-07 22:16:10,647: 	 Found proxy file /tmp/x509up_u20641
+DEBUG 2019-08-07 22:16:10,647: 	 Getting proxy life time left
+DEBUG 2019-08-07 22:16:11,656: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u20641 -timeleft
+ output : 43182
+
+ error: 
+ retcode : 0
+DEBUG 2019-08-07 22:16:12,665: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u20641 -actimeleft
+ output : 43181
+
+ error: 
+ retcode : 0
+DEBUG 2019-08-07 22:16:12,666: 	 Proxy lifetime 43182 secs is different from voms extension lifetime 43181 secs for proxy: /tmp/x509up_u20641
+DEBUG 2019-08-07 22:16:12,666: 	 Proxy valid for 11:59:41 hours
+INFO 2019-08-07 22:16:12,667: 	 Will use CRAB configuration file crabConfig_FlatTreeProducerV0s.py
+DEBUG 2019-08-07 22:16:12,668: 	 Loading CRAB configuration file.
+DEBUG 2019-08-07 22:16:12,674: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2019-08-07 22:16:12,675: 	 Invalid CRAB configuration: A local DBS instance 'phys03' was specified for reading an input dataset of tier AODSIM .
+Datasets of tier different than USER must be read from the global DBS instance; this is, set Data.inputDBS = 'global'.
+If Data.inputDBS would not be specified, the default 'global' ('https://cmsweb.cern.ch/dbs/prod/global/DBSReader') would be used.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2019-08-07 22:16:12,675: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 161, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 311, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 92, in loadConfig
+    raise ConfigurationException(configmsg)
+ConfigurationException: Invalid CRAB configuration: A local DBS instance 'phys03' was specified for reading an input dataset of tier AODSIM .
+Datasets of tier different than USER must be read from the global DBS instance; this is, set Data.inputDBS = 'global'.
+If Data.inputDBS would not be specified, the default 'global' ('https://cmsweb.cern.ch/dbs/prod/global/DBSReader') would be used.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
