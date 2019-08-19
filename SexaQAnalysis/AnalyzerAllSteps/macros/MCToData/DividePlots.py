@@ -1,24 +1,14 @@
 from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas
 import numpy as np
 
-fIn1 = TFile('./analyzedFlatTreeV0s_test_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root', 'read') #MC: needs to be plots containing Ks and Lambdas which are not from the AntiS 
-fIn2 = TFile('./analyzedFlatTreeV0s_t_SingleMuon_FlatTreeV0s.root', 'read') #Data: needs to be plots from ZeroBias sample with V0s reconstructed according to the new algorithm
+fIn1 = TFile('./analyzedFlatTreeV0s_test_ttZJets_13TeV_madgraphMLM.root', 'read') #MC: needs to be plots containing Ks and Lambdas which are not from the AntiS 
+fIn2 = TFile('./analyzedFlatTreeV0s_test_DoubleMuon.root', 'read') #Data: needs to be plots from ZeroBias sample with V0s reconstructed according to the new algorithm
 
-#MC_dir = "AnalyzerGEN/GENRECO/GENRECO_KsNonAntiS/GENRECO_RECO_KsNonAntiS/RECO_Ks_extra_mass_cut/"
-MC_dir = "AnalyzerRECO/RECO/RECO_Ks/RECO_Ks_extra_mass_cut/RECO_Ks_extra_mass_cut_kinregA/"
-Data_dir = "AnalyzerRECO/RECO/RECO_Ks/RECO_Ks_extra_mass_cut/RECO_Ks_extra_mass_cut_kinregA/"
-
-#l_overlap_MC = [
-#MC_dir+"h_GENRECO_RECO_RECO_Ks_dxy",
-#MC_dir+"h_GENRECO_RECO_RECO_Ks_dz",
-#MC_dir+"h2_GENRECO_RECO_RECO_Ks_lxy_dz",
-#MC_dir+"h2_GENRECO_RECO_RECO_Ks_lxy_vz"
-#]
 
 l_overlap = [
 "h2_RECO_Ks_lxy_vz_kinregA",
 "h2_RECO_Ks_pt_pz_kinregA",
-"h2_RECO_Ks_dxy_dz_min_kinregA",
+"h2_RECO_Ks_dxy_dz_PV_kinregA",
 "h2_RECO_Ks_eta_phi_kinregA"
 ]
 

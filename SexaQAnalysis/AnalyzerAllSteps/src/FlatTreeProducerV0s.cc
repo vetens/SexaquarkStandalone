@@ -55,6 +55,7 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Ks->Branch("_Ks_dxy",&_Ks_dxy);
 	_tree_Ks->Branch("_Ks_dz",&_Ks_dz);
 	_tree_Ks->Branch("_Ks_dz_min",&_Ks_dz_min);
+	_tree_Ks->Branch("_Ks_dz_PV",&_Ks_dz_PV);
 
 
 	//for the Lambda
@@ -70,7 +71,12 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_dxy",&_Lambda_dxy);
 	_tree_Lambda->Branch("_Lambda_dz",&_Lambda_dz);
 	_tree_Lambda->Branch("_Lambda_dz_min",&_Lambda_dz_min);
+	_tree_Lambda->Branch("_Lambda_dz_PV",&_Lambda_dz_PV);
 
+	//for the Z
+        _tree_Z = fs->make <TTree>("FlatTreeZ","treeZ");
+
+	_tree_Z->Branch("_Z_mass",&_Z_mass);
 
 }
 
@@ -129,51 +135,79 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   bool ZCandidatePresent = false;
   double ZCandidateMass = 0;
   double ZCandidatePhi = 0;
+  double nLooseMuons = 0; 
   if(h_muons.isValid()){
 	for(unsigned int i = 0; i < h_muons->size(); ++i){
 
 		//now check if this muon i is tight and isolated, has a minmal pt and is in the acceptance, if not do not consider this muon
-		//bool muon1Tight = muon::isTightMuon(h_muons->at(i), h_offlinePV->at(0));
-		//if(!muon1Tight) continue;
+
+
 		if(h_muons->at(i).pt() < 20) continue;	
 		if(fabs(h_muons->at(i).eta()) > 2.4) continue;	
+		if(! IsolationCriterium(h_muons->at(i))) continue;
+	
+		bool muon1Loose = muon::isLooseMuon(h_muons->at(i));
+                if(muon1Loose) nLooseMuons++;
+
+		bool muon1Tight = muon::isTightMuon(h_muons->at(i), h_offlinePV->at(0));
+		if(!muon1Tight) continue;
 
 		for(unsigned int j = i + 1; j < h_muons->size(); ++j){
 			
 			//now check if this muon j is tight and isolated, has a minmal pt and is in the acceptance, if not do not consider this muon
+			
+		
+			if(h_muons->at(j).pt() < 20) continue;	
+			if(fabs(h_muons->at(j).eta()) > 2.4) continue;	
+			if(! IsolationCriterium(h_muons->at(j))) continue;
+
 			bool muon2Tight = muon::isTightMuon(h_muons->at(j), h_offlinePV->at(0));
 			if(!muon2Tight) continue;
 
-			if(h_muons->at(j).pt() < 20) continue;	
-			if(fabs(h_muons->at(j).eta()) > 2.4) continue;	
-
 			LorentzVector p4ZCandidate = h_muons->at(i).p4() + h_muons->at(j).p4();
 
-			//now check if there is no jet (with pt>30GeV) going back to back with the Z 
-			bool backToBackHighPtJetFound = false;
+			//now check if the ONLY jet in the event is going back to back with the Z, jets with momenta lower than 30 GeV can be ignored
+			bool ContaminatingHighPtJetFound = false;
+
 			for(unsigned int k = 0; k < h_jets->size(); ++k){
+
 				if(h_jets->at(k).pt() < 30) continue;
 				double deltaPhiJetZ = reco::deltaPhi(p4ZCandidate.phi(),h_jets->at(k).phi());
-				if(abs(deltaPhiJetZ - TMath::Pi()) < 0.1) backToBackHighPtJetFound = true;
+				//if the jet is outside of the phi-cone with opening pi/4 around the backToBack of the Z then this jet can affect the cleanlyness of the the transverse region
+				bool jetInBackToBackRegion = false;
+				bool jetInForwardRegion    = false;
+				if(abs(reco::deltaPhi(deltaPhiJetZ,TMath::Pi())) < TMath::Pi()/4 ) jetInBackToBackRegion = true;
+				if(abs(reco::deltaPhi(deltaPhiJetZ, 0.)) < TMath::Pi()/4 ) jetInForwardRegion = true;
+				if(jetInBackToBackRegion || jetInForwardRegion) continue;
+				ContaminatingHighPtJetFound = true;
 
 			}
 
+			if(ContaminatingHighPtJetFound) continue;
+
 			double invDiMuonMass = p4ZCandidate.mass();
 
-			//ask for the inv mass to be within 15GeV from the known Z mass
-			if(abs(invDiMuonMass - 91.1876) < 15/2 && !backToBackHighPtJetFound){ZCandidateMass = invDiMuonMass;  ZCandidatePresent = true; ZCandidatePhi = p4ZCandidate.phi();}
+			ZCandidateMass = invDiMuonMass;  
+			ZCandidatePresent = true; 
+			ZCandidatePhi = p4ZCandidate.phi();
 		}
 
 
 	}
   }
 
-  if(ZCandidatePresent) std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
 
   //now that you have the phi of the Z candidate you know in which direction the hard event goes, so now look at the V0s in the underlying event, which are the V0s which are not in the deltaPhi cone of the hard event, this cone is defined as 60° around the Z and 60° around the Z in the back to back
 
-  if(ZCandidatePresent){
+  if(ZCandidatePresent  &&  nLooseMuons <= 2){
 
+	InitZ();
+	_Z_mass.push_back(ZCandidateMass);
+	std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
+	_tree_Z->Fill();
+
+	//only save the Ks and Lambdas if the Z mass is within a good range
+	if(abs(ZCandidateMass - 91.1876) < 15/2){
 	  if(h_V0Ks.isValid()){
 	      for(unsigned int i = 0; i < h_V0Ks->size(); ++i){//loop all RECO Ks
 		const reco::VertexCompositeCandidate * Ks = &h_V0Ks->at(i);
@@ -191,6 +225,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 		if(abs(deltaPhiLHardCone) <  TMath::Pi()/3 ||  abs(deltaPhiLBackToBackHardCone) <  TMath::Pi()/3)FillBranchesLambda(L, beamspot, beamspotVariance, h_offlinePV);
 	      }
 	  }
+	}
 
  }
 
@@ -209,6 +244,8 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
         double dz = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,beamspot);
         TVector3 PVmin = AnalyzerAllSteps::dz_line_point_min(KsCreationVertex,KsMomentum,h_offlinePV);
         double dz_min = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,PVmin);
+	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
+        double dz_PV = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,PV0);
 
 
 
@@ -229,6 +266,7 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
 	_Ks_dxy.push_back(dxy);	
 	_Ks_dz.push_back(dz);	
 	_Ks_dz_min.push_back(dz_min);	
+	_Ks_dz_PV.push_back(dz_PV);	
 
   	_tree_Ks->Fill();
 
@@ -244,6 +282,8 @@ void FlatTreeProducerV0s::FillBranchesLambda(const reco::VertexCompositeCandidat
 	double dz = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,beamspot);
 	TVector3 PVmin = AnalyzerAllSteps::dz_line_point_min(LambdaCreationVertex,LambdaMomentum,h_offlinePV);
 	double dz_min = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,PVmin);
+	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
+	double dz_PV = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,PV0);
 
 
 	InitLambda();	
@@ -261,11 +301,28 @@ void FlatTreeProducerV0s::FillBranchesLambda(const reco::VertexCompositeCandidat
 	_Lambda_dxy.push_back(dxy);	
 	_Lambda_dz.push_back(dz);	
 	_Lambda_dz_min.push_back(dz_min);	
+	_Lambda_dz_PV.push_back(dz_PV);	
 
   	_tree_Lambda->Fill();
 
 }
 
+bool FlatTreeProducerV0s::IsolationCriterium(reco::Muon muon)
+{
+      bool passedIso = false;
+
+      double chargedHadronIso = muon.pfIsolationR04().sumChargedHadronPt;
+      double chargedHadronIsoPU = muon.pfIsolationR04().sumPUPt;
+      double neutralHadronIso  = muon.pfIsolationR04().sumNeutralHadronEt;
+      double photonIso  = muon.pfIsolationR04().sumPhotonEt;
+      double a=0.5;
+      // OPTION 1: DeltaBeta corrections for iosolation
+      float RelativeIsolationDBetaCorr = (chargedHadronIso + std::max(photonIso+neutralHadronIso - 0.5*chargedHadronIsoPU,0.))/std::max(a, muon.pt());
+      if(RelativeIsolationDBetaCorr < 0.15) passedIso = true;
+
+      return passedIso;
+
+}
 
 void FlatTreeProducerV0s::endJob()
 {
@@ -325,6 +382,7 @@ void FlatTreeProducerV0s::InitKs()
 	_Ks_dxy.clear();	
 	_Ks_dz.clear();
 	_Ks_dz_min.clear();	
+	_Ks_dz_PV.clear();	
 }
 
 void FlatTreeProducerV0s::InitLambda()
@@ -344,6 +402,14 @@ void FlatTreeProducerV0s::InitLambda()
 	_Lambda_dxy.clear();	
 	_Lambda_dz.clear();
 	_Lambda_dz_min.clear();	
+	_Lambda_dz_PV.clear();	
+}
+
+void FlatTreeProducerV0s::InitZ()
+{
+
+	_Z_mass.clear();
+
 }
 
 

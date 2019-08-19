@@ -8,3 +8,5 @@ __init__.py
 *.nfs
 *.txt
 password
+crab_*
+crab.log

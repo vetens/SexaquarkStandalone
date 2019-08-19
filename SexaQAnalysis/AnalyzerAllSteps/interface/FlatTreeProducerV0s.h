@@ -17,8 +17,10 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     virtual ~FlatTreeProducerV0s();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
+    bool IsolationCriterium(reco::Muon muon);
     void FillBranchesKs(const reco::VertexCompositeCandidate * Ks, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV);    
     void FillBranchesLambda(const reco::VertexCompositeCandidate * Lambda, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV);    
+
 
   private:
     bool m_lookAtAntiS;
@@ -35,6 +37,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
 
     void InitKs();
     void InitLambda();
+    void InitZ();
 
     edm::Service<TFileService> m_fs;
  
@@ -64,10 +67,12 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
    
     TTree* _tree_Ks;   
     TTree* _tree_Lambda;   
+    TTree* _tree_Z;   
 
     //definition of variables which should go to tree
-    std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy,_Ks_dz,_Ks_dz_min;
-    std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy,_Lambda_dz,_Lambda_dz_min;
+    std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy,_Ks_dz,_Ks_dz_min,_Ks_dz_PV;
+    std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy,_Lambda_dz,_Lambda_dz_min,_Lambda_dz_PV;
+    std::vector<float> _Z_mass;
 
      };
 
