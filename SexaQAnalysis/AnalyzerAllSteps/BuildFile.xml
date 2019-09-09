@@ -15,6 +15,7 @@
 <use name="RecoVertex/PrimaryVertexProducer"/>
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/MuonReco"/>
+<use name="DataFormats/RecoCandidate"/>
 <use name="RecoMuon/TrackingTools"/>
 <flags EDM_PLUGIN="1"/>
 

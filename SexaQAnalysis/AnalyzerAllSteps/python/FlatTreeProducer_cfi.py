@@ -10,6 +10,6 @@ FlatTreeProducer = cms.EDAnalyzer('FlatTreeProducer',
     genCollection_SIM_GEANT =  cms.InputTag("genParticlesPlusGEANT","","SIM"),
     generalTracksCollection =  cms.InputTag("generalTracks","","RECO"),
     sexaqCandidates = cms.InputTag("lambdaKshortVertexFilter", "sParticles",""),
-    V0KsCollection = cms.InputTag("generalV0Candidates","Kshort","RECO"),
-    V0LCollection = cms.InputTag("generalV0Candidates","Lambda","RECO"),
+    V0KsCollection = cms.InputTag("generalV0Candidates","Kshort","SEXAQ"),
+    V0LCollection = cms.InputTag("generalV0Candidates","Lambda","SEXAQ"),
 )

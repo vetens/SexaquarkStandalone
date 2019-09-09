@@ -17,6 +17,7 @@ class FlatTreeProducer : public edm::EDAnalyzer
   private:
     int nTotalRECOS=0;
     int nSavedRECOS=0;
+    int nGENAntiSWithCorrectGranddaughters=0;
     bool m_lookAtAntiS;
     bool m_runningOnData; 
 
@@ -30,6 +31,7 @@ class FlatTreeProducer : public edm::EDAnalyzer
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
     void Init();
+    void Init_Counter();
 
     edm::Service<TFileService> m_fs;
  
@@ -53,6 +55,7 @@ class FlatTreeProducer : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0LToken;
    
     TTree* _tree;   
+    TTree* _tree_counter;
 
     //definition of variables which should go to tree
     std::vector<float> _S_charge;
@@ -66,6 +69,10 @@ class FlatTreeProducer : public edm::EDAnalyzer
     std::vector<float> _S_pz,_Ks_pz,_Lambda_pz;
     std::vector<float> _S_vz_interaction_vertex,_Ks_vz_decay_vertex,_Lambda_vz_decay_vertex;
     std::vector<float> _S_vx,_S_vy,_S_vz;
+    std::vector<float> _Lambda_mass,_Ks_mass;
+    
+
+    std::vector<float> _nGENAntiSWithCorrectGranddaughters;
 
 
      };

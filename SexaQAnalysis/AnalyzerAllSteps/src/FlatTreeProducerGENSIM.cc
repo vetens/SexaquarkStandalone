@@ -35,6 +35,9 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_S_lxyz_interaction_vertex",&_S_lxyz_interaction_vertex);
 	_tree->Branch("_S_error_lxy_interaction_vertex",&_S_error_lxy_interaction_vertex);
 	_tree->Branch("_S_mass",&_S_mass);
+	_tree->Branch("_S_Mt",&_S_Mt);
+	_tree->Branch("_n_M",&_n_M);
+	_tree->Branch("_n_p",&_n_p);
 	_tree->Branch("_S_chi2_ndof",&_S_chi2_ndof);
 
 	_tree->Branch("_S_daughters_deltaphi",&_S_daughters_deltaphi);
@@ -42,6 +45,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_S_daughters_openingsangle",&_S_daughters_openingsangle);
 	_tree->Branch("_S_Ks_openingsangle",&_S_Ks_openingsangle);
 	_tree->Branch("_S_Lambda_openingsangle",&_S_Lambda_openingsangle);
+	_tree->Branch("_S_sumDaughters_openingsangle",&_S_sumDaughters_openingsangle);
 	_tree->Branch("_S_daughters_DeltaR",&_S_daughters_DeltaR);
 	_tree->Branch("_S_eta",&_S_eta);
 	_tree->Branch("_Ks_eta",&_Ks_eta);
@@ -61,6 +65,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_S_dz_min",&_S_dz_min);
 	_tree->Branch("_Ks_dz_min",&_Ks_dz_min);
 	_tree->Branch("_Lambda_dz_min",&_Lambda_dz_min);
+
+	_tree->Branch("_deltaR_sumDaughterMomenta_antiSMomentum",&_deltaR_sumDaughterMomenta_antiSMomentum);
 
 	_tree->Branch("_S_pt",&_S_pt);
 	_tree->Branch("_Ks_pt",&_Ks_pt);
@@ -142,7 +148,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
   //beamspot
   edm::Handle<reco::BeamSpot> h_bs;
-  //iEvent.getByToken(m_bsToken, h_bs);
+  iEvent.getByToken(m_bsToken, h_bs);
 
   //SIM particles: normal Gen particles or PlusGEANT
   edm::Handle<vector<reco::GenParticle>> h_genParticles;
@@ -161,10 +167,13 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
+  else{
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!beamspot collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+  }
 
 
   //loop over the gen particles, check for this antiS if there are any antiS with the same eta, so duplicates
-  //save the duplicates in a vector of vectors. Each vector has  as a first element the eta of the antiS and 2nd element the # of antiS with this eta. 
+  //save the number of duplicates in a vector of vectors. Each vector has  as a first element the eta of the antiS and 2nd element the # of antiS with this eta. 
   vector<vector<float>> v_antiS_momenta_and_itt; 
   for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 	const reco::Candidate * genParticle = &h_genParticles->at(i);
@@ -210,15 +219,17 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
 			const reco::Candidate * genParticle = &h_genParticles->at(i);
 			if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
-			//std::cout << "Found an AntiS with eta = " << genParticle->eta() << std::endl;
-		 		
-
 
 			//check if this is a reconstructable antiS, so should have 2 daughters of correct type, each daughter should have 2 daughters with the correct type
 			//the below implicitely neglects the duplitcate antiS due to looping, because only 1 of the duplicates will interact and give daughters
+			if(genParticle->numberOfDaughters()==0 && abs(genParticle->eta()) < 4) nTotalGiving0DaughtersGENSWithEtaSmallerThan4++;
+			//couning the number of antiS with only 1 daughter as below will also count the duplicates
+			//if(genParticle->numberOfDaughters()==1 && abs(genParticle->eta()) < 4) nTotalGiving1DaughtersGENSWithEtaSmallerThan4++;
 			if(genParticle->numberOfDaughters()==2){
 
 				nTotalGiving2DaughtersGENS++;
+				if(abs(genParticle->eta()) < 4 ) nTotalGiving2DaughtersGENSWithEtaSmallerThan4++;
+
 				int daughterParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle);//returns 3 if daughters from antiS are Ks and AntiLambda
  
 				if(genParticle->daughter(0)->numberOfDaughters()==2 && genParticle->daughter(1)->numberOfDaughters()==2 && daughterParticlesTypes == 3){
@@ -232,6 +243,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 						if(genParticle->eta()>0) nTotalGENSPosEta++;
 						if(genParticle->eta()<0) nTotalGENSNegEta++;
 						FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP);
+						
 					}
 					//else std::cout << "AntiS with correct daughters and correct number of granddaughters, but not correct type of granddaughters" << std::endl;
 
@@ -245,9 +257,16 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
 	  }//if(h_genParticles.isValid())
+	else{
+		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!genparticle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+	}
+
   }
 
   nTotalUniqueGenS = nTotalUniqueGenS + v_antiS_momenta_and_itt.size();
+  for(unsigned int s = 0; s <  v_antiS_momenta_and_itt.size(); s++ ){
+	if(abs(v_antiS_momenta_and_itt[s][0]) < 4) nTotalUniqueGenSWithEtaSmallerThan4++;
+  }
 
  } //end of analyzer
 
@@ -263,6 +282,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 			itDuplicateAntiS = j;
 		}
 	} 
+
+	std::cout << "number of daughters of the GEN antiS: " << genParticle->numberOfDaughters() << " pdgID daughter0 and daughter1: " <<  genParticle->daughter(0)->pdgId() << " " << genParticle->daughter(1)->pdgId()  << std::endl;
 	
 	//calculate some kinematic variables for the GEN AntiS
 	TVector3 GENAntiSInteractionVertex(genParticle->daughter(0)->vx(),genParticle->daughter(0)->vy(),genParticle->daughter(0)->vz());//this is the interaction vertex of the antiS and the neutron.
@@ -273,8 +294,16 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GENDeltaEtaDaughters = genParticle->daughter(0)->eta()-genParticle->daughter(1)->eta();
 	double GENDeltaRDaughters = pow(GENDeltaPhiDaughters*GENDeltaPhiDaughters+GENDeltaEtaDaughters*GENDeltaEtaDaughters,0.5);
 
+	//count the number of AntiS going to fully correct granddaughters and which interact in the beampipe 
+	if(GENLxy_interactionVertex < 3) nTotalCorrectGENSInteractingInBeampipe++;
+
 	reco::LeafCandidate::LorentzVector n_(0,0,0,0.939565);
 	double GEN_Smass = ((genParticle->daughter(0)->daughter(0)->p4()+genParticle->daughter(0)->daughter(1)->p4()+genParticle->daughter(1)->daughter(0)->p4()+genParticle->daughter(1)->daughter(1)->p4())-n_).mass();
+	double GEN_Smass_trans = ((genParticle->daughter(0)->daughter(0)->p4()+genParticle->daughter(0)->daughter(1)->p4()+genParticle->daughter(1)->daughter(0)->p4()+genParticle->daughter(1)->daughter(1)->p4())-n_).Mt();
+
+	//calculate properties of the neutron. This is interesting when running over simulation with neutrons with a Fermi momentum
+	double GEN_n_invM =  ( genParticle->daughter(0)->p4() + genParticle->daughter(1)->p4() - genParticle->p4() ).mass();
+	double GEN_n_p =  ( genParticle->daughter(0)->p4() + genParticle->daughter(1)->p4() - genParticle->p4() ).P();
 
 	//the dxy of the Ks and Lambda
 	TVector3 GENAntiSDaug0Momentum(genParticle->daughter(0)->px(),genParticle->daughter(0)->py(),genParticle->daughter(0)->pz());
@@ -284,6 +313,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
         reco::Candidate::Vector vGENAntiSDaug1Momentum(genParticle->daughter(1)->px(),genParticle->daughter(1)->py(),genParticle->daughter(1)->pz());
 	double GENOpeningsAngleAntiSKs = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSMomentum);
 	double GENOpeningsAngleAntiSLambda = AnalyzerAllSteps::openings_angle(vGENAntiSDaug1Momentum,vGENAntiSMomentum);
+	//the openingsangle between the GEN AntiS and the sum of the momenta of the daughters. Normally these should be pointing exactly in the direction of the mother, but due to the momentum of the neutron this is no longer the case
+	double S_sumDaughters_openingsangle = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum,vGENAntiSMomentum);	
+
 	double GENOpeningsAngleDaughters = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSDaug1Momentum);
         double GEN_dxy_daughter0 = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex, GENAntiSDaug0Momentum,beamspot);
         double GEN_dxy_daughter1 = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex, GENAntiSDaug1Momentum,beamspot);
@@ -293,6 +325,12 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	//dxy and dz of the AntiS itself
 	double GEN_dxy_antiS = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex,GENAntiSMomentumVertex,beamspot);
 	double GEN_dz_antiS = AnalyzerAllSteps::dz_line_point(GENAntiSInteractionVertex,GENAntiSMomentumVertex,beamspot);
+
+	//now look at the deltaR between the sum of the antiS daughters and antiS momentum. If the neutron momentum is zero then this should be a delta peak at zero, but if the neutron does not have zero momentum, then the sum of the momenta of the daughters might not be pointing to the antiS
+	reco::Candidate::Vector vGENAntiSSumDaug0and1Momentum = vGENAntiSDaug0Momentum + vGENAntiSDaug1Momentum;
+	double deltaPhi_sumDaughterMomenta_antiSMomentum = reco::deltaPhi(vGENAntiSSumDaug0and1Momentum.Phi(), GENAntiSMomentumVertex.Phi());
+	double deltaEta_sumDaughterMomenta_antiSMomentum = vGENAntiSSumDaug0and1Momentum.Eta() - GENAntiSMomentumVertex.Eta();
+	double deltaR_sumDaughterMomenta_antiSMomentum = pow(deltaPhi_sumDaughterMomenta_antiSMomentum*deltaPhi_sumDaughterMomenta_antiSMomentum + deltaEta_sumDaughterMomenta_antiSMomentum*deltaEta_sumDaughterMomenta_antiSMomentum ,0.5); 
 
 	//now look at the granddaughters:
 	//For the Ks:
@@ -376,6 +414,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 		}	
 	      }
 	}
+	else{
+		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackingparticle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+	}
 
 	if(tp_AntiLambda_AntiProton_found > -1 && tp_AntiLambda_Pion_found > -1){
 		if(h_TP->at(tp_AntiLambda_AntiProton_found).p() < h_TP->at(tp_AntiLambda_Pion_found).p()){
@@ -408,12 +449,17 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_S_lxy_interaction_vertex.push_back(GENLxy_interactionVertex);
 	_S_lxyz_interaction_vertex.push_back(GENLxyz_interactionVertex);
 	_S_mass.push_back(GEN_Smass);
+	_S_Mt.push_back(GEN_Smass_trans);
+
+	_n_M.push_back(GEN_n_invM);
+	_n_p.push_back(GEN_n_p);
 
 	_S_daughters_deltaphi.push_back(GENDeltaPhiDaughters);
 	_S_daughters_deltaeta.push_back(GENDeltaEtaDaughters);
 	_S_daughters_openingsangle.push_back(GENOpeningsAngleDaughters);
 	_S_Ks_openingsangle.push_back(GENOpeningsAngleAntiSKs);
 	_S_Lambda_openingsangle.push_back(GENOpeningsAngleAntiSLambda);
+	_S_sumDaughters_openingsangle.push_back(S_sumDaughters_openingsangle);
 	_S_daughters_DeltaR.push_back(GENDeltaRDaughters);
 	_S_eta.push_back(genParticle->eta());
 	_Ks_eta.push_back(genParticle->daughter(0)->eta());
@@ -430,6 +476,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_S_dz.push_back(GEN_dz_antiS);
 	_Ks_dz.push_back(GEN_dz_daughter0);
 	_Lambda_dz.push_back(GEN_dz_daughter1);
+
+	_deltaR_sumDaughterMomenta_antiSMomentum.push_back(deltaR_sumDaughterMomenta_antiSMomentum);
 
 	_S_pt.push_back(genParticle->pt());
 	_Ks_pt.push_back(genParticle->daughter(0)->pt());
@@ -551,13 +599,25 @@ FlatTreeProducerGENSIM::~FlatTreeProducerGENSIM()
 	}
 	
 
-	std::cout << "The total number GEN " << particle << " that were found is: " << nTotalGENS << std::endl; 
+	std::cout << "The total number GEN " << particle << " that were found is (this includes duplicates): " << nTotalGENS << std::endl; 
 	std::cout << "The total number of unique " << particle << ": " << nTotalUniqueGenS  << std::endl; 
+	std::cout << "The total number of unique " << particle << " with |eta| < 4: " << nTotalUniqueGenSWithEtaSmallerThan4  << std::endl; 
 	std::cout << "The total number GEN " << particle << "  giving 2 daughters: " << nTotalGiving2DaughtersGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << "  giving 2 correct daughters and 4 granddaughters: " << nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << " decaying to all correct particles is: " << nTotalCorrectGENS << std::endl;
-	std::cout << "The total number GEN " << particle << " to all correct particles, that were found with pos eta is: " << nTotalGENSPosEta << std::endl;
-        std::cout << "The total number GEN " << particle << " to all correct particles, that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 2 daughters (should be the same as above, cause only antiS with |eta|<4 can interact and thus have 2 daughters): " << nTotalGiving2DaughtersGENSWithEtaSmallerThan4 << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 0 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalGiving0DaughtersGENSWithEtaSmallerThan4 << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 1 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalUniqueGenSWithEtaSmallerThan4 - nTotalGiving2DaughtersGENS - nTotalGiving0DaughtersGENSWithEtaSmallerThan4 << std::endl; 
+	std::cout << "The total number GEN " << particle << " giving 2 correct daughters and 4 granddaughters: " << nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl; 
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct granddaughters is: " << nTotalCorrectGENS << std::endl;
+	std::cout << "so the branching ratio you extract for all charged decay is the division of the 2 previous lines: " << (double)nTotalCorrectGENS/(double)nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl;
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles and interacting in the beampipe is: " << nTotalCorrectGENSInteractingInBeampipe << std::endl;
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with pos eta is: " << nTotalGENSPosEta << std::endl;
+        std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
+
+	std::cout << "So the efficiency factor you extract for the fact that you discard |eta| > 4 anti-S is (you could already have extracted this at GEN level): " <<  (double)nTotalUniqueGenSWithEtaSmallerThan4/(double)nTotalUniqueGenS << std::endl;
+	std::cout << "fraction of AntiS with |eta| < 4 which go to correct granddaughters: " << (double)nTotalCorrectGENS/(double)nTotalUniqueGenSWithEtaSmallerThan4 << std::endl;
+	std::cout << "The second efficiency factor is the number of these AntiS with |eta| < 4 which actually go to correct granddaughters AND interact in the beampipe: "<< (double)nTotalCorrectGENSInteractingInBeampipe/(double)nTotalUniqueGenSWithEtaSmallerThan4 << std::endl;
+	
+
 }
 
 
@@ -573,13 +633,18 @@ FlatTreeProducerGENSIM::Init()
     	_S_lxyz_interaction_vertex.clear();
         _S_error_lxy_interaction_vertex.clear();
         _S_mass.clear();
+        _S_Mt.clear();
         _S_chi2_ndof.clear();
+
+	_n_M.clear();
+	_n_p.clear();
 
 	_S_daughters_deltaphi.clear();
 	_S_daughters_deltaeta.clear();
 	_S_daughters_openingsangle.clear();
 	_S_Ks_openingsangle.clear();
 	_S_Lambda_openingsangle.clear();
+	_S_sumDaughters_openingsangle.clear();
 	_S_daughters_DeltaR.clear();
 	_S_eta.clear();
 	_Ks_eta.clear();
@@ -599,6 +664,8 @@ FlatTreeProducerGENSIM::Init()
 	_S_dz_min.clear();
 	_Ks_dz_min.clear();
 	_Lambda_dz_min.clear();
+
+	_deltaR_sumDaughterMomenta_antiSMomentum.clear();
 
 	_S_pt.clear();
 	_Ks_pt.clear();

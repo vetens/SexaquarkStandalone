@@ -6,47 +6,47 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing('python')
 
 #for MC: you want to add the extra collections so that you will be able to do the trackmatching on hits.
-#collections_to_keep = cms.untracked.vstring(
-#    'drop *',
-#    'keep *_InitialProducer_*_*',
-#    'keep recoVertexs_offlinePrimaryVertices_*_*',
-#    'keep recoBeamSpot_offlineBeamSpot_*_*',
-#    'keep *_genParticles_*_HLT',
-#    'keep recoVertexCompositeCandidates_generalV0Candidates_*_*',
-#    'keep recoTracks_lambdaKshortVertexFilter_sParticlesTracks_*',
-#    'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
-#    'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
-#    'keep *_*_*_SEXAQ',
-#    "keep *_genParticlesPlusGEANT_*_*",#this is for MC
-#    "keep *_g4SimHits_*_*",#this is for MC
-#    "keep *_simSiPixelDigis_*_*",#this is for MC
-#    "keep *_simMuonRPCDigis_*_*",#this is for MC
-#    "keep *_simSiStripDigis_*_*",#this is for MC
-#    "keep *_mix_MergedTrackTruth_*",#this is for MC
-#    "keep *_siPixelDigis_*_*",#this is for MC
-#    "keep *_siStripDigis_*_*",#this is for MC
-#    "keep *_siStripDigis_*_*",#this is for MC
-#    "keep *_siPixelClusters_*_*",#this is for MC
-#    "keep *_siStripClusters_*_*",#this is for MC
-#    "keep *_generalTracks_*_*"#this is for MC
-#  )
+collections_to_keep = cms.untracked.vstring(
+    'drop *',
+    'keep *_InitialProducer_*_*',
+    'keep recoVertexs_offlinePrimaryVertices_*_*',
+    'keep recoBeamSpot_offlineBeamSpot_*_*',
+    'keep *_genParticles_*_HLT',
+    'keep recoVertexCompositeCandidates_generalV0Candidates_*_*',
+    'keep recoTracks_lambdaKshortVertexFilter_sParticlesTracks_*',
+    'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
+    'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
+    'keep *_*_*_SEXAQ',
+    "keep *_genParticlesPlusGEANT_*_*",#this is for MC
+    "keep *_g4SimHits_*_*",#this is for MC
+    "keep *_simSiPixelDigis_*_*",#this is for MC
+    "keep *_simMuonRPCDigis_*_*",#this is for MC
+    "keep *_simSiStripDigis_*_*",#this is for MC
+    "keep *_mix_MergedTrackTruth_*",#this is for MC
+    "keep *_siPixelDigis_*_*",#this is for MC
+    "keep *_siStripDigis_*_*",#this is for MC
+    "keep *_siStripDigis_*_*",#this is for MC
+    "keep *_siPixelClusters_*_*",#this is for MC
+    "keep *_siStripClusters_*_*",#this is for MC
+    "keep *_generalTracks_*_*"#this is for MC
+  )
 
 #for data: do not save the extra collections as things will get heavy
-collections_to_keep = cms.untracked.vstring(
-   'drop *',
-   'keep *_generalTracks_*_*',
-   'keep *_InitialProducer_*_*',
-   'keep recoVertexs_offlinePrimaryVertices_*_*',
-   'keep recoBeamSpot_offlineBeamSpot_*_*',
-   'keep *_genParticles_*_HLT',
-   'keep recoVertexCompositeCandidates_generalV0Candidates_*_*',
-   'keep recoTracks_lambdaKshortVertexFilter_sParticlesTracks_*',
-   'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
-   'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
-   'keep *_*_*_SEXAQ',
-   'keep *_muons_*_RECO',
-   'keep *_ak4PFJets_*_RECO'
- )
+#collections_to_keep = cms.untracked.vstring(
+#   'drop *',
+#   'keep *_generalTracks_*_*',
+#   'keep *_InitialProducer_*_*',
+#   'keep recoVertexs_offlinePrimaryVertices_*_*',
+#   'keep recoBeamSpot_offlineBeamSpot_*_*',
+#   'keep *_genParticles_*_HLT',
+#   'keep recoVertexCompositeCandidates_generalV0Candidates_*_*',
+#   'keep recoTracks_lambdaKshortVertexFilter_sParticlesTracks_*',
+#   'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
+#   'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
+#   'keep *_*_*_SEXAQ',
+#   'keep *_muons_*_RECO',
+#   'keep *_ak4PFJets_*_RECO'
+# )
 
 #collections_to_keep = cms.untracked.vstring(
 #   'keep *'

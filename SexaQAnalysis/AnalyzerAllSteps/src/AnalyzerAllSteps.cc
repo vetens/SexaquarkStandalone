@@ -146,9 +146,12 @@ TVector3 AnalyzerAllSteps::dz_line_point_min(TVector3 Point_line_in, TVector3 Ve
 	double dzmin = 999.;
 
 	for(unsigned int i = 0; i < h_offlinePV->size(); ++i){
-		TVector3 PV(h_offlinePV->at(i).x(),h_offlinePV->at(i).y(),h_offlinePV->at(i).z());
-		double dz  = AnalyzerAllSteps::dz_line_point(Point_line_in,Vector_along_line_in,PV);
-		if(abs(dz) < abs(dzmin)) {dzmin = dz; bestPV =  PV;}
+		//select only PV with certain quality cuts like it needs enough tracks pointing to it
+		if(h_offlinePV->at(i).isValid()){
+			TVector3 PV(h_offlinePV->at(i).x(),h_offlinePV->at(i).y(),h_offlinePV->at(i).z());
+			double dz  = AnalyzerAllSteps::dz_line_point(Point_line_in,Vector_along_line_in,PV);
+			if(abs(dz) < abs(dzmin)) {dzmin = dz; bestPV =  PV;}
+		}
 	}
 
 	return bestPV;
@@ -187,4 +190,60 @@ int AnalyzerAllSteps::trackQualityAsInt(const reco::Track *track){
     if(track->quality(reco::TrackBase::discarded))myquality=7;
     if(track->quality(reco::TrackBase::qualitySize))myquality=8;
     return myquality;
+}
+
+std::vector<double> AnalyzerAllSteps::isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp){
+
+ std::vector<double> returnVector; //this vector contains as first element the number defined at the bottom of this function which tells which kind of track this is and as second number the eta of this antiS
+ returnVector.push_back(0.);
+ returnVector.push_back(999.);
+  
+
+ bool tpIsGrandDaughterAntiS = false;
+ string daughter = "none";
+ string granddaughter = "none";
+ if(abs(tp.pdgId()) == 211 || tp.pdgId() == - 2212){//found a charged pion or antiproton
+
+        double granddaughterVx = tp.vx();double granddaughterVy = tp.vy();double granddaughterVz = tp.vz();
+
+        for(size_t j=0; j<TPColl.size(); ++j) {//now find the daughters which have a decay vertex = the production vertex of the granddaughters
+                if(tpIsGrandDaughterAntiS)continue;//can skip it was already found in a previous loop
+                const TrackingParticle& tp_daughter = TPColl[j];
+
+                if(abs(tp_daughter.pdgId()) == 310 || tp_daughter.pdgId() == -3122){//daughter has to be a Ks or Lambda
+
+                        tv_iterator tp_daughter_firstDecayVertex = tp_daughter.decayVertices_begin();
+                        double daughterdecayVx = (**tp_daughter_firstDecayVertex).position().X(); double daughterdecayVy = (**tp_daughter_firstDecayVertex).position().Y(); double daughterdecayVz = (**tp_daughter_firstDecayVertex).position().Z();
+
+                        if(granddaughterVx == daughterdecayVx && granddaughterVy == daughterdecayVy && granddaughterVz == daughterdecayVz){//daughter decay vertex has to match the granddaughter creation vertex
+                                for(size_t k=0; k<TPColl.size(); ++k) {//loop to find the antiS
+                                        if(tpIsGrandDaughterAntiS)continue;//can skip it was already found in a previous loop
+                                        const TrackingParticle& tp_S = TPColl[k];
+                                        if(tp_S.pdgId() == -1020000020){//found the S
+                                                tv_iterator tp_S_firstDecayVertex = tp_S.decayVertices_begin();
+                                                double SdecayVx = (**tp_S_firstDecayVertex).position().X(); double SdecayVy = (**tp_S_firstDecayVertex).position().Y();double SdecayVz = (**tp_S_firstDecayVertex).position().Z();
+                                                if(tp_daughter.vx() == SdecayVx && tp_daughter.vy() == SdecayVy && tp_daughter.vz() == SdecayVz){
+                                                        tpIsGrandDaughterAntiS = true;
+							if(abs(tp.pdgId()) == 211) granddaughter = "pion";
+							else if(tp.pdgId() == -2212) granddaughter = "antiproton";
+
+							if(abs(tp_daughter.pdgId()) == 310) daughter = "Ks";
+							else if(tp_daughter.pdgId() == -3122) daughter = "AntiLambda";
+							
+							returnVector[1] = tp_S.eta();
+                                                }
+                                        }//end if antiS
+                                }//end loop over the tp to find the antiS
+                        }//end check if granddaughter vertex matches the the daughter decay vertex      
+                }//end check for pdgId daughter
+        }//end loop over tp to find daughters
+   }//end check of granddaughter pdgId
+
+ if(tpIsGrandDaughterAntiS && daughter == "Ks" && granddaughter == "pion") returnVector[0] = 1.;
+ else if(tpIsGrandDaughterAntiS && daughter == "AntiLambda" && granddaughter == "pion") returnVector[0] = 2.;
+ else if(tpIsGrandDaughterAntiS && daughter == "AntiLambda" && granddaughter == "antiproton") returnVector[0] = 3.;
+ else returnVector[0] = 0;
+ 
+ return returnVector;
+
 }   

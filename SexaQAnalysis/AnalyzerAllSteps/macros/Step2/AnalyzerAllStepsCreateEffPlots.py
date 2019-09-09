@@ -1,8 +1,8 @@
 from ROOT import TFile, TH1F, TH2F, TEfficiency, TCanvas, TH2D
 
 
-fIn = TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/Step2/crab_Step2SexaqWithPU2016NeutrinoGun_tryToFix_8/crab_WithPU2016NeutrinoGun_tryToFix_808072019_v1/190708_113423/combined_AnalyzerAllStep2_WithPU2016NeutrinoGun_tryToFix_8.root', 'read')
-fOut = TFile('effPlots_Step2_SexaqWithPU2016NeutrinoGun_tryToFix_8.root','RECREATE')
+fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_analyzed_Skimmed_trial13.root', 'read')
+fOut = TFile('effPlots_analyzed_Skimmed_trial13.root','RECREATE')
 ##########################################################################################################################################################################################################################
 #add to this list all the num and denom plots of which you want to make an efficiency plot
 ##########################################################################################################################################################################################################################
@@ -12,9 +12,17 @@ standard_parameters = ["pt","eta","phi","lxy","vz","dxy"]
 twoD_standard_parameters = ["vx_vy","lxy_vz","vx_vy_cut_pt_0p5","vx_vy_cut_pt_0p5_and_1","vx_vy_cut_pt_1","vx_vy_cut_pz_0p5","vx_vy_cut_pz_0p5_and_1","vx_vy_cut_pz_1","lxy_vz_cut_pt_0p5","lxy_vz_cut_pt_0p5_and_1","lxy_vz_cut_pt_1","lxy_vz_cut_pz_0p5","lxy_vz_cut_pz_0p5_and_1","lxy_vz_cut_pz_1"]
 
 #Non AntiS tracking efficiency:
-for parameter in ["pt","eta","phi","lxy","vz","dxy","pt_cut_eta_Lxy","lxy_cut_pt_eta","lxy_cut_pt_eta_dxy_dz","lxy_cut_tight_pt_eta","lxy_cut_pt_eta_purity_tight_high","lxy_cut_pt_eta_purity_loose_tight_high","lxy_cut_pt_eta_dxy_nPVs_1","lxy_cut_pt_eta_dxy_nPVs_smaller5","lxy_cut_pt_eta_dxy_nPVs_from5to10","lxy_cut_pt_eta_dxy_nPVs_from10to20","lxy_cut_pt_eta_dxy_nPVs_from20to30","lxy_cut_pt_eta_dxy_nPVs_larger30","eta_cut_pt_lxy"]:
+for parameter in ["pt","eta","phi","lxy","vz","dxy","pt_cut_eta_Lxy","lxy_cut_pt_eta","lxy_cut_pt_eta_dxy_dz","lxy_cut_tight_pt_eta","lxy_cut_pt_eta_purity_tight_high","lxy_cut_pt_eta_purity_loose_tight_high","lxy_cut_pt_eta_dxy_nPVs_1","lxy_cut_pt_eta_dxy_nPVs_smaller5","lxy_cut_pt_eta_dxy_nPVs_from5to10","lxy_cut_pt_eta_dxy_nPVs_from10to20","lxy_cut_pt_eta_dxy_nPVs_from20to30","lxy_cut_pt_eta_dxy_nPVs_larger30","eta_cut_pt_lxy","vz_cut_pt","vz_cut_pt_eta","vz_cut_pt_lxy","vz_cut_pt_lxy_pz","vz_cut_pt_dxy","vz_cut_pt_lxy_tight_eta","vz_cut_pt_dxy_tight_eta","vz_cut_pt_dxy_lxy",]:
 #for parameter in ["pt","eta","phi","lxy","vz","dxy","pt_cut_eta_Lxy","lxy_cut_pt_eta","lxy_cut_pt_eta_dxy","eta_cut_pt_lxy"]:
 	aNumAndDenomForEff.append([fIn.Get("AnalyzerGEN/TrackingEff/NonAntiSTracks/RECO/h_NonAntiSTrack_RECO_"+parameter),fIn.Get("AnalyzerGEN/TrackingEff/NonAntiSTracks/All/h_NonAntiSTrack_All_"+parameter)])
+
+
+#Non AntiS tracking specifically for checking the difference between the vz region of < 20 cm and > 20 cm
+for parameter in ["pt_cut_vzSmall","pz_cut_vzSmall","lxy_cut_vzSmall","dxy_cut_vzSmall","dz_cut_vzSmall","pt_cut_vzLarge","pz_cut_vzLarge","lxy_cut_vzLarge","dxy_cut_vzLarge","dz_cut_vzLarge","vz_cut_vzLarge"]:
+	aNumAndDenomForEff.append([fIn.Get("AnalyzerGEN/TrackingEff/NonAntiSTracks/RECO/TrackingEff_NonAntiS_RECO_vz_dependece/h_NonAntiSTrack_RECO_"+parameter),fIn.Get("AnalyzerGEN/TrackingEff/NonAntiSTracks/All/TrackingEff_NonAntiS_All_vz_dependece/h_NonAntiSTrack_All_"+parameter)])
+
+
+
 
 #daughters from AntiS-Ks tracking efficiency, only for charged granddaughters
 for parameter in standard_parameters:
@@ -49,6 +57,14 @@ for particle in ["KsNonAntiS","KsAntiS","AntiLambdaNonAntiS","AntiLambdaAntiS"]:
 		denom = "AnalyzerGEN/GENRECO/GENRECO_"+particle+"/GENRECO_All_"+particle+"/h_GENRECO_All_"+particle+"_"+parameter
         	aNumAndDenomForEff.append([fIn.Get(num),fIn.Get(denom)])
 		teff = TEfficiency(fIn.Get(num),fIn.Get(denom))
+
+for parameter in ["pt","eta","phi","vz","dxy"]:
+	print parameter
+	particle = "AntiS" 
+	num = "AnalyzerGEN/GENRECO/GENRECO_"+particle+"/GENRECO_RECO_"+particle+"/h_GENRECO_RECO_"+particle+"_"+parameter
+	denom = "AnalyzerGEN/GENRECO/GENRECO_"+particle+"/GENRECO_All_"+particle+"/h_GENRECO_All_"+particle+"_"+parameter
+	aNumAndDenomForEff.append([fIn.Get(num),fIn.Get(denom)])
+	teff = TEfficiency(fIn.Get(num),fIn.Get(denom))
 
 
 aTeff=[]

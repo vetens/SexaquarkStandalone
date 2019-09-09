@@ -70,6 +70,30 @@ void AnalyzerGEN::beginJob() {
      histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_pt_eta_dxy_nPVs_from20to30"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_lxy_cut_pt_eta_dxy_nPVs_from20to30", "; SIM track lxy(beamspot, SIM track vertex) (cm); #entries ",200,0,200);
      histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_pt_eta_dxy_nPVs_larger30"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_lxy_cut_pt_eta_dxy_nPVs_larger30", "; SIM track lxy(beamspot, SIM track vertex) (cm); #entries ",200,0,200);
      histos_th1f["h_NonAntiSTrack_RECO_eta_cut_pt_lxy"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_eta_cut_pt_lxy", "; SIM track #eta; #entries ",200,-10,10);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_eta"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_lxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy_pz"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_lxy_pz", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_dxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy_tight_eta"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_lxy_tight_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy_tight_eta"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_dxy_tight_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy_lxy"] = dir_TrackingEff_NonAntiS_RECO.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_pt_dxy_lxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     
+     TFileDirectory dir_TrackingEff_NonAntiS_RECO_vz_dependece = dir_TrackingEff_NonAntiS_RECO.mkdir("TrackingEff_NonAntiS_RECO_vz_dependece"); 
+     histos_th1f["h_NonAntiSTrack_RECO_pt_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_pt_cut_vzSmall", "; SIM track pt (GeV); #entries ",100,0,10);
+     histos_th1f["h_NonAntiSTrack_RECO_pz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_pz_cut_vzSmall", "; SIM track pz (GeV); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_lxy_cut_vzSmall", "; SIM track lxy (cm); #entries ",120,0,120);
+     histos_th1f["h_NonAntiSTrack_RECO_dxy_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_dxy_cut_vzSmall", "; SIM track dxy (cm); #entries ",100,-10,10);
+     histos_th1f["h_NonAntiSTrack_RECO_dz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_dz_cut_vzSmall", "; SIM track dz (cm); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_vzSmall", "; SIM track vz (cm); #entries ",20,-100,100);
+
+     histos_th1f["h_NonAntiSTrack_RECO_pt_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_pt_cut_vzLarge", "; SIM track pt (GeV); #entries ",100,0,10);
+     histos_th1f["h_NonAntiSTrack_RECO_pz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_pz_cut_vzLarge", "; SIM track pz (GeV); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_lxy_cut_vzLarge", "; SIM track lxy (cm); #entries ",120,0,120);
+     histos_th1f["h_NonAntiSTrack_RECO_dxy_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_dxy_cut_vzLarge", "; SIM track dxy (cm); #entries ",100,-10,10);
+     histos_th1f["h_NonAntiSTrack_RECO_dz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_dz_cut_vzLarge", "; SIM track dz (cm); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_RECO_vz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_RECO_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_RECO_vz_cut_vzLarge", "; SIM track vz (cm); #entries ",20,-100,100);
+
 
 
      TFileDirectory dir_TrackingEff_NonAntiS_All = dir_TrackingEff_NonAntiS.mkdir("All"); 
@@ -96,6 +120,29 @@ void AnalyzerGEN::beginJob() {
      histos_th1f["h_NonAntiSTrack_All_lxy_cut_pt_eta_dxy_nPVs_from20to30"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_lxy_cut_pt_eta_dxy_nPVs_from20to30", "; SIM track lxy(beamspot, SIM track vertex) (cm); #entries ",200,0,200);
      histos_th1f["h_NonAntiSTrack_All_lxy_cut_pt_eta_dxy_nPVs_larger30"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_lxy_cut_pt_eta_dxy_nPVs_larger30", "; SIM track lxy(beamspot, SIM track vertex) (cm); #entries ",200,0,200);
 histos_th1f["h_NonAntiSTrack_All_eta_cut_pt_lxy"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_eta_cut_pt_lxy", "; SIM track #eta; #entries ",200,-10,10);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_eta"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_lxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy_pz"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_lxy_pz", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_dxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy_tight_eta"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_lxy_tight_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy_tight_eta"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_dxy_tight_eta", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy_lxy"] = dir_TrackingEff_NonAntiS_All.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_pt_dxy_lxy", "; SIM track vz(SIM track vertex) (cm); #entries ",60,-300,300);
+
+     TFileDirectory dir_TrackingEff_NonAntiS_All_vz_dependece = dir_TrackingEff_NonAntiS_All.mkdir("TrackingEff_NonAntiS_All_vz_dependece"); 
+     histos_th1f["h_NonAntiSTrack_All_pt_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_pt_cut_vzSmall", "; SIM track pt (GeV); #entries ",100,0,10);
+     histos_th1f["h_NonAntiSTrack_All_pz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_pz_cut_vzSmall", "; SIM track pz (GeV); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_All_lxy_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_lxy_cut_vzSmall", "; SIM track lxy (cm); #entries ",120,0,120);
+     histos_th1f["h_NonAntiSTrack_All_dxy_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_dxy_cut_vzSmall", "; SIM track dxy (cm); #entries ",100,-10,10);
+     histos_th1f["h_NonAntiSTrack_All_dz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_dz_cut_vzSmall", "; SIM track dz (cm); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_vzSmall"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_vzSmall", "; SIM track vz (cm); #entries ",20,-100,100);
+
+     histos_th1f["h_NonAntiSTrack_All_pt_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_pt_cut_vzLarge", "; SIM track pt (GeV); #entries ",100,0,10);
+     histos_th1f["h_NonAntiSTrack_All_pz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_pz_cut_vzLarge", "; SIM track pz (GeV); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_All_lxy_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_lxy_cut_vzLarge", "; SIM track lxy (cm); #entries ",120,0,120);
+     histos_th1f["h_NonAntiSTrack_All_dxy_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_dxy_cut_vzLarge", "; SIM track dxy (cm); #entries ",100,-10,10);
+     histos_th1f["h_NonAntiSTrack_All_dz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_dz_cut_vzLarge", "; SIM track dz (cm); #entries ",100,-50,50);
+     histos_th1f["h_NonAntiSTrack_All_vz_cut_vzLarge"] = dir_TrackingEff_NonAntiS_All_vz_dependece.make<TH1F>(b+"h_NonAntiSTrack_All_vz_cut_vzLarge", "; SIM track vz (cm); #entries ",20,-100,100);
 
      TFileDirectory dir_TrackingEff_KsAntiS = dir_TrackingEff.mkdir("AntiSKsDaughterTracks"); 
      
@@ -576,7 +623,7 @@ void AnalyzerGEN::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
  
   //beamspot
   edm::Handle<reco::BeamSpot> h_bs;
-  //iEvent.getByToken(m_bsToken, h_bs);
+  iEvent.getByToken(m_bsToken, h_bs);
 
   //primary vertex
   edm::Handle<vector<reco::Vertex>> h_offlinePV;
@@ -627,15 +674,23 @@ void AnalyzerGEN::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
+  else{
+        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!beamspot collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+  }
+
+  if(!h_generalTracks.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!generalTracks collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
+  if(!h_TP.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackingParticles collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
+  if(!h_trackAssociator.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackAssociator collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
+
 
 //evaluate tracking performance
-//to speed up
-  /*
   if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid()){
 	for(size_t i=0; i<TPColl.size(); ++i) {
 	  //first investigate whether this tp is a dauhgter of an AntiS. You need this because these granddaughter tracks you want to investigate separately from the rest of the tracks. 
 	  const TrackingParticle& tp = TPColl[i];
-	  bool tpIsGrandDaughterAntiS = isTpGrandDaughterAntiS(TPColl, tp);
+	  bool tpIsGrandDaughterAntiS = false;
+	  std::vector<double> isTpGrandDaughterAntiSResult = AnalyzerAllSteps::isTpGrandDaughterAntiS(TPColl, tp);
+	  if(isTpGrandDaughterAntiSResult[0] > 0) tpIsGrandDaughterAntiS = true;
 	  //std::cout << "---------------------------" << std::endl;
 	  //std::cout << "tp pdgId: " << tp.pdgId() << std::endl;
 	  //std::cout << "tp is a granddaughter of an antiS " << tpIsGrandDaughterAntiS << std::endl;
@@ -667,7 +722,7 @@ void AnalyzerGEN::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
         
 	
 	  //now fill some catagory of plots: set of histograms for all charged tp (except for the granddaughters from the antiS) which got reconstructed and a set of histograms for all tp (excpet granddaughters from the antiS) --> get eff easily by dividing histos
-	  if(!tpIsGrandDaughterAntiS && tp.charge()!=0){
+	  if(!tpIsGrandDaughterAntiS && tp.charge()!=0 && abs(tp.eta()) < 2.5){
 		if(matchingTrackFound)FillHistosNonAntiSTracksRECO(tp, beamspot, nPVs, matchedTrackQuality);
 		FillHistosNonAntiSTracksAll(tp , beamspot,nPVs, matchedTrackQuality);
        	  }
@@ -675,7 +730,7 @@ void AnalyzerGEN::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
 	  if(tp.pdgId() == AnalyzerAllSteps::pdgIdAntiS)FillHistosAntiSTracks(tp, beamspot, TPColl,  h_TP, h_trackAssociator, h_generalTracks, h_V0Ks, h_V0L);
 	}
   }
-  */
+  
 
   int nAntiSThisEvent = 0;
   int nAntiSInteractThisEvent = 0;
@@ -765,6 +820,36 @@ void AnalyzerGEN::FillHistosNonAntiSTracksRECO(const TrackingParticle& tp, TVect
 	}
 	if(tp.pt() > 2. && abs(tp.eta()) < 1)histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_tight_pt_eta"]->Fill(Lxy);
 	if(tp.pt() > 0.9 && Lxy < 3.5) histos_th1f["h_NonAntiSTrack_RECO_eta_cut_pt_lxy"]->Fill(tp.eta());
+
+	//investigate inneficiency wrt vz
+	if(tp.pt() > 0.9) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(tp.eta()) < 1) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_eta"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5 && abs(tp.pz()) > 2) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy_pz"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5      && abs(tp.eta()) < 1 ) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_lxy_tight_eta"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1 && abs(tp.eta()) < 1 ) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy_tight_eta"]->Fill(tp.vz());
+
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1 && Lxy <3.5) histos_th1f["h_NonAntiSTrack_RECO_vz_cut_pt_dxy_lxy"]->Fill(tp.vz());
+
+	//to investigate inneficiency wrt vz check the difference between the trackcollections for |vz| < 20cm and |vz| > 20cm:
+	if(abs(tp.vz()) < 20 && tp.pt() > 0.9){
+		histos_th1f["h_NonAntiSTrack_RECO_pt_cut_vzSmall"]->Fill(tp.pt());
+		histos_th1f["h_NonAntiSTrack_RECO_pz_cut_vzSmall"]->Fill(tp.pz());
+		histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_vzSmall"]->Fill(Lxy);
+		histos_th1f["h_NonAntiSTrack_RECO_dxy_cut_vzSmall"]->Fill(dxy);
+		histos_th1f["h_NonAntiSTrack_RECO_dz_cut_vzSmall"]->Fill(dz);
+		histos_th1f["h_NonAntiSTrack_RECO_vz_cut_vzSmall"]->Fill(tp.vz());
+	}
+	else if(abs(tp.vz()) > 20 && tp.pt() > 2. && abs(tp.pz()) > 5. && Lxy < 20){
+		histos_th1f["h_NonAntiSTrack_RECO_pt_cut_vzLarge"]->Fill(tp.pt());
+		histos_th1f["h_NonAntiSTrack_RECO_pz_cut_vzLarge"]->Fill(tp.pz());
+		histos_th1f["h_NonAntiSTrack_RECO_lxy_cut_vzLarge"]->Fill(Lxy);
+		histos_th1f["h_NonAntiSTrack_RECO_dxy_cut_vzLarge"]->Fill(dxy);
+		histos_th1f["h_NonAntiSTrack_RECO_dz_cut_vzLarge"]->Fill(dz);
+		histos_th1f["h_NonAntiSTrack_RECO_vz_cut_vzLarge"]->Fill(tp.vz());
+	}
+
 }
 
 void AnalyzerGEN::FillHistosNonAntiSTracksAll(const TrackingParticle& tp, TVector3 beamspot, int nPVs, int matchedTrackQuality){
@@ -800,6 +885,34 @@ void AnalyzerGEN::FillHistosNonAntiSTracksAll(const TrackingParticle& tp, TVecto
  	}
 	if(tp.pt() > 2. && abs(tp.eta()) < 1)histos_th1f["h_NonAntiSTrack_All_lxy_cut_tight_pt_eta"]->Fill(Lxy);
 	if(tp.pt() > 0.9 && Lxy < 3.5) histos_th1f["h_NonAntiSTrack_All_eta_cut_pt_lxy"]->Fill(tp.eta());
+
+	//investigate inneficiency wrt vz (to check the cut off at 20cm)
+	if(tp.pt() > 0.9) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(tp.eta()) < 1) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_eta"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5 && abs(tp.pz()) > 2) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy_pz"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && Lxy < 3.5      && abs(tp.eta()) < 1 ) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_lxy_tight_eta"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1 && abs(tp.eta()) < 1 ) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy_tight_eta"]->Fill(tp.vz());
+	if(tp.pt() > 0.9 && abs(dxy) < 0.1 && Lxy < 3.5) histos_th1f["h_NonAntiSTrack_All_vz_cut_pt_dxy_lxy"]->Fill(tp.vz());
+	
+	//to investigate inneficiency wrt vz check the difference between the trackcollections for |vz| < 20cm and |vz| > 20cm:
+	if(abs(tp.vz()) < 20 && tp.pt() > 0.9){
+		histos_th1f["h_NonAntiSTrack_All_pt_cut_vzSmall"]->Fill(tp.pt());
+		histos_th1f["h_NonAntiSTrack_All_pz_cut_vzSmall"]->Fill(tp.pz());
+		histos_th1f["h_NonAntiSTrack_All_lxy_cut_vzSmall"]->Fill(Lxy);
+		histos_th1f["h_NonAntiSTrack_All_dxy_cut_vzSmall"]->Fill(dxy);
+		histos_th1f["h_NonAntiSTrack_All_dz_cut_vzSmall"]->Fill(dz);
+		histos_th1f["h_NonAntiSTrack_All_vz_cut_vzSmall"]->Fill(tp.vz());
+	}
+	else if(abs(tp.vz()) > 20 && tp.pt() > 2. && abs(tp.pz()) > 5. && Lxy < 20){
+		histos_th1f["h_NonAntiSTrack_All_pt_cut_vzLarge"]->Fill(tp.pt());
+		histos_th1f["h_NonAntiSTrack_All_pz_cut_vzLarge"]->Fill(tp.pz());
+		histos_th1f["h_NonAntiSTrack_All_lxy_cut_vzLarge"]->Fill(Lxy);
+		histos_th1f["h_NonAntiSTrack_All_dxy_cut_vzLarge"]->Fill(dxy);
+		histos_th1f["h_NonAntiSTrack_All_dz_cut_vzLarge"]->Fill(dz);
+		histos_th1f["h_NonAntiSTrack_All_vz_cut_vzLarge"]->Fill(tp.vz());
+	}
 	
 
 }
@@ -872,12 +985,12 @@ void AnalyzerGEN::FillHistosAntiSTracks(const TrackingParticle& tp, TVector3 bea
 			}	
 		}	
     	}
-  std::cout << "Ks, pi+ " << granddaughterTrackMatched[0] << std::endl; 
-  std::cout << "Ks, pi- " << granddaughterTrackMatched[1] << std::endl; 
-  std::cout << " L, p-  " << granddaughterTrackMatched[2] << std::endl; 
-  std::cout << " L, pi+ " << granddaughterTrackMatched[3] << std::endl; 
+  //std::cout << "Ks, pi+ " << granddaughterTrackMatched[0] << std::endl; 
+  //std::cout << "Ks, pi- " << granddaughterTrackMatched[1] << std::endl; 
+  //std::cout << " L, p-  " << granddaughterTrackMatched[2] << std::endl; 
+  //std::cout << " L, pi+ " << granddaughterTrackMatched[3] << std::endl; 
   
-  std::cout << "number of correct (=charged) granddaughters of this antiS: " << nCorrectGrandDaughters << std::endl;
+  //std::cout << "number of correct (=charged) granddaughters of this antiS: " << nCorrectGrandDaughters << std::endl;
   if(nCorrectGrandDaughters == 4)FillMajorEfficiencyPlot(granddaughterTrackMatched, matchedTrackPointerKsPosPion,matchedTrackPointerKsNegPion,matchedTrackPointerAntiLPosPion,matchedTrackPointerAntiLNegProton,h_V0Ks,h_V0L);
 
 }
@@ -1788,41 +1901,6 @@ void AnalyzerGEN::RecoEvaluationAntiS(const reco::Candidate  * genParticle, edm:
   }
 }
 
-bool AnalyzerGEN::isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp){
- bool tpIsGrandDaughterAntiS = false;
- if(abs(tp.pdgId()) == 211 || tp.pdgId() == - 2212){//found a charged pion or antiproton
-
-	double granddaughterVx = tp.vx();double granddaughterVy = tp.vy();double granddaughterVz = tp.vz();
-
-	for(size_t j=0; j<TPColl.size(); ++j) {//now find the daughters which have a decay vertex = the production vertex of the granddaughters
-		if(tpIsGrandDaughterAntiS)continue;//can skip it was already found in a previous loop
-     		const TrackingParticle& tp_daughter = TPColl[j];
-
-		if(abs(tp_daughter.pdgId()) == 310 || tp_daughter.pdgId() == -3122){//daughter has to be a Ks or Lambda
-
-			tv_iterator tp_daughter_firstDecayVertex = tp_daughter.decayVertices_begin();
-			double daughterdecayVx = (**tp_daughter_firstDecayVertex).position().X(); double daughterdecayVy = (**tp_daughter_firstDecayVertex).position().Y(); double daughterdecayVz = (**tp_daughter_firstDecayVertex).position().Z();	
-
-		 	if(granddaughterVx == daughterdecayVx && granddaughterVy == daughterdecayVy && granddaughterVz == daughterdecayVz){//daughter decay vertex has to match the granddaughter creation vertex
-				for(size_t k=0; k<TPColl.size(); ++k) {//loop to find the antiS
-					if(tpIsGrandDaughterAntiS)continue;//can skip it was already found in a previous loop
-					const TrackingParticle& tp_S = TPColl[k];
-					if(tp_S.pdgId() == -1020000020){//found the S
-						tv_iterator tp_S_firstDecayVertex = tp_S.decayVertices_begin();
-						double SdecayVx = (**tp_S_firstDecayVertex).position().X(); double SdecayVy = (**tp_S_firstDecayVertex).position().Y();double SdecayVz = (**tp_S_firstDecayVertex).position().Z();
-						if(tp_daughter.vx() == SdecayVx && tp_daughter.vy() == SdecayVy && tp_daughter.vz() == SdecayVz){
-							tpIsGrandDaughterAntiS = true;
-						}
-					}//end if antiS
-				}//end loop over the tp to find the antiS
-			}//end check if granddaughter vertex matches the the daughter decay vertex	
-		}//end check for pdgId daughter
-	}//end loop over tp to find daughters
-   }//end check of granddaughter pdgId
- 
- return tpIsGrandDaughterAntiS;
-
-}
 
 
 

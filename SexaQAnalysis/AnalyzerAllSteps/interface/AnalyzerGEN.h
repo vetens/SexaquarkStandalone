@@ -14,7 +14,6 @@ class AnalyzerGEN : public edm::EDAnalyzer
     virtual void endJob();
     virtual ~AnalyzerGEN();
 
-    bool isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp);
 
     void FillHistosNonAntiSTracksRECO(const TrackingParticle& tp, TVector3 beamspot, int nPVs, int matchedTrackQuality);
     void FillHistosNonAntiSTracksAll(const TrackingParticle& tp, TVector3 beamspot, int nPVs, int matchedTrackQuality);

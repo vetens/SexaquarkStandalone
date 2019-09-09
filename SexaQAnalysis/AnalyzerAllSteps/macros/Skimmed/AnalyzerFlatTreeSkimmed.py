@@ -1,4 +1,5 @@
 from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas
+import numpy as np
 
 #fIn = TFile('/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_7/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_TrackMatchingOnHits.root', 'read')
 fIns = [
@@ -12,6 +13,7 @@ OutputFileName = 'macroFlatTree.root'
 h_antiS_mass = TH1F('h_antiS_mass','; #bar{S} mass (GeV); #Entries',200,0,20)
 h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{t} (GeV); #Entries',200,0,20)
 h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV); #Entries',100,0,100)
+h_antiS_p = TH1F('h_antiS_p','; #bar{S} |p| (GeV); #Entries',100,0,100)
 h2_antiS_pt_pz = TH2F('h2_antiS_pt_pz','; #bar{S} p_{t} (GeV);#bar{S} |p_{z}| (GeV); #Entries',100,0,10,100,0,100)
 h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; #Entries',160,-8,8)
 h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} interaction vertex l_{0} (cm) ; #Entries',100,0,10)
@@ -42,6 +44,7 @@ for fIn in fIns:
 		h_antiS_mass.Fill(tree._S_mass[0])
 		h_antiS_pt.Fill(tree._S_pt[0])
 		h_antiS_pz.Fill(abs(tree._S_pz[0]))
+		h_antiS_p.Fill(np.sqrt(tree._S_pt[0]*tree._S_pt[0]+tree._S_pz[0]*tree._S_pz[0]))
 		h2_antiS_pt_pz.Fill(tree._S_pt[0],abs(tree._S_pz[0]))
 		h_antiS_eta.Fill(tree._S_eta[0])
 		h_antiS_lxy.Fill(tree._S_lxy_interaction_vertex[0])	
@@ -83,6 +86,10 @@ c_antiS_pt.Write()
 c_antiS_pz = TCanvas("c_antiS_pz","");
 h_antiS_pz.DrawNormalized()
 c_antiS_pz.Write()
+
+c_antiS_p = TCanvas("c_antiS_p","");
+h_antiS_p.DrawNormalized()
+c_antiS_p.Write()
 
 c_antiS_eta = TCanvas("c_antiS_eta","");
 h_antiS_eta.DrawNormalized()

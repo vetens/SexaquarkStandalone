@@ -7,7 +7,7 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 using namespace edm;
 using namespace std; 
 class FlatTreeProducerV0s : public edm::EDAnalyzer
@@ -18,8 +18,8 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
     bool IsolationCriterium(reco::Muon muon);
-    void FillBranchesKs(const reco::VertexCompositeCandidate * Ks, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV);    
-    void FillBranchesLambda(const reco::VertexCompositeCandidate * Lambda, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV);    
+    void FillBranchesKs(const reco::VertexCompositeCandidate * Ks, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<View<reco::Track>> h_generalTracks);    
+    void FillBranchesLambda(const reco::VertexCompositeCandidate * Lambda, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles);    
 
 
   private:
@@ -38,8 +38,11 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     void InitKs();
     void InitLambda();
     void InitZ();
+    void InitPV();
+    void InitBeamspot();
 
     edm::Service<TFileService> m_fs;
+
  
     edm::InputTag m_bsTag;
     edm::InputTag m_offlinePVTag;
@@ -68,11 +71,26 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     TTree* _tree_Ks;   
     TTree* _tree_Lambda;   
     TTree* _tree_Z;   
+    TTree* _tree_PV;
+    TTree* _tree_beamspot;
 
     //definition of variables which should go to tree
-    std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy,_Ks_dz,_Ks_dz_min,_Ks_dz_PV;
-    std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy,_Lambda_dz,_Lambda_dz_min,_Lambda_dz_PV;
-    std::vector<float> _Z_mass;
+    std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy_beamspot,_Ks_dxy_min_PV,_Ks_dxy_PV0,_Ks_dxy_000,_Ks_dz_beamspot,_Ks_dz_min_PV,_Ks_dz_PV0,_Ks_dz_000,_Ks_vz_dz_min_PV;
+    std::vector<float> _Ks_deltaRBestMatchingGENParticle,_Ks_trackPair_mindeltaR,_Ks_trackPair_mass,_Ks_Track1Track2_openingsAngle, _Ks_Track1Track2_deltaR,_Ks_Track1_openingsAngle,_Ks_Track2_openingsAngle,_Ks_Track1_deltaR,_Ks_Track2_deltaR;
+    std::vector<float> _Ks_daughterTrack1_eta,_Ks_daughterTrack1_phi,_Ks_daughterTrack1_pt,_Ks_daughterTrack1_pz,_Ks_daughterTrack1_dxy,_Ks_daughterTrack1_dz,_Ks_daughterTrack1_charge,_Ks_daughterTrack1_chi2,_Ks_daughterTrack1_ndof;
+    std::vector<float> _Ks_daughterTrack2_eta,_Ks_daughterTrack2_phi,_Ks_daughterTrack2_pt,_Ks_daughterTrack2_pz,_Ks_daughterTrack2_dxy,_Ks_daughterTrack2_dz,_Ks_daughterTrack2_charge,_Ks_daughterTrack2_chi2,_Ks_daughterTrack2_ndof;
+ 
+   std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy,_Lambda_dxy_min_PV,_Lambda_dxy_PV0,_Lambda_dxy_000,_Lambda_dz_beamspot,_Lambda_dz_min_PV,_Lambda_dz_PV0,_Lambda_dz_000,_Lambda_vz_dz_min_PV;
+
+
+    std::vector<float> _Z_mass,_Z_dz_PV_muon1,_Z_dz_PV_muon2,_Z_ptMuMu;
+    std::vector<float> _PV_n,_PV0_lxy,_PV0_vz;
+    std::vector<float> _beampot_lxy,_beampot_vz;
+
+   
+
+
+
 
      };
 

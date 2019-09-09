@@ -17,9 +17,14 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
   private:
     int nTotalGENS=0;
     int nTotalUniqueGenS=0;
+    int nTotalUniqueGenSWithEtaSmallerThan4=0;
     int nTotalGiving2DaughtersGENS=0;
+    int nTotalGiving0DaughtersGENSWithEtaSmallerThan4=0;
+    int nTotalGiving1DaughtersGENSWithEtaSmallerThan4=0;
+    int nTotalGiving2DaughtersGENSWithEtaSmallerThan4=0;
     int nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS=0;
     int nTotalCorrectGENS=0;
+    int nTotalCorrectGENSInteractingInBeampipe=0;
     int nTotalGENSPosEta=0;
     int nTotalGENSNegEta=0;
     bool m_lookAtAntiS;
@@ -58,11 +63,13 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     //definition of variables which should go to _tree
     std::vector<float> _S_n_loops;
     std::vector<float> _S_charge;
-    std::vector<float> _S_lxy_interaction_vertex, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_chi2_ndof;
-    std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
+    std::vector<float> _S_lxy_interaction_vertex, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_Mt,_S_chi2_ndof;
+    std::vector<float> _n_M, _n_p;
+    std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_sumDaughters_openingsangle,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy;
     std::vector<float> _S_dxy_over_lxy,_Ks_dxy_over_lxy,_Lambda_dxy_over_lxy;
     std::vector<float> _S_dz,_Ks_dz,_Lambda_dz,_S_dz_min,_Ks_dz_min,_Lambda_dz_min;
+    std::vector<float> _deltaR_sumDaughterMomenta_antiSMomentum; 
     std::vector<float> _S_pt,_Ks_pt,_Lambda_pt;
     std::vector<float> _S_pz,_Ks_pz,_Lambda_pz;
     std::vector<float> _S_vx_interaction_vertex,_S_vy_interaction_vertex,_S_vz_interaction_vertex;

@@ -93,6 +93,9 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     const static int pdgIdPosPion = 211;
     const static int pdgIdNegPion = -211;
 
+    //some pdg masses
+    static constexpr double pdgMassChargedPion = 0.13957061;
+
     double static openings_angle(reco::Candidate::Vector momentum1, reco::Candidate::Vector momentum2);
     double static deltaR(double phi1, double eta1, double phi2, double eta2);
     double static lxy(TVector3 v1, TVector3 v2);
@@ -109,6 +112,7 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     double static sgn(double input);
     int static getDaughterParticlesTypes(const reco::Candidate * genParticle);
     int static trackQualityAsInt(const reco::Track *track);
+    std::vector<double> static isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp);
      };
 
 #endif

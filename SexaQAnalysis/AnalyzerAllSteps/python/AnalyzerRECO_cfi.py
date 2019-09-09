@@ -7,6 +7,6 @@ AnalyzerRECO = cms.EDAnalyzer('AnalyzerRECO',
     offlinePV = cms.InputTag("offlinePrimaryVertices","","RECO"),
     generalTracksCollection =  cms.InputTag("generalTracks","","RECO"),
     sexaqCandidates = cms.InputTag("lambdaKshortVertexFilter", "sParticles","SEXAQ"),
-    V0KsCollection = cms.InputTag("generalV0Candidates","Kshort","RECO"),
-    V0LCollection = cms.InputTag("generalV0Candidates","Lambda","RECO")
+    V0KsCollection = cms.InputTag("generalV0Candidates","Kshort","SEXAQ"),
+    V0LCollection = cms.InputTag("generalV0Candidates","Lambda","SEXAQ")
 )

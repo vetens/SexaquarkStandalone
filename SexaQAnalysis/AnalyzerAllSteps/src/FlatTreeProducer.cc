@@ -94,6 +94,11 @@ void FlatTreeProducer::beginJob() {
 	_tree->Branch("_S_vy",&_S_vy);
 	_tree->Branch("_S_vz",&_S_vz);
 
+	_tree->Branch("_Lambda_mass",&_Lambda_mass);
+	_tree->Branch("_Ks_mass",&_Ks_mass);
+
+        _tree_counter = fs->make <TTree>("FlatTreeCounter","tree_counter");
+	_tree_counter->Branch("_nGENAntiSWithCorrectGranddaughters",&_nGENAntiSWithCorrectGranddaughters);
 
 
 }
@@ -103,7 +108,7 @@ void FlatTreeProducer::analyze(edm::Event const& iEvent, edm::EventSetup const& 
 
   //beamspot
   edm::Handle<reco::BeamSpot> h_bs;
-  //iEvent.getByToken(m_bsToken, h_bs);
+  iEvent.getByToken(m_bsToken, h_bs);
 
   //primary vertex
   edm::Handle<vector<reco::Vertex>> h_offlinePV;
@@ -135,14 +140,15 @@ void FlatTreeProducer::analyze(edm::Event const& iEvent, edm::EventSetup const& 
 
 
   //beamspot
-  TVector3 beamspot(0,0,0);
-  TVector3 beamspotVariance(0,0,0);
+  TVector3 beamspot(999999,999999,999999);
+  TVector3 beamspotVariance(999999,999999,999999);
   if(h_bs.isValid()){  
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
 
-
+  int nGENAntiSWithCorrectGranddaughtersThisEvent = 0;
+  
   //in case of data: just fill the flatTree with data from all the reconstructed S particles.
   if(m_runningOnData){
 	  //loop over the RECO AntiS to plot the kinematics
@@ -175,13 +181,20 @@ void FlatTreeProducer::analyze(edm::Event const& iEvent, edm::EventSetup const& 
 				if(genParticle->daughter(0)->numberOfDaughters()==2 && genParticle->daughter(1)->numberOfDaughters()==2 && daughterParticlesTypes == 3){
 					int graddaughters0ParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle->daughter(0));
 					int graddaughters1ParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle->daughter(1));
-					if(genParticleIsAntiS && ((graddaughters0ParticlesTypes == 1 && graddaughters1ParticlesTypes == 2) || (graddaughters1ParticlesTypes == 1 && graddaughters0ParticlesTypes == 2))){ FindRecoAntiS(genParticle,h_sCands,beamspot, beamspotVariance, h_offlinePV);}
+					if(genParticleIsAntiS && ((graddaughters0ParticlesTypes == 1 && graddaughters1ParticlesTypes == 2) || (graddaughters1ParticlesTypes == 1 && graddaughters0ParticlesTypes == 2))){ 
+						nGENAntiSWithCorrectGranddaughters++;	
+						nGENAntiSWithCorrectGranddaughtersThisEvent++;
+						FindRecoAntiS(genParticle,h_sCands,beamspot, beamspotVariance, h_offlinePV);
+					}
 				}
 			}
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
 	  }//if(h_genParticles.isValid())
   }
 
+  Init_Counter();
+  _nGENAntiSWithCorrectGranddaughters.push_back(nGENAntiSWithCorrectGranddaughtersThisEvent);
+  _tree_counter->Fill();
 
  } //end of analyzer
 
@@ -291,7 +304,8 @@ void FlatTreeProducer::FillBranches(const reco::VertexCompositeCandidate * RECO_
 
 
 	//if the RECO S particle fails one of the below cuts than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice.
-	if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut || RECO_Smass < 0.)return;
+	//if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut || RECO_Smass < 0.)return;
+	if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut )return;
 
 
 	nSavedRECOS++;
@@ -352,6 +366,9 @@ void FlatTreeProducer::FillBranches(const reco::VertexCompositeCandidate * RECO_
 	_S_vy.push_back(RECO_S->vy());	
 	_S_vz.push_back(RECO_S->vz());	
 
+	_Lambda_mass.push_back(RECO_S->daughter(0)->mass());
+	_Ks_mass.push_back(RECO_S->daughter(1)->mass());
+
   	_tree->Fill();
 
 }
@@ -397,6 +414,7 @@ FlatTreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 FlatTreeProducer::~FlatTreeProducer()
 {
 	if(m_lookAtAntiS){
+			std::cout << "The total number of GEN anti-S with all correct granddaughters: " << nGENAntiSWithCorrectGranddaughters << std::endl;
 			std::cout << "The total number RECO anti-S that were found is: " << nTotalRECOS << std::endl; 
 			std::cout << "The total number RECO anti-S that were saved is: " << nSavedRECOS << std::endl; 
 	}
@@ -407,9 +425,12 @@ FlatTreeProducer::~FlatTreeProducer()
 	std::cout << "saved/found = " << (double)nSavedRECOS/(double)nTotalRECOS << std::endl;
 }
 
+void FlatTreeProducer::Init_Counter()
+{
+	_nGENAntiSWithCorrectGranddaughters.clear();
+}
 
-void
-FlatTreeProducer::Init()
+void FlatTreeProducer::Init()
 {
 
 
@@ -466,6 +487,9 @@ FlatTreeProducer::Init()
 	_S_vx.clear();
 	_S_vy.clear();
 	_S_vz.clear();
+
+	_Lambda_mass.clear();
+	_Ks_mass.clear();
 
 
 }
