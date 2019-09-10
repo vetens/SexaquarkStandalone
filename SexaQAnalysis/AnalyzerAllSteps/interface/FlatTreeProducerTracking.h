@@ -24,8 +24,8 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
 
 
     void FillTreesTracks(const TrackingParticle& tp, TVector3 beamspot, int nPVs, const reco::Track *matchedTrackPointer, bool matchingTrackFound, std::vector<double> tpIsGrandDaughterAntiS);
-
-
+    void FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl);
+    void FillFlatTreeTpsAntiS(TVector3 beamspot, TrackingParticle trackingParticle, bool RECOFound, int type);
 
  //   void FillHistosNonAntiSTracksAll(const TrackingParticle& tp, TVector3 beamspot, int nPVs, int matchedTrackQuality);
     void FillHistosAntiSTracks(const TrackingParticle& tp, TVector3 beamspot, TrackingParticleCollection const & TPColl, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L);
@@ -51,10 +51,15 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
 
 
   private:
+
+    int numberOfAntiSWithCorrectGranddaughters = 0;
+    int totalNumberOfAntiSWhichInteract = 0;
+
     //---- configurable parameters --------
     bool m_lookAtAntiS;
 
     void InitTracking();
+    void InitTrackingAntiS();
     
     edm::Service<TFileService> m_fs;
  
@@ -90,7 +95,9 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     std::vector<float> _matchedTrack_pt,_matchedTrack_eta,_matchedTrack_phi,_matchedTrack_pz,_matchedTrack_chi2,_matchedTrack_ndof,_matchedTrack_dxy_beamspot,_matchedTrack_dz_beamspot;
     std::vector<int> _matchedTrack_trackQuality,_matchedTrack_charge,_matchedTrack_isLooper;
 
-
+    TTree* _tree_tpsAntiS;
+    std::vector<float> _tpsAntiS_pt,_tpsAntiS_eta,_tpsAntiS_phi,_tpsAntiS_pz,_tpsAntiS_Lxy_beamspot,_tpsAntiS_vz_beamspot,_tpsAntiS_dxy_beamspot,_tpsAntiS_dz_beamspot,_tpsAntiS_numberOfTrackerLayers,_tpsAntiS_charge,_tpsAntiS_reconstructed;
+    std::vector<int> _tpsAntiS_type,_tpsAntiS_pdgId;
 
      };
 

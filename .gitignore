@@ -10,3 +10,4 @@ __init__.py
 password
 crab_*
 crab.log
+*.sh.*

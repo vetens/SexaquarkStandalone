@@ -84,8 +84,11 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Ks->Branch("_Ks_daughterTrack1_phi",&_Ks_daughterTrack1_phi);
 	_tree_Ks->Branch("_Ks_daughterTrack1_pt",&_Ks_daughterTrack1_pt);
 	_tree_Ks->Branch("_Ks_daughterTrack1_pz",&_Ks_daughterTrack1_pz);
-	_tree_Ks->Branch("_Ks_daughterTrack1_dxy",&_Ks_daughterTrack1_dxy);
-	_tree_Ks->Branch("_Ks_daughterTrack1_dz",&_Ks_daughterTrack1_dz);
+	_tree_Ks->Branch("_Ks_daughterTrack1_dxy_beamspot",&_Ks_daughterTrack1_dxy_beamspot);
+	_tree_Ks->Branch("_Ks_daughterTrack1_dz_beamspot",&_Ks_daughterTrack1_dz_beamspot);
+	_tree_Ks->Branch("_Ks_daughterTrack1_dz_min_PV",&_Ks_daughterTrack1_dz_min_PV);
+	_tree_Ks->Branch("_Ks_daughterTrack1_dz_PV0",&_Ks_daughterTrack1_dz_PV0);
+	_tree_Ks->Branch("_Ks_daughterTrack1_dz_000",&_Ks_daughterTrack1_dz_000);
 
 	_tree_Ks->Branch("_Ks_daughterTrack2_charge",&_Ks_daughterTrack2_charge);
 	_tree_Ks->Branch("_Ks_daughterTrack2_chi2",&_Ks_daughterTrack2_chi2);
@@ -94,9 +97,11 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Ks->Branch("_Ks_daughterTrack2_phi",&_Ks_daughterTrack2_phi);
 	_tree_Ks->Branch("_Ks_daughterTrack2_pt",&_Ks_daughterTrack2_pt);
 	_tree_Ks->Branch("_Ks_daughterTrack2_pz",&_Ks_daughterTrack2_pz);
-	_tree_Ks->Branch("_Ks_daughterTrack2_dxy",&_Ks_daughterTrack2_dxy);
-	_tree_Ks->Branch("_Ks_daughterTrack2_dz",&_Ks_daughterTrack2_dz);
-
+	_tree_Ks->Branch("_Ks_daughterTrack2_dxy_beamspot",&_Ks_daughterTrack2_dxy_beamspot);
+	_tree_Ks->Branch("_Ks_daughterTrack2_dz_beamspot",&_Ks_daughterTrack2_dz_beamspot);
+	_tree_Ks->Branch("_Ks_daughterTrack2_dz_min_PV",&_Ks_daughterTrack2_dz_min_PV);
+	_tree_Ks->Branch("_Ks_daughterTrack2_dz_PV0",&_Ks_daughterTrack2_dz_PV0);
+	_tree_Ks->Branch("_Ks_daughterTrack2_dz_000",&_Ks_daughterTrack2_dz_000);
 
 	//for the Lambda
         _tree_Lambda = fs->make <TTree>("FlatTreeLambda","treeLambda");
@@ -420,7 +425,21 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
 	double deltaRTrack1Ks = AnalyzerAllSteps::deltaR(RECOKs->daughter(0)->phi(),RECOKs->daughter(0)->eta(),RECOKs->phi(),RECOKs->eta());
 	double deltaRTrack2Ks = AnalyzerAllSteps::deltaR(RECOKs->daughter(1)->phi(),RECOKs->daughter(1)->eta(),RECOKs->phi(),RECOKs->eta());
 
-	
+	TVector3 KsTrack1creationVertex(RECOKs->daughter(0)->vx(),RECOKs->daughter(0)->vy(),RECOKs->daughter(0)->vz());
+        TVector3 KsTrack1Momentum(RECOKs->daughter(0)->px(),RECOKs->daughter(0)->py(),RECOKs->daughter(0)->pz());
+	double dxy_Track1Ks_beamspot = AnalyzerAllSteps::dxy_signed_line_point(KsTrack1creationVertex,KsTrack1Momentum,beamspot);	
+        double dz_Track1Ks_beamspot = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,beamspot);
+        double dz_Track1Ks_min_PV = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,PVmin);
+        double dz_Track1Ks_PV0 = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,PV0);
+        double dz_Track1Ks_000 = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,ZeroZeroZero);
+
+	TVector3 KsTrack2creationVertex(RECOKs->daughter(1)->vx(),RECOKs->daughter(1)->vy(),RECOKs->daughter(1)->vz());
+        TVector3 KsTrack2Momentum(RECOKs->daughter(1)->px(),RECOKs->daughter(1)->py(),RECOKs->daughter(1)->pz());
+	double dxy_Track2Ks_beamspot = AnalyzerAllSteps::dxy_signed_line_point(KsTrack2creationVertex,KsTrack2Momentum,beamspot);	
+        double dz_Track2Ks_beamspot = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,beamspot);
+        double dz_Track2Ks_min_PV = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,PVmin);
+        double dz_Track2Ks_PV0 = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,PV0);
+        double dz_Track2Ks_000 = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,ZeroZeroZero);
 
 	//_Ks_trackPair_mindeltaR.push_back(deltaRRecoKsTrackPair);
 	_Ks_trackPair_mass.push_back(p4bestTrackPair.M());
@@ -447,8 +466,11 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
 	_Ks_daughterTrack1_phi.push_back(RECOKs->daughter(0)->phi());
 	_Ks_daughterTrack1_pt.push_back(RECOKs->daughter(0)->pt());
 	_Ks_daughterTrack1_pz.push_back(RECOKs->daughter(0)->pz());
-	//_Ks_daughterTrack1_dxy.push_back(RECOKs->daughter(0)->dxy(beamspotPoint));
-	//_Ks_daughterTrack1_dz.push_back(RECOKs->daughter(0)->dsz(beamspotPoint));
+	_Ks_daughterTrack1_dxy_beamspot.push_back(dxy_Track1Ks_beamspot);
+	_Ks_daughterTrack1_dz_beamspot.push_back(dz_Track1Ks_beamspot);
+	_Ks_daughterTrack1_dz_min_PV.push_back(dz_Track1Ks_min_PV);
+	_Ks_daughterTrack1_dz_PV0.push_back(dz_Track1Ks_PV0);
+	_Ks_daughterTrack1_dz_000.push_back(dz_Track1Ks_000);
 
 	_Ks_daughterTrack2_charge.push_back(RECOKs->daughter(1)->charge());
 	//_Ks_daughterTrack2_chi2.push_back(RECOKs->daughter(1)->chi2());
@@ -457,8 +479,11 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
 	_Ks_daughterTrack2_phi.push_back(RECOKs->daughter(1)->phi());
 	_Ks_daughterTrack2_pt.push_back(RECOKs->daughter(1)->pt());
 	_Ks_daughterTrack2_pz.push_back(RECOKs->daughter(1)->pz());
-	//_Ks_daughterTrack2_dxy.push_back(RECOKs->daughter(1)->dxy(beamspotPoint));
-	//_Ks_daughterTrack2_dz.push_back(RECOKs->daughter(1)->dsz(beamspotPoint));
+	_Ks_daughterTrack2_dxy_beamspot.push_back(dxy_Track2Ks_beamspot);
+	_Ks_daughterTrack2_dz_beamspot.push_back(dz_Track2Ks_beamspot);
+	_Ks_daughterTrack2_dz_min_PV.push_back(dz_Track2Ks_min_PV);
+	_Ks_daughterTrack2_dz_PV0.push_back(dz_Track2Ks_PV0);
+	_Ks_daughterTrack2_dz_000.push_back(dz_Track2Ks_000);
 
 	
 
@@ -619,8 +644,12 @@ void FlatTreeProducerV0s::InitKs()
 	_Ks_daughterTrack1_phi.clear();	
 	_Ks_daughterTrack1_pt.clear();	
 	_Ks_daughterTrack1_pz.clear();	
-	_Ks_daughterTrack1_dxy.clear();	
-	_Ks_daughterTrack1_dz.clear();	
+        _Ks_daughterTrack1_dxy_beamspot.clear();
+        _Ks_daughterTrack1_dz_beamspot.clear();
+        _Ks_daughterTrack1_dz_min_PV.clear();
+        _Ks_daughterTrack1_dz_PV0.clear();
+        _Ks_daughterTrack1_dz_000.clear();
+
 
 
 	_Ks_daughterTrack2_charge.clear();
@@ -630,8 +659,11 @@ void FlatTreeProducerV0s::InitKs()
 	_Ks_daughterTrack2_phi.clear();	
 	_Ks_daughterTrack2_pt.clear();	
 	_Ks_daughterTrack2_pz.clear();	
-	_Ks_daughterTrack2_dxy.clear();	
-	_Ks_daughterTrack2_dz.clear();	
+        _Ks_daughterTrack2_dxy_beamspot.clear();
+        _Ks_daughterTrack2_dz_beamspot.clear();
+        _Ks_daughterTrack2_dz_min_PV.clear();
+        _Ks_daughterTrack2_dz_PV0.clear();
+        _Ks_daughterTrack2_dz_000.clear();
 }
 
 void FlatTreeProducerV0s::InitLambda()

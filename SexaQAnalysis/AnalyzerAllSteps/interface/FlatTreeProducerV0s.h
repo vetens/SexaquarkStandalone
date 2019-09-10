@@ -77,8 +77,9 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     //definition of variables which should go to tree
     std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy_beamspot,_Ks_dxy_min_PV,_Ks_dxy_PV0,_Ks_dxy_000,_Ks_dz_beamspot,_Ks_dz_min_PV,_Ks_dz_PV0,_Ks_dz_000,_Ks_vz_dz_min_PV;
     std::vector<float> _Ks_deltaRBestMatchingGENParticle,_Ks_trackPair_mindeltaR,_Ks_trackPair_mass,_Ks_Track1Track2_openingsAngle, _Ks_Track1Track2_deltaR,_Ks_Track1_openingsAngle,_Ks_Track2_openingsAngle,_Ks_Track1_deltaR,_Ks_Track2_deltaR;
-    std::vector<float> _Ks_daughterTrack1_eta,_Ks_daughterTrack1_phi,_Ks_daughterTrack1_pt,_Ks_daughterTrack1_pz,_Ks_daughterTrack1_dxy,_Ks_daughterTrack1_dz,_Ks_daughterTrack1_charge,_Ks_daughterTrack1_chi2,_Ks_daughterTrack1_ndof;
-    std::vector<float> _Ks_daughterTrack2_eta,_Ks_daughterTrack2_phi,_Ks_daughterTrack2_pt,_Ks_daughterTrack2_pz,_Ks_daughterTrack2_dxy,_Ks_daughterTrack2_dz,_Ks_daughterTrack2_charge,_Ks_daughterTrack2_chi2,_Ks_daughterTrack2_ndof;
+    std::vector<float> _Ks_daughterTrack1_eta,_Ks_daughterTrack1_phi,_Ks_daughterTrack1_pt,_Ks_daughterTrack1_pz,_Ks_daughterTrack1_dxy,_Ks_daughterTrack1_dz,_Ks_daughterTrack1_charge,_Ks_daughterTrack1_chi2,_Ks_daughterTrack1_ndof,_Ks_daughterTrack1_dxy_beamspot,_Ks_daughterTrack1_dz_beamspot,_Ks_daughterTrack1_dz_min_PV,_Ks_daughterTrack1_dz_PV0,_Ks_daughterTrack1_dz_000;
+    std::vector<float> _Ks_daughterTrack2_eta,_Ks_daughterTrack2_phi,_Ks_daughterTrack2_pt,_Ks_daughterTrack2_pz,_Ks_daughterTrack2_charge,_Ks_daughterTrack2_chi2,_Ks_daughterTrack2_ndof,_Ks_daughterTrack2_dxy_beamspot,_Ks_daughterTrack2_dz_beamspot,_Ks_daughterTrack2_dz_min_PV,_Ks_daughterTrack2_dz_PV0,_Ks_daughterTrack2_dz_000;
+
  
    std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy,_Lambda_dxy_min_PV,_Lambda_dxy_PV0,_Lambda_dxy_000,_Lambda_dz_beamspot,_Lambda_dz_min_PV,_Lambda_dz_PV0,_Lambda_dz_000,_Lambda_vz_dz_min_PV;
 
