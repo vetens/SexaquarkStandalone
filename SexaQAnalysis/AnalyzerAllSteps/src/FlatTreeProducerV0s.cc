@@ -113,7 +113,7 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_vz",&_Lambda_vz);
 	_tree_Lambda->Branch("_Lambda_eta",&_Lambda_eta);
 	_tree_Lambda->Branch("_Lambda_phi",&_Lambda_phi);
-	_tree_Lambda->Branch("_Lambda_dxy",&_Lambda_dxy);
+	_tree_Lambda->Branch("_Lambda_dxy_beamspot",&_Lambda_dxy_beamspot);
 	_tree_Lambda->Branch("_Lambda_dxy_min_PV",&_Lambda_dxy_min_PV);
 	_tree_Lambda->Branch("_Lambda_dxy_PV0",&_Lambda_dxy_PV0);
 	_tree_Lambda->Branch("_Lambda_dxy_000",&_Lambda_dxy_000);
@@ -124,26 +124,67 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_dz_PV0",&_Lambda_dz_PV0);
 	_tree_Lambda->Branch("_Lambda_dz_000",&_Lambda_dz_000);
 	_tree_Lambda->Branch("_Lambda_vz_dz_min_PV",&_Lambda_vz_dz_min_PV);
+	_tree_Lambda->Branch("_Lambda_deltaRBestMatchingGENParticle",&_Lambda_deltaRBestMatchingGENParticle);
+
+	_tree_Lambda->Branch("_Lambda_trackPair_mindeltaR",&_Lambda_trackPair_mindeltaR);
+	_tree_Lambda->Branch("_Lambda_trackPair_mass",&_Lambda_trackPair_mass);
+
+	_tree_Lambda->Branch("_Lambda_Track1Track2_openingsAngle",&_Lambda_Track1Track2_openingsAngle);
+	_tree_Lambda->Branch("_Lambda_Track1Track2_deltaR",&_Lambda_Track1Track2_deltaR);
+
+	_tree_Lambda->Branch("_Lambda_Track1_openingsAngle",&_Lambda_Track1_openingsAngle);
+	_tree_Lambda->Branch("_Lambda_Track2_openingsAngle",&_Lambda_Track2_openingsAngle);
+	_tree_Lambda->Branch("_Lambda_Track1_deltaR",&_Lambda_Track1_deltaR);
+	_tree_Lambda->Branch("_Lambda_Track2_deltaR",&_Lambda_Track2_deltaR);
+
+
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_charge",&_Lambda_daughterTrack1_charge);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_chi2",&_Lambda_daughterTrack1_chi2);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_ndof",&_Lambda_daughterTrack1_ndof);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_eta",&_Lambda_daughterTrack1_eta);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_phi",&_Lambda_daughterTrack1_phi);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_pt",&_Lambda_daughterTrack1_pt);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_pz",&_Lambda_daughterTrack1_pz);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_dxy_beamspot",&_Lambda_daughterTrack1_dxy_beamspot);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_beamspot",&_Lambda_daughterTrack1_dz_beamspot);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_min_PV",&_Lambda_daughterTrack1_dz_min_PV);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_PV0",&_Lambda_daughterTrack1_dz_PV0);
+	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_000",&_Lambda_daughterTrack1_dz_000);
+
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_charge",&_Lambda_daughterTrack2_charge);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_chi2",&_Lambda_daughterTrack2_chi2);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_ndof",&_Lambda_daughterTrack2_ndof);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_eta",&_Lambda_daughterTrack2_eta);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_phi",&_Lambda_daughterTrack2_phi);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_pt",&_Lambda_daughterTrack2_pt);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_pz",&_Lambda_daughterTrack2_pz);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_dxy_beamspot",&_Lambda_daughterTrack2_dxy_beamspot);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_beamspot",&_Lambda_daughterTrack2_dz_beamspot);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_min_PV",&_Lambda_daughterTrack2_dz_min_PV);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_PV0",&_Lambda_daughterTrack2_dz_PV0);
+	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_000",&_Lambda_daughterTrack2_dz_000);
+
+
 	//for the Z
         _tree_Z = fs->make <TTree>("FlatTreeZ","treeZ");
 
-	_tree_Z->Branch("_Z_mass",&_Z_mass);
-	_tree_Z->Branch("_Z_dz_PV_muon1",&_Z_dz_PV_muon1);
-	_tree_Z->Branch("_Z_dz_PV_muon2",&_Z_dz_PV_muon2);
-	_tree_Z->Branch("_Z_ptMuMu",&_Z_ptMuMu);
+        _tree_Z->Branch("_Z_mass",&_Z_mass);
+        _tree_Z->Branch("_Z_dz_PV_muon1",&_Z_dz_PV_muon1);
+        _tree_Z->Branch("_Z_dz_PV_muon2",&_Z_dz_PV_muon2);
+        _tree_Z->Branch("_Z_ptMuMu",&_Z_ptMuMu);
+
 
 	//for the PV 
         _tree_PV = fs->make <TTree>("FlatTreePV","treePV");
 
-	_tree_PV->Branch("_PV_n",&_PV_n);
-	_tree_PV->Branch("_PV0_lxy",&_PV0_lxy);
-	_tree_PV->Branch("_PV0_vz",&_PV0_vz);
+        _tree_PV->Branch("_PV_n",&_PV_n);
+        _tree_PV->Branch("_PV0_lxy",&_PV0_lxy);
+        _tree_PV->Branch("_PV0_vz",&_PV0_vz);
 
-	//for the beamspot
+        //for the beamspot
         _tree_beamspot = fs->make <TTree>("FlatTreeBeamspot","treeBeamspot");
-
-	_tree_beamspot->Branch("_beampot_lxy",&_beampot_lxy);
-	_tree_beamspot->Branch("_beampot_vz",&_beampot_vz);
+        _tree_beamspot->Branch("_beampot_lxy",&_beampot_lxy);
+        _tree_beamspot->Branch("_beampot_vz",&_beampot_vz);
 
 }
 
@@ -283,6 +324,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   if(ZCandidatePresent  &&  nLooseMuons <= 2 && abs(dz_PV_muon1)  < 0.01 && abs(dz_PV_muon2) < 0.01 && abs(ZCandidateMass - 91.1876) < 15/2){
 
 	std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
+
 	
 	//save some variables to the Z tree
 	InitZ();
@@ -297,12 +339,13 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	_PV0_lxy.push_back( sqrt( pow( h_offlinePV->at(0).x()- h_bs->x0() , 2) + pow( h_offlinePV->at(0).y()- h_bs->y0() , 2)  ) );
 	_PV0_vz.push_back(h_offlinePV->at(0).z());
 	_tree_PV->Fill();
-	
+
 	InitBeamspot();
 	_beampot_lxy.push_back( sqrt( pow( h_bs->x0() , 2) + pow( h_bs->y0() , 2) ));
 	_beampot_vz.push_back(h_bs->z0());
 	_tree_beamspot->Fill();       
- 
+
+	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
 
 	InitKs();
 	  if(h_V0Ks.isValid()){
@@ -310,22 +353,31 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 		const reco::VertexCompositeCandidate * Ks = &h_V0Ks->at(i);
 		double deltaPhiKsHardCone = reco::deltaPhi( Ks->phi() , ZCandidatePhi ); 
 		double deltaPhiKsBackToBackHardCone = reco::deltaPhi( Ks->phi() , -TMath::Pi() + ZCandidatePhi ); 
-		if(abs(deltaPhiKsHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiKsBackToBackHardCone) >  TMath::Pi()/3)FillBranchesKs(Ks, beamspot, beamspotVariance, h_offlinePV, h_genParticles,  h_generalTracks);
+		//only select Ks in the transverse region OR if the Ks is pointing in dz far enough from the hard PV
+		
+		TVector3 V0CreationVertex(Ks->vx(),Ks->vy(),Ks->vz());
+        	TVector3 V0Momentum(Ks->px(),Ks->py(),Ks->pz());
+		double dz_PV0 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PV0);
+
+		if(  (abs(deltaPhiKsHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiKsBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(Ks, beamspot, beamspotVariance, h_offlinePV, h_genParticles,  h_generalTracks, "Ks");
 	      }
 	  }
 	_tree_Ks->Fill();
-
 	InitLambda();
 	  if(h_V0L.isValid()){
 	      for(unsigned int i = 0; i < h_V0L->size(); ++i){//loop all RECO Lambdas
 		const reco::VertexCompositeCandidate * L = &h_V0L->at(i);
 		double deltaPhiLHardCone = reco::deltaPhi( L->phi() , ZCandidatePhi );
 		double deltaPhiLBackToBackHardCone = reco::deltaPhi( L->phi() , -TMath::Pi() + ZCandidatePhi );
-		if(abs(deltaPhiLHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiLBackToBackHardCone) >  TMath::Pi()/3)FillBranchesLambda(L, beamspot, beamspotVariance, h_offlinePV,h_genParticles);
+
+		TVector3 V0CreationVertex(L->vx(),L->vy(),L->vz());
+        	TVector3 V0Momentum(L->px(),L->py(),L->pz());
+		double dz_PV0 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PV0);
+
+		if(  (abs(deltaPhiLHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiLBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(L, beamspot, beamspotVariance, h_offlinePV,h_genParticles, h_generalTracks, "Lambda");
 	      }
 	  }
 	_tree_Lambda->Fill();
-
 
  }
 
@@ -335,20 +387,20 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 
 
-void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * RECOKs, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<View<reco::Track>> h_generalTracks){
+void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * RECOV0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<View<reco::Track>> h_generalTracks, std::string V0Type){
 
 
 	math::XYZPoint beamspotPoint(beamspot.X(),beamspot.Y(),beamspot.Z());
 	
 	//loop over the GEN particles and try to find a Kshort which mathches this RECO Kshort. Then save the status of this particle so you know from where it comes: PV, material or maybe a fake?
 	//int bestMatchingGENParticle = -1;
-	double deltaRBestMatchingGENParticle = 10;
-	if(h_genParticles.isValid()){
+	double deltaRBestMatchingGENParticle = 99;
+	if(h_genParticles.isValid() && V0Type == "Ks"){
 		for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 
 			if(h_genParticles->at(i).pdgId() == AnalyzerAllSteps::pdgIdKs){
-				double deltaPhi = reco::deltaPhi(h_genParticles->at(i).phi(), RECOKs->phi()); 
-				double deltaEta = abs(h_genParticles->at(i).eta() - RECOKs->eta()); 
+				double deltaPhi = reco::deltaPhi(h_genParticles->at(i).phi(), RECOV0->phi()); 
+				double deltaEta = abs(h_genParticles->at(i).eta() - RECOV0->eta()); 
 				double deltaR = sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta);
 				if(deltaR < deltaRBestMatchingGENParticle){ 
 					//bestMatchingGENParticle = i;
@@ -360,183 +412,225 @@ void FlatTreeProducerV0s::FillBranchesKs(const reco::VertexCompositeCandidate * 
 		}		
 	}
 
-        TVector3 KsCreationVertex(RECOKs->vx(),RECOKs->vy(),RECOKs->vz());
-        double Lxy = AnalyzerAllSteps::lxy(beamspot,KsCreationVertex);
-        TVector3 KsMomentum(RECOKs->px(),RECOKs->py(),RECOKs->pz());
+	if(h_genParticles.isValid() && V0Type == "Lambda"){
+		for(unsigned int i = 0; i < h_genParticles->size(); ++i){
+
+			if(abs(h_genParticles->at(i).pdgId()) == abs(AnalyzerAllSteps::pdgIdAntiLambda) ){
+				double deltaPhi = reco::deltaPhi(h_genParticles->at(i).phi(), RECOV0->phi()); 
+				double deltaEta = abs(h_genParticles->at(i).eta() - RECOV0->eta()); 
+				double deltaR = sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta);
+				if(deltaR < deltaRBestMatchingGENParticle){ 
+					//bestMatchingGENParticle = i;
+					deltaRBestMatchingGENParticle = deltaR;
+				}
+
+			}
+
+		}		
+	}
+
+        TVector3 V0CreationVertex(RECOV0->vx(),RECOV0->vy(),RECOV0->vz());
+        double Lxy = AnalyzerAllSteps::lxy(beamspot,V0CreationVertex);
+        TVector3 V0Momentum(RECOV0->px(),RECOV0->py(),RECOV0->pz());
 
 	//different reference points
-	TVector3 PVmin = AnalyzerAllSteps::dz_line_point_min(KsCreationVertex,KsMomentum,h_offlinePV);
+	TVector3 PVmin = AnalyzerAllSteps::dz_line_point_min(V0CreationVertex,V0Momentum,h_offlinePV);
 	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
 	TVector3 ZeroZeroZero(0.,0.,0.);
 
 	//different dxy definitions
-	double dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(KsCreationVertex,KsMomentum,beamspot);
-	double dxy_min_PV = AnalyzerAllSteps::dxy_signed_line_point(KsCreationVertex,KsMomentum,PVmin);
-	double dxy_PV0 = AnalyzerAllSteps::dxy_signed_line_point(KsCreationVertex,KsMomentum,PV0);
-	double dxy_000 = AnalyzerAllSteps::dxy_signed_line_point(KsCreationVertex,KsMomentum,ZeroZeroZero);
+	double dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(V0CreationVertex,V0Momentum,beamspot);
+	double dxy_min_PV = AnalyzerAllSteps::dxy_signed_line_point(V0CreationVertex,V0Momentum,PVmin);
+	double dxy_PV0 = AnalyzerAllSteps::dxy_signed_line_point(V0CreationVertex,V0Momentum,PV0);
+	double dxy_000 = AnalyzerAllSteps::dxy_signed_line_point(V0CreationVertex,V0Momentum,ZeroZeroZero);
 	//different dz definitions
-        double dz_beamspot = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,beamspot);
-        double dz_min_PV = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,PVmin);
-        double dz_PV0 = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,PV0);
-        double dz_000 = AnalyzerAllSteps::dz_line_point(KsCreationVertex,KsMomentum,ZeroZeroZero);
-
-
-
-	_Ks_mass.push_back(RECOKs->mass());	
-
-	_Ks_pt.push_back(RECOKs->pt());	
-	_Ks_pz.push_back(RECOKs->pz());	
-	_Ks_Lxy.push_back(Lxy);	
-	_Ks_vz.push_back(RECOKs->vz());	
-
-	_Ks_eta.push_back(RECOKs->eta());
-	_Ks_phi.push_back(RECOKs->phi());
-
-	_Ks_dxy_beamspot.push_back(dxy_beamspot);
-	_Ks_dxy_min_PV.push_back(dxy_min_PV);
-	_Ks_dxy_PV0.push_back(dxy_PV0);
-	_Ks_dxy_000.push_back(dxy_000);
-
-	_Ks_dz_beamspot.push_back(dz_beamspot);	
-	_Ks_dz_min_PV.push_back(dz_min_PV);	
-	_Ks_dz_PV0.push_back(dz_PV0);	
-	_Ks_dz_000.push_back(dz_000);
-
-	_Ks_vz_dz_min_PV.push_back(PVmin.Z());
-
-	_Ks_deltaRBestMatchingGENParticle.push_back(deltaRBestMatchingGENParticle);
+        double dz_beamspot = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,beamspot);
+        double dz_min_PV = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PVmin);
+        double dz_PV0 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PV0);
+        double dz_000 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,ZeroZeroZero);
 
 	//save things related to the track daughters of the Ks
 
 	//calculate the invariant mass of the trackpair as if the two tracks were pions (which is the case for Ks)
-	TLorentzVector p4bestTrack1(RECOKs->daughter(0)->px(),RECOKs->daughter(0)->py(),RECOKs->daughter(0)->pz(), sqrt( pow(RECOKs->daughter(0)->p(),2) + pow(AnalyzerAllSteps::pdgMassChargedPion,2)  ));
-	TLorentzVector p4bestTrack2(RECOKs->daughter(1)->px(),RECOKs->daughter(1)->py(),RECOKs->daughter(1)->pz(), sqrt( pow(RECOKs->daughter(1)->p(),2) + pow(AnalyzerAllSteps::pdgMassChargedPion,2)  ));
+	TLorentzVector p4bestTrack1(RECOV0->daughter(0)->px(),RECOV0->daughter(0)->py(),RECOV0->daughter(0)->pz(), sqrt( pow(RECOV0->daughter(0)->p(),2) + pow(AnalyzerAllSteps::pdgMassChargedPion,2)  ));
+	TLorentzVector p4bestTrack2(RECOV0->daughter(1)->px(),RECOV0->daughter(1)->py(),RECOV0->daughter(1)->pz(), sqrt( pow(RECOV0->daughter(1)->p(),2) + pow(AnalyzerAllSteps::pdgMassChargedPion,2)  ));
 	TLorentzVector p4bestTrackPair = p4bestTrack1 + p4bestTrack2;	
 
-	//calculate some angles between the tracks and between the Ks and the tracks, the RECOKs->daughter(0) and RECOKs->daughter(1) objects should have the angles calculated at the vertex of the two tracks, which is a good thing as this is where you want to evaluate the angles. See: https://github.com/jarnedc/cmssw/blob/from-CMSSW_8_0_30/RecoVertex/V0Producer/src/V0Fitter.cc#L435-L440
+	//calculate some angles between the tracks and between the Ks and the tracks, the RECOV0->daughter(0) and RECOV0->daughter(1) objects should have the angles calculated at the vertex of the two tracks, which is a good thing as this is where you want to evaluate the angles. See: https://github.com/jarnedc/cmssw/blob/from-CMSSW_8_0_30/RecoVertex/V0Producer/src/V0Fitter.cc#L435-L440
 	//between the two tracks
-	double openingsAngleTrack1Track2 = AnalyzerAllSteps::openings_angle(RECOKs->daughter(0)->momentum(),RECOKs->daughter(1)->momentum());
-	double deltaRTrack1Track2 = AnalyzerAllSteps::deltaR(RECOKs->daughter(0)->phi(),RECOKs->daughter(0)->eta(),RECOKs->daughter(1)->phi(),RECOKs->daughter(1)->eta());
+	double openingsAngleTrack1Track2 = AnalyzerAllSteps::openings_angle(RECOV0->daughter(0)->momentum(),RECOV0->daughter(1)->momentum());
+	double deltaRTrack1Track2 = AnalyzerAllSteps::deltaR(RECOV0->daughter(0)->phi(),RECOV0->daughter(0)->eta(),RECOV0->daughter(1)->phi(),RECOV0->daughter(1)->eta());
 
 	//between the tracks and the Ks
-	double openingsAngleTrack1Ks = AnalyzerAllSteps::openings_angle(RECOKs->daughter(0)->momentum(),RECOKs->momentum());
-	double openingsAngleTrack2Ks = AnalyzerAllSteps::openings_angle(RECOKs->daughter(1)->momentum(),RECOKs->momentum());
+	double openingsAngleTrack1V0 = AnalyzerAllSteps::openings_angle(RECOV0->daughter(0)->momentum(),RECOV0->momentum());
+	double openingsAngleTrack2V0 = AnalyzerAllSteps::openings_angle(RECOV0->daughter(1)->momentum(),RECOV0->momentum());
 
-	double deltaRTrack1Ks = AnalyzerAllSteps::deltaR(RECOKs->daughter(0)->phi(),RECOKs->daughter(0)->eta(),RECOKs->phi(),RECOKs->eta());
-	double deltaRTrack2Ks = AnalyzerAllSteps::deltaR(RECOKs->daughter(1)->phi(),RECOKs->daughter(1)->eta(),RECOKs->phi(),RECOKs->eta());
+	double deltaRTrack1V0 = AnalyzerAllSteps::deltaR(RECOV0->daughter(0)->phi(),RECOV0->daughter(0)->eta(),RECOV0->phi(),RECOV0->eta());
+	double deltaRTrack2V0 = AnalyzerAllSteps::deltaR(RECOV0->daughter(1)->phi(),RECOV0->daughter(1)->eta(),RECOV0->phi(),RECOV0->eta());
 
-	TVector3 KsTrack1creationVertex(RECOKs->daughter(0)->vx(),RECOKs->daughter(0)->vy(),RECOKs->daughter(0)->vz());
-        TVector3 KsTrack1Momentum(RECOKs->daughter(0)->px(),RECOKs->daughter(0)->py(),RECOKs->daughter(0)->pz());
-	double dxy_Track1Ks_beamspot = AnalyzerAllSteps::dxy_signed_line_point(KsTrack1creationVertex,KsTrack1Momentum,beamspot);	
-        double dz_Track1Ks_beamspot = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,beamspot);
-        double dz_Track1Ks_min_PV = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,PVmin);
-        double dz_Track1Ks_PV0 = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,PV0);
-        double dz_Track1Ks_000 = AnalyzerAllSteps::dz_line_point(KsTrack1creationVertex,KsTrack1Momentum,ZeroZeroZero);
+	TVector3 V0Track1creationVertex(RECOV0->daughter(0)->vx(),RECOV0->daughter(0)->vy(),RECOV0->daughter(0)->vz());
+        TVector3 V0Track1Momentum(RECOV0->daughter(0)->px(),RECOV0->daughter(0)->py(),RECOV0->daughter(0)->pz());
+	double dxy_Track1V0_beamspot = AnalyzerAllSteps::dxy_signed_line_point(V0Track1creationVertex,V0Track1Momentum,beamspot);	
+        double dz_Track1V0_beamspot = AnalyzerAllSteps::dz_line_point(V0Track1creationVertex,V0Track1Momentum,beamspot);
+        double dz_Track1V0_min_PV = AnalyzerAllSteps::dz_line_point(V0Track1creationVertex,V0Track1Momentum,PVmin);
+        double dz_Track1V0_PV0 = AnalyzerAllSteps::dz_line_point(V0Track1creationVertex,V0Track1Momentum,PV0);
+        double dz_Track1V0_000 = AnalyzerAllSteps::dz_line_point(V0Track1creationVertex,V0Track1Momentum,ZeroZeroZero);
 
-	TVector3 KsTrack2creationVertex(RECOKs->daughter(1)->vx(),RECOKs->daughter(1)->vy(),RECOKs->daughter(1)->vz());
-        TVector3 KsTrack2Momentum(RECOKs->daughter(1)->px(),RECOKs->daughter(1)->py(),RECOKs->daughter(1)->pz());
-	double dxy_Track2Ks_beamspot = AnalyzerAllSteps::dxy_signed_line_point(KsTrack2creationVertex,KsTrack2Momentum,beamspot);	
-        double dz_Track2Ks_beamspot = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,beamspot);
-        double dz_Track2Ks_min_PV = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,PVmin);
-        double dz_Track2Ks_PV0 = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,PV0);
-        double dz_Track2Ks_000 = AnalyzerAllSteps::dz_line_point(KsTrack2creationVertex,KsTrack2Momentum,ZeroZeroZero);
+	TVector3 V0Track2creationVertex(RECOV0->daughter(1)->vx(),RECOV0->daughter(1)->vy(),RECOV0->daughter(1)->vz());
+        TVector3 V0Track2Momentum(RECOV0->daughter(1)->px(),RECOV0->daughter(1)->py(),RECOV0->daughter(1)->pz());
+	double dxy_Track2V0_beamspot = AnalyzerAllSteps::dxy_signed_line_point(V0Track2creationVertex,V0Track2Momentum,beamspot);	
+        double dz_Track2V0_beamspot = AnalyzerAllSteps::dz_line_point(V0Track2creationVertex,V0Track2Momentum,beamspot);
+        double dz_Track2V0_min_PV = AnalyzerAllSteps::dz_line_point(V0Track2creationVertex,V0Track2Momentum,PVmin);
+        double dz_Track2V0_PV0 = AnalyzerAllSteps::dz_line_point(V0Track2creationVertex,V0Track2Momentum,PV0);
+        double dz_Track2V0_000 = AnalyzerAllSteps::dz_line_point(V0Track2creationVertex,V0Track2Momentum,ZeroZeroZero);
 
-	//_Ks_trackPair_mindeltaR.push_back(deltaRRecoKsTrackPair);
-	_Ks_trackPair_mass.push_back(p4bestTrackPair.M());
 
-	//between the two tracks
-	_Ks_Track1Track2_openingsAngle.push_back(openingsAngleTrack1Track2);
-	_Ks_Track1Track2_deltaR.push_back(deltaRTrack1Track2);
+	if(V0Type == "Ks"){
+		_Ks_mass.push_back(RECOV0->mass());	
 
-	//between the two tracks and the Ks
-	_Ks_Track1_openingsAngle.push_back(openingsAngleTrack1Ks);
-	_Ks_Track2_openingsAngle.push_back(openingsAngleTrack2Ks);
-	_Ks_Track1_deltaR.push_back(deltaRTrack1Ks);
-	_Ks_Track2_deltaR.push_back(deltaRTrack2Ks);
-	
-	//somehow the RECOKs->daughter(0) should be containing the reference to the track (see e.g. https://github.com/jarnedc/cmssw/blob/from-CMSSW_8_0_30/RecoVertex/V0Producer/src/V0Fitter.cc#L515), but I am not able to get it out...
-	//const reco::Candidate* Ks_daug0 = RECOKs->daughter(0);
-	//reco::TrackRef Ks_daug0_trackref = Ks_daug0->track();
+		_Ks_pt.push_back(RECOV0->pt());	
+		_Ks_pz.push_back(RECOV0->pz());	
+		_Ks_Lxy.push_back(Lxy);	
+		_Ks_vz.push_back(RECOV0->vz());	
 
-	
-	_Ks_daughterTrack1_charge.push_back(RECOKs->daughter(0)->charge());
-	//_Ks_daughterTrack1_chi2.push_back(RECOKs->daughter(0)->chi2());
-	//_Ks_daughterTrack1_ndof.push_back(RECOKs->daughter(0)->ndof());
-	_Ks_daughterTrack1_eta.push_back(RECOKs->daughter(0)->eta());
-	_Ks_daughterTrack1_phi.push_back(RECOKs->daughter(0)->phi());
-	_Ks_daughterTrack1_pt.push_back(RECOKs->daughter(0)->pt());
-	_Ks_daughterTrack1_pz.push_back(RECOKs->daughter(0)->pz());
-	_Ks_daughterTrack1_dxy_beamspot.push_back(dxy_Track1Ks_beamspot);
-	_Ks_daughterTrack1_dz_beamspot.push_back(dz_Track1Ks_beamspot);
-	_Ks_daughterTrack1_dz_min_PV.push_back(dz_Track1Ks_min_PV);
-	_Ks_daughterTrack1_dz_PV0.push_back(dz_Track1Ks_PV0);
-	_Ks_daughterTrack1_dz_000.push_back(dz_Track1Ks_000);
+		_Ks_eta.push_back(RECOV0->eta());
+		_Ks_phi.push_back(RECOV0->phi());
 
-	_Ks_daughterTrack2_charge.push_back(RECOKs->daughter(1)->charge());
-	//_Ks_daughterTrack2_chi2.push_back(RECOKs->daughter(1)->chi2());
-	//_Ks_daughterTrack2_ndof.push_back(RECOKs->daughter(1)->ndof());
-	_Ks_daughterTrack2_eta.push_back(RECOKs->daughter(1)->eta());
-	_Ks_daughterTrack2_phi.push_back(RECOKs->daughter(1)->phi());
-	_Ks_daughterTrack2_pt.push_back(RECOKs->daughter(1)->pt());
-	_Ks_daughterTrack2_pz.push_back(RECOKs->daughter(1)->pz());
-	_Ks_daughterTrack2_dxy_beamspot.push_back(dxy_Track2Ks_beamspot);
-	_Ks_daughterTrack2_dz_beamspot.push_back(dz_Track2Ks_beamspot);
-	_Ks_daughterTrack2_dz_min_PV.push_back(dz_Track2Ks_min_PV);
-	_Ks_daughterTrack2_dz_PV0.push_back(dz_Track2Ks_PV0);
-	_Ks_daughterTrack2_dz_000.push_back(dz_Track2Ks_000);
+		_Ks_dxy_beamspot.push_back(dxy_beamspot);
+		_Ks_dxy_min_PV.push_back(dxy_min_PV);
+		_Ks_dxy_PV0.push_back(dxy_PV0);
+		_Ks_dxy_000.push_back(dxy_000);
 
+		_Ks_dz_beamspot.push_back(dz_beamspot);	
+		_Ks_dz_min_PV.push_back(dz_min_PV);	
+		_Ks_dz_PV0.push_back(dz_PV0);	
+		_Ks_dz_000.push_back(dz_000);
+
+		_Ks_vz_dz_min_PV.push_back(PVmin.Z());
+
+		_Ks_deltaRBestMatchingGENParticle.push_back(deltaRBestMatchingGENParticle);
+
+
+		//_Ks_trackPair_mindeltaR.push_back(deltaRRecoKsTrackPair);
+		_Ks_trackPair_mass.push_back(p4bestTrackPair.M());
+
+		//between the two tracks
+		_Ks_Track1Track2_openingsAngle.push_back(openingsAngleTrack1Track2);
+		_Ks_Track1Track2_deltaR.push_back(deltaRTrack1Track2);
+
+		//between the two tracks and the Ks
+		_Ks_Track1_openingsAngle.push_back(openingsAngleTrack1V0);
+		_Ks_Track2_openingsAngle.push_back(openingsAngleTrack2V0);
+		_Ks_Track1_deltaR.push_back(deltaRTrack1V0);
+		_Ks_Track2_deltaR.push_back(deltaRTrack2V0);
+		
+		//somehow the RECOV0->daughter(0) should be containing the reference to the track (see e.g. https://github.com/jarnedc/cmssw/blob/from-CMSSW_8_0_30/RecoVertex/V0Producer/src/V0Fitter.cc#L515), but I am not able to get it out...
+		//const reco::Candidate* Ks_daug0 = RECOV0->daughter(0);
+		//reco::TrackRef Ks_daug0_trackref = Ks_daug0->track();
+
+		
+		_Ks_daughterTrack1_charge.push_back(RECOV0->daughter(0)->charge());
+		//_Ks_daughterTrack1_chi2.push_back(RECOV0->daughter(0)->chi2());
+		//_Ks_daughterTrack1_ndof.push_back(RECOV0->daughter(0)->ndof());
+		_Ks_daughterTrack1_eta.push_back(RECOV0->daughter(0)->eta());
+		_Ks_daughterTrack1_phi.push_back(RECOV0->daughter(0)->phi());
+		_Ks_daughterTrack1_pt.push_back(RECOV0->daughter(0)->pt());
+		_Ks_daughterTrack1_pz.push_back(RECOV0->daughter(0)->pz());
+		_Ks_daughterTrack1_dxy_beamspot.push_back(dxy_Track1V0_beamspot);
+		_Ks_daughterTrack1_dz_beamspot.push_back(dz_Track1V0_beamspot);
+		_Ks_daughterTrack1_dz_min_PV.push_back(dz_Track1V0_min_PV);
+		_Ks_daughterTrack1_dz_PV0.push_back(dz_Track1V0_PV0);
+		_Ks_daughterTrack1_dz_000.push_back(dz_Track1V0_000);
+
+		_Ks_daughterTrack2_charge.push_back(RECOV0->daughter(1)->charge());
+		//_Ks_daughterTrack2_chi2.push_back(RECOV0->daughter(1)->chi2());
+		//_Ks_daughterTrack2_ndof.push_back(RECOV0->daughter(1)->ndof());
+		_Ks_daughterTrack2_eta.push_back(RECOV0->daughter(1)->eta());
+		_Ks_daughterTrack2_phi.push_back(RECOV0->daughter(1)->phi());
+		_Ks_daughterTrack2_pt.push_back(RECOV0->daughter(1)->pt());
+		_Ks_daughterTrack2_pz.push_back(RECOV0->daughter(1)->pz());
+		_Ks_daughterTrack2_dxy_beamspot.push_back(dxy_Track2V0_beamspot);
+		_Ks_daughterTrack2_dz_beamspot.push_back(dz_Track2V0_beamspot);
+		_Ks_daughterTrack2_dz_min_PV.push_back(dz_Track2V0_min_PV);
+		_Ks_daughterTrack2_dz_PV0.push_back(dz_Track2V0_PV0);
+		_Ks_daughterTrack2_dz_000.push_back(dz_Track2V0_000);
+	}
+	else if (V0Type == "Lambda"){
+		_Lambda_mass.push_back(RECOV0->mass());	
+
+		_Lambda_pt.push_back(RECOV0->pt());	
+		_Lambda_pz.push_back(RECOV0->pz());	
+		_Lambda_Lxy.push_back(Lxy);	
+		_Lambda_vz.push_back(RECOV0->vz());	
+
+		_Lambda_eta.push_back(RECOV0->eta());
+		_Lambda_phi.push_back(RECOV0->phi());
+
+		_Lambda_dxy_beamspot.push_back(dxy_beamspot);
+		_Lambda_dxy_min_PV.push_back(dxy_min_PV);
+		_Lambda_dxy_PV0.push_back(dxy_PV0);
+		_Lambda_dxy_000.push_back(dxy_000);
+
+		_Lambda_dz_beamspot.push_back(dz_beamspot);	
+		_Lambda_dz_min_PV.push_back(dz_min_PV);	
+		_Lambda_dz_PV0.push_back(dz_PV0);	
+		_Lambda_dz_000.push_back(dz_000);
+
+		_Lambda_vz_dz_min_PV.push_back(PVmin.Z());
+
+		_Lambda_deltaRBestMatchingGENParticle.push_back(deltaRBestMatchingGENParticle);
+
+
+		//_Ks_trackPair_mindeltaR.push_back(deltaRRecoKsTrackPair);
+		_Lambda_trackPair_mass.push_back(p4bestTrackPair.M());
+
+		//between the two tracks
+		_Lambda_Track1Track2_openingsAngle.push_back(openingsAngleTrack1Track2);
+		_Lambda_Track1Track2_deltaR.push_back(deltaRTrack1Track2);
+
+		//between the two tracks and the Ks
+		_Lambda_Track1_openingsAngle.push_back(openingsAngleTrack1V0);
+		_Lambda_Track2_openingsAngle.push_back(openingsAngleTrack2V0);
+		_Lambda_Track1_deltaR.push_back(deltaRTrack1V0);
+		_Lambda_Track2_deltaR.push_back(deltaRTrack2V0);
+		
+		//somehow the RECOV0->daughter(0) should be containing the reference to the track (see e.g. https://github.com/jarnedc/cmssw/blob/from-CMSSW_8_0_30/RecoVertex/V0Producer/src/V0Fitter.cc#L515), but I am not able to get it out...
+		//const reco::Candidate* Ks_daug0 = RECOV0->daughter(0);
+		//reco::TrackRef Ks_daug0_trackref = Ks_daug0->track();
+
+		
+		_Lambda_daughterTrack1_charge.push_back(RECOV0->daughter(0)->charge());
+		//_Ks_daughterTrack1_chi2.push_back(RECOV0->daughter(0)->chi2());
+		//_Ks_daughterTrack1_ndof.push_back(RECOV0->daughter(0)->ndof());
+		_Lambda_daughterTrack1_eta.push_back(RECOV0->daughter(0)->eta());
+		_Lambda_daughterTrack1_phi.push_back(RECOV0->daughter(0)->phi());
+		_Lambda_daughterTrack1_pt.push_back(RECOV0->daughter(0)->pt());
+		_Lambda_daughterTrack1_pz.push_back(RECOV0->daughter(0)->pz());
+		_Lambda_daughterTrack1_dxy_beamspot.push_back(dxy_Track1V0_beamspot);
+		_Lambda_daughterTrack1_dz_beamspot.push_back(dz_Track1V0_beamspot);
+		_Lambda_daughterTrack1_dz_min_PV.push_back(dz_Track1V0_min_PV);
+		_Lambda_daughterTrack1_dz_PV0.push_back(dz_Track1V0_PV0);
+		_Lambda_daughterTrack1_dz_000.push_back(dz_Track1V0_000);
+
+		_Lambda_daughterTrack2_charge.push_back(RECOV0->daughter(1)->charge());
+		//_Ks_daughterTrack2_chi2.push_back(RECOV0->daughter(1)->chi2());
+		//_Ks_daughterTrack2_ndof.push_back(RECOV0->daughter(1)->ndof());
+		_Lambda_daughterTrack2_eta.push_back(RECOV0->daughter(1)->eta());
+		_Lambda_daughterTrack2_phi.push_back(RECOV0->daughter(1)->phi());
+		_Lambda_daughterTrack2_pt.push_back(RECOV0->daughter(1)->pt());
+		_Lambda_daughterTrack2_pz.push_back(RECOV0->daughter(1)->pz());
+		_Lambda_daughterTrack2_dxy_beamspot.push_back(dxy_Track2V0_beamspot);
+		_Lambda_daughterTrack2_dz_beamspot.push_back(dz_Track2V0_beamspot);
+		_Lambda_daughterTrack2_dz_min_PV.push_back(dz_Track2V0_min_PV);
+		_Lambda_daughterTrack2_dz_PV0.push_back(dz_Track2V0_PV0);
+		_Lambda_daughterTrack2_dz_000.push_back(dz_Track2V0_000);
+
+
+	}
 	
 
 }
 
-void FlatTreeProducerV0s::FillBranchesLambda(const reco::VertexCompositeCandidate * RECOLambda, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles){
-
-
-	TVector3 LambdaCreationVertex(RECOLambda->vx(),RECOLambda->vy(),RECOLambda->vz());
-	double Lxy = AnalyzerAllSteps::lxy(beamspot,LambdaCreationVertex);
-	TVector3 LambdaMomentum(RECOLambda->px(),RECOLambda->py(),RECOLambda->pz());
-
-	//different reference points
-	TVector3 PVmin = AnalyzerAllSteps::dz_line_point_min(LambdaCreationVertex,LambdaMomentum,h_offlinePV);
-	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
-	TVector3 ZeroZeroZero(0.,0.,0.);
-	//different dxy
-	double dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(LambdaCreationVertex,LambdaMomentum,beamspot);
-	double dxy_min_PV = AnalyzerAllSteps::dxy_signed_line_point(LambdaCreationVertex,LambdaMomentum,PVmin);
-	double dxy_PV0 = AnalyzerAllSteps::dxy_signed_line_point(LambdaCreationVertex,LambdaMomentum,PV0);
-	double dxy_000 = AnalyzerAllSteps::dxy_signed_line_point(LambdaCreationVertex,LambdaMomentum,ZeroZeroZero);
-
-	//different dz's
-	double dz_beamspot = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,beamspot);
-	double dz_min_PV = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,PVmin);
-	double dz_PV0 = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,PV0);
-        double dz_000 = AnalyzerAllSteps::dz_line_point(LambdaCreationVertex,LambdaMomentum,ZeroZeroZero);
-
-
-	_Lambda_mass.push_back(RECOLambda->mass());	
-
-	_Lambda_pt.push_back(RECOLambda->pt());	
-	_Lambda_pz.push_back(RECOLambda->pz());	
-	_Lambda_Lxy.push_back(Lxy);	
-	_Lambda_vz.push_back(RECOLambda->vz());	
-
-	_Lambda_eta.push_back(RECOLambda->eta());
-	_Lambda_phi.push_back(RECOLambda->phi());
-
-	_Lambda_dxy.push_back(dxy_beamspot);
-	_Lambda_dxy_min_PV.push_back(dxy_min_PV);
-	_Lambda_dxy_PV0.push_back(dxy_PV0);
-	_Lambda_dxy_000.push_back(dxy_000);
-	
-	_Lambda_dz_beamspot.push_back(dz_beamspot);	
-	_Lambda_dz_min_PV.push_back(dz_min_PV);	
-	_Lambda_dz_PV0.push_back(dz_PV0);	
-	_Lambda_dz_000.push_back(dz_000);	
-
-	_Lambda_vz_dz_min_PV.push_back(PVmin.Z());
-
-
-}
 
 bool FlatTreeProducerV0s::IsolationCriterium(reco::Muon muon)
 {
@@ -669,7 +763,6 @@ void FlatTreeProducerV0s::InitKs()
 void FlatTreeProducerV0s::InitLambda()
 {
 
-
 	_Lambda_mass.clear();
 
 	_Lambda_pt.clear();
@@ -680,7 +773,7 @@ void FlatTreeProducerV0s::InitLambda()
 	_Lambda_eta.clear();
 	_Lambda_phi.clear();
 
-	_Lambda_dxy.clear();
+	_Lambda_dxy_beamspot.clear();
 	_Lambda_dxy_min_PV.clear();
 	_Lambda_dxy_PV0.clear();
 	_Lambda_dxy_000.clear();
@@ -690,7 +783,50 @@ void FlatTreeProducerV0s::InitLambda()
 	_Lambda_dz_PV0.clear();	
 	_Lambda_dz_000.clear();	
 
-	_Lambda_vz_dz_min_PV.clear();	
+	_Lambda_vz_dz_min_PV.clear();
+
+	_Lambda_deltaRBestMatchingGENParticle.clear();	
+
+	_Lambda_trackPair_mindeltaR.clear();	
+	_Lambda_trackPair_mass.clear();	
+
+	_Lambda_Track1Track2_openingsAngle.clear();
+	_Lambda_Track1Track2_deltaR.clear();
+
+	_Lambda_Track1_openingsAngle.clear();
+	_Lambda_Track2_openingsAngle.clear();
+	_Lambda_Track1_deltaR.clear();
+	_Lambda_Track2_deltaR.clear();
+
+
+
+	_Lambda_daughterTrack1_charge.clear();
+	_Lambda_daughterTrack1_chi2.clear();
+	_Lambda_daughterTrack1_ndof.clear();
+	_Lambda_daughterTrack1_eta.clear();	
+	_Lambda_daughterTrack1_phi.clear();	
+	_Lambda_daughterTrack1_pt.clear();	
+	_Lambda_daughterTrack1_pz.clear();	
+        _Lambda_daughterTrack1_dxy_beamspot.clear();
+        _Lambda_daughterTrack1_dz_beamspot.clear();
+        _Lambda_daughterTrack1_dz_min_PV.clear();
+        _Lambda_daughterTrack1_dz_PV0.clear();
+        _Lambda_daughterTrack1_dz_000.clear();
+
+
+
+	_Lambda_daughterTrack2_charge.clear();
+	_Lambda_daughterTrack2_chi2.clear();
+	_Lambda_daughterTrack2_ndof.clear();
+	_Lambda_daughterTrack2_eta.clear();	
+	_Lambda_daughterTrack2_phi.clear();	
+	_Lambda_daughterTrack2_pt.clear();	
+	_Lambda_daughterTrack2_pz.clear();	
+        _Lambda_daughterTrack2_dxy_beamspot.clear();
+        _Lambda_daughterTrack2_dz_beamspot.clear();
+        _Lambda_daughterTrack2_dz_min_PV.clear();
+        _Lambda_daughterTrack2_dz_PV0.clear();
+        _Lambda_daughterTrack2_dz_000.clear();
 
 
 }

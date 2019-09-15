@@ -59,7 +59,7 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     static constexpr double deltaRCutV0RECOKs = 0.1;
     static constexpr double deltaRCutV0RECOLambda = 0.1;
     static constexpr double deltaRCutRECOAntiS = 0.1;
-
+    static constexpr double deltaLCutInteractionVertexAntiSmin = 0.5;
 
     //definition of the background cuts
     static constexpr double MinLxyCut = 1.9;

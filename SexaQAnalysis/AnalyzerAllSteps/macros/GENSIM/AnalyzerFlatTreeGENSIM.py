@@ -483,7 +483,7 @@ h_antiS_sumDaughters_openingsangle.SetMarkerStyle(22)
 h_antiS_sumDaughters_openingsangle.SetMarkerColor(colours[0])
 h_antiS_sumDaughters_openingsangle.SetStats(0)
 CMS_lumi.CMS_lumi(c_h_antiS_sumDaughters_openingsangle, 0, 11)
-c_h_antiS_sumDaughters_openingsangle.SetLogy()
+#c_h_antiS_sumDaughters_openingsangle.SetLogy()
 c_h_antiS_sumDaughters_openingsangle.SaveAs(plots_output_dir+c_h_antiS_sumDaughters_openingsangle.GetName()+".pdf")
 c_h_antiS_sumDaughters_openingsangle.Write()
 
@@ -493,12 +493,13 @@ c_h2_antiS_inv_mass_p_Ks_plus_Lambda.SetRightMargin(0.2) #make room for the tile
 if(h2_antiS_inv_mass_p_Ks_plus_Lambda.GetSumw2N() == 0):
 	h2_antiS_inv_mass_p_Ks_plus_Lambda.Sumw2(kTRUE)
 h2_antiS_inv_mass_p_Ks_plus_Lambda.Scale(1./h2_antiS_inv_mass_p_Ks_plus_Lambda.Integral(), "width");
-h2_antiS_inv_mass_p_Ks_plus_Lambda.Draw("SURF1")
+#h2_antiS_inv_mass_p_Ks_plus_Lambda.Draw("SURF1") #for 3D plot
+h2_antiS_inv_mass_p_Ks_plus_Lambda.Draw("colz")
 h2_antiS_inv_mass_p_Ks_plus_Lambda.SetStats(0)
 h2_antiS_inv_mass_p_Ks_plus_Lambda.GetXaxis().SetTitleOffset(1.5)
 h2_antiS_inv_mass_p_Ks_plus_Lambda.GetYaxis().SetTitleOffset(2)
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.SetLogz()
-CMS_lumi.CMS_lumi(c, 0, 11)
+CMS_lumi.CMS_lumi(c_h2_antiS_inv_mass_p_Ks_plus_Lambda, 0, 11)
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.SaveAs(plots_output_dir+h2_antiS_inv_mass_p_Ks_plus_Lambda.GetName()+".pdf")
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.Write()
 

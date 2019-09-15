@@ -11,3 +11,8 @@ password
 crab_*
 crab.log
 *.sh.*
+*.pdf
+.nfs*
+*.txt.*
+*.err
+*.log

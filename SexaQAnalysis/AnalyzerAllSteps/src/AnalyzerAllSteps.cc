@@ -147,7 +147,7 @@ TVector3 AnalyzerAllSteps::dz_line_point_min(TVector3 Point_line_in, TVector3 Ve
 
 	for(unsigned int i = 0; i < h_offlinePV->size(); ++i){
 		//select only PV with certain quality cuts like it needs enough tracks pointing to it
-		if(h_offlinePV->at(i).isValid()){
+		if(h_offlinePV->at(i).isValid() && h_offlinePV->at(i).tracksSize() >= 4){
 			TVector3 PV(h_offlinePV->at(i).x(),h_offlinePV->at(i).y(),h_offlinePV->at(i).z());
 			double dz  = AnalyzerAllSteps::dz_line_point(Point_line_in,Vector_along_line_in,PV);
 			if(abs(dz) < abs(dzmin)) {dzmin = dz; bestPV =  PV;}
