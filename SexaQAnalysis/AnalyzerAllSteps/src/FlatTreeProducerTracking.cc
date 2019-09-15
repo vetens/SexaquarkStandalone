@@ -195,7 +195,6 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 	  reco::SimToRecoCollection simRecCollL;
 	  reco::SimToRecoCollection const * simRecCollP=nullptr;
 	  simRecCollL = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-	  std::cout << "0. simRecCollL.empty "<< simRecCollL.empty() << std::endl;
 	  simRecCollP = &simRecCollL;
           reco::SimToRecoCollection const & simRecColl = *simRecCollP;
 
@@ -224,21 +223,17 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 
 //fill a second tree: one entry in this tree will have the parameters of the antiS, the parameters of the daughters and the parameters of the granddaughters. And will check if they were reconstructed or not. 
   if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid() && h_V0Ks.isValid() && h_V0L.isValid()){
+
+	reco::SimToRecoCollection simRecCollL;
+	reco::SimToRecoCollection const * simRecCollP=nullptr;
+	simRecCollL= std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
+	simRecCollP= &simRecCollL;
+	reco::SimToRecoCollection const & simRecColl= *simRecCollP;
+
 	for(size_t i=0; i<TPColl.size(); ++i) {
 
-		reco::SimToRecoCollection simRecCollL_KsPosPion;
-		reco::SimToRecoCollection const * simRecCollP_KsPosPion=nullptr;
-		simRecCollL_KsPosPion = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-		std::cout << "1. simRecCollL_KsPosPion.empty "<< simRecCollL_KsPosPion.empty() << std::endl;
-		std::cout << "1. simRecCollL_KsPosPion.size "<< simRecCollL_KsPosPion.size() << std::endl;
-		simRecCollP_KsPosPion = &simRecCollL_KsPosPion;
-		reco::SimToRecoCollection const & simRecColl_KsPosPion = *simRecCollP_KsPosPion;
-		std::cout << "1. simRecColl_KsPosPion.empty(): " << simRecColl_KsPosPion.empty() << std::endl;
-		std::cout << "1. simRecColl_KsPosPion.size(): " << simRecColl_KsPosPion.size() << std::endl;
-
 	  	const TrackingParticle& tp = TPColl[i];
-		if(tp.pdgId() == AnalyzerAllSteps::pdgIdAntiS) FillTreesAntiSAndDaughters(tp, beamspot, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl_KsPosPion);
-		
+		if(tp.pdgId() == AnalyzerAllSteps::pdgIdAntiS) FillTreesAntiSAndDaughters(tp, beamspot, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl);
  		
 	}
   }
@@ -328,7 +323,7 @@ void FlatTreeProducerTracking::FillTreesTracks(const TrackingParticle& tp, TVect
 
 }
 
-void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl_KsPosPion){
+void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl){
 
 	//loop through the trackingparticles to find the antiS daughters and granddaughters and save them so that you can compare later the dauhgters to the V0 collections using deltaR matching and the granddaughters to the track collection using track matching on hits
 
@@ -470,29 +465,12 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	bool RECOKsPosPionFound = false;
 	const reco::Track *matchedTrackPointer_KsPosPion = nullptr;
 
-	std::cout << "tp_it_Ks_posPion: " << tp_it_Ks_posPion << std::endl;
-	std::cout << "h_generalTracks.isValid(): " << h_generalTracks.isValid() << std::endl;
-	std::cout << "h_TP.isValid(): " << h_TP.isValid() << std::endl;
-	std::cout << "h_trackAssociator.isValid(): " << h_trackAssociator.isValid() << std::endl;
-	
 
 	TrackingParticleRef tpr_KsPosPion(h_TP,tp_it_Ks_posPion);
-	std::cout << "TrackingParticleRef tpr_KsPosPion->pt(): " << tpr_KsPosPion->pt() << std::endl;
-	std::cout << "TrackingParticleRef tpr_KsPosPion->charge(): " << tpr_KsPosPion->charge() << std::endl;
-	std::cout << "TrackingParticleRef tpr_KsPosPion->pdgId(): " << tpr_KsPosPion->pdgId() << std::endl;
-//	reco::SimToRecoCollection simRecCollL_KsPosPion;
-//	reco::SimToRecoCollection const * simRecCollP_KsPosPion=nullptr;
-//	simRecCollL_KsPosPion = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-//	std::cout << "simRecCollL_KsPosPion.empty "<< simRecCollL_KsPosPion.empty() << std::endl;
-//	std::cout << "simRecCollL_KsPosPion.size "<< simRecCollL_KsPosPion.size() << std::endl;
-//	simRecCollP_KsPosPion = &simRecCollL_KsPosPion;
-//        reco::SimToRecoCollection const & simRecColl_KsPosPion = *simRecCollP_KsPosPion;
-	std::cout << "2 simRecColl_KsPosPion.empty(): " << simRecColl_KsPosPion.empty() << std::endl;
-	std::cout << "2 simRecColl_KsPosPion.size(): " << simRecColl_KsPosPion.size() << std::endl;
 
-	if(simRecColl_KsPosPion.find(tpr_KsPosPion) != simRecColl_KsPosPion.end()){
+	if(simRecColl.find(tpr_KsPosPion) != simRecColl.end()){
 		std::cout << "found tpr_KsPosPion in the collection" << std::endl;
-	        auto const & rt = simRecColl_KsPosPion[tpr_KsPosPion];
+	        auto const & rt = simRecColl[tpr_KsPosPion];
 	        if (rt.size()!=0) {
 	          matchedTrackPointer_KsPosPion = rt.begin()->first.get();
 	          RECOKsPosPionFound  = true;
@@ -509,14 +487,9 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	const reco::Track *matchedTrackPointer_KsNegPion = nullptr;
 
 	TrackingParticleRef tpr_KsNegPion(h_TP,tp_it_Ks_negPion);
-	reco::SimToRecoCollection simRecCollL_KsNegPion;
-	reco::SimToRecoCollection const * simRecCollP_KsNegPion=nullptr;
-	simRecCollL_KsNegPion = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-	simRecCollP_KsNegPion = &simRecCollL_KsNegPion;
-        reco::SimToRecoCollection const & simRecColl_KsNegPion = *simRecCollP_KsNegPion;
 
-	if(simRecColl_KsNegPion.find(tpr_KsNegPion) != simRecColl_KsNegPion.end()){
-	        auto const & rt = simRecColl_KsNegPion[tpr_KsNegPion];
+	if(simRecColl.find(tpr_KsNegPion) != simRecColl.end()){
+	        auto const & rt = simRecColl[tpr_KsNegPion];
 	        if (rt.size()!=0) {
 	          matchedTrackPointer_KsNegPion = rt.begin()->first.get();
 	          RECOKsNegPionFound  = true;
@@ -532,14 +505,9 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	const reco::Track *matchedTrackPointer_AntiLambda_posPion = nullptr;
 
 	TrackingParticleRef tpr_AntiLambda_posPion(h_TP,tp_it_AntiLambda_posPion);
-	reco::SimToRecoCollection simRecCollL_AntiLambda_posPion;
-	reco::SimToRecoCollection const * simRecCollP_AntiLambda_posPion=nullptr;
-	simRecCollL_AntiLambda_posPion = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-	simRecCollP_AntiLambda_posPion = &simRecCollL_AntiLambda_posPion;
-        reco::SimToRecoCollection const & simRecColl_AntiLambda_posPion = *simRecCollP_AntiLambda_posPion;
 
-	if(simRecColl_AntiLambda_posPion.find(tpr_AntiLambda_posPion) != simRecColl_AntiLambda_posPion.end()){
-	        auto const & rt = simRecColl_AntiLambda_posPion[tpr_AntiLambda_posPion];
+	if(simRecColl.find(tpr_AntiLambda_posPion) != simRecColl.end()){
+	        auto const & rt = simRecColl[tpr_AntiLambda_posPion];
 	        if (rt.size()!=0) {
 	          matchedTrackPointer_AntiLambda_posPion = rt.begin()->first.get();
 	          RECOAntiLambda_posPionFound  = true;
@@ -555,14 +523,9 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	const reco::Track *matchedTrackPointer_AntiLambda_AntiProton = nullptr;
 
 	TrackingParticleRef tpr_AntiLambda_AntiProton(h_TP,tp_it_AntiLambda_AntiProton);
-	reco::SimToRecoCollection simRecCollL_AntiLambda_AntiProton;
-	reco::SimToRecoCollection const * simRecCollP_AntiLambda_AntiProton=nullptr;
-	simRecCollL_AntiLambda_AntiProton = std::move(h_trackAssociator->associateSimToReco(h_generalTracks,h_TP));
-	simRecCollP_AntiLambda_AntiProton = &simRecCollL_AntiLambda_AntiProton;
-        reco::SimToRecoCollection const & simRecColl_AntiLambda_AntiProton = *simRecCollP_AntiLambda_AntiProton;
 
-	if(simRecColl_AntiLambda_AntiProton.find(tpr_AntiLambda_AntiProton) != simRecColl_AntiLambda_AntiProton.end()){
-	        auto const & rt = simRecColl_AntiLambda_AntiProton[tpr_AntiLambda_AntiProton];
+	if(simRecColl.find(tpr_AntiLambda_AntiProton) != simRecColl.end()){
+	        auto const & rt = simRecColl[tpr_AntiLambda_AntiProton];
 	        if (rt.size()!=0) {
 	          matchedTrackPointer_AntiLambda_AntiProton = rt.begin()->first.get();
 	          RECOAntiLambda_AntiProtonFound  = true;
