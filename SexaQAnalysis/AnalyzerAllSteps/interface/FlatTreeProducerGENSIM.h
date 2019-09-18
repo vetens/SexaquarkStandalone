@@ -17,11 +17,11 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
   private:
     int nTotalGENS=0;
     int nTotalUniqueGenS=0;
-    int nTotalUniqueGenSWithEtaSmallerThan4=0;
+    int nTotalUniqueGenSWithEtaSmallerThan4p3=0;
     int nTotalGiving2DaughtersGENS=0;
-    int nTotalGiving0DaughtersGENSWithEtaSmallerThan4=0;
-    int nTotalGiving1DaughtersGENSWithEtaSmallerThan4=0;
-    int nTotalGiving2DaughtersGENSWithEtaSmallerThan4=0;
+    int nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3=0;
+    int nTotalGiving1DaughtersGENSWithEtaSmallerThan4p3=0;
+    int nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3=0;
     int nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS=0;
     int nTotalCorrectGENS=0;
     int nTotalCorrectGENSInteractingInBeampipe=0;

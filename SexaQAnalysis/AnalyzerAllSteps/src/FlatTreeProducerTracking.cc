@@ -180,7 +180,7 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
   if(!h_trackAssociator.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackAssociator collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
 
 //evaluate tracking performance
-  if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid()){
+/*  if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid()){
 	for(size_t i=0; i<TPColl.size(); ++i) {
 	  //first investigate whether this tp is a dauhgter of an AntiS. You need this because these granddaughter tracks you want to investigate separately from the rest of the tracks. 
 	  const TrackingParticle& tp = TPColl[i];
@@ -219,7 +219,7 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 	  //if(tp.pdgId() == AnalyzerAllSteps::pdgIdAntiS)FillHistosAntiSTracks(tp, beamspot, TPColl,  h_TP, h_trackAssociator, h_generalTracks, h_V0Ks, h_V0L);
 	}
   }
-
+*/
 
 //fill a second tree: one entry in this tree will have the parameters of the antiS, the parameters of the daughters and the parameters of the granddaughters. And will check if they were reconstructed or not. 
   if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid() && h_V0Ks.isValid() && h_V0L.isValid()){
@@ -390,7 +390,7 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
         }//end loop over tp to find daughters
 
 	std::cout << "numberOfGranddaughtersFound in this event: " << numberOfGranddaughtersFound << std::endl;
-	totalNumberOfAntiSWhichInteract++;
+	totalNumberOfUniqueAntiS++;
 
 	//now only when there are 4 correct tp granddaughters found you have the chance to actually reconstruct them, so save only those in the tree
 	if(tp_it_Ks_posPion == -1 || tp_it_Ks_negPion == -1 || tp_it_AntiLambda_posPion == -1 || tp_it_AntiLambda_AntiProton == -1) return;
@@ -1964,7 +1964,7 @@ FlatTreeProducerTracking::fillDescriptions(edm::ConfigurationDescriptions& descr
 FlatTreeProducerTracking::~FlatTreeProducerTracking()
 {
 
-	std::cout << "number of antiS found which interact: " << totalNumberOfAntiSWhichInteract << std::endl;
+	std::cout << "number of antiS found which interact: " << totalNumberOfUniqueAntiS << std::endl;
 	std::cout << "number of antiS found with the correct granddaughters: " << numberOfAntiSWithCorrectGranddaughters << std::endl;
 
 }

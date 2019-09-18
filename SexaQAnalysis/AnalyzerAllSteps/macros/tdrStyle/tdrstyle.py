@@ -104,7 +104,7 @@ def setTDRStyle():
 
   tdrStyle.SetTitleColor(1, "XYZ")
   tdrStyle.SetTitleFont(42, "XYZ")
-  tdrStyle.SetTitleSize(0.04, "XYZ")
+  tdrStyle.SetTitleSize(0.03, "XYZ")
   # tdrStyle.SetTitleXSize(Float_t size = 0.02) # Another way to set the size?
   # tdrStyle.SetTitleYSize(Float_t size = 0.02)
   tdrStyle.SetTitleXOffset(1.)

@@ -56,7 +56,7 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
   private:
 
     int numberOfAntiSWithCorrectGranddaughters = 0;
-    int totalNumberOfAntiSWhichInteract = 0;
+    int totalNumberOfUniqueAntiS= 0;
 
     //---- configurable parameters --------
     bool m_lookAtAntiS;

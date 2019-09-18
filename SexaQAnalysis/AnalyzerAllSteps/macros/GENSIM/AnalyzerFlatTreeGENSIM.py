@@ -12,7 +12,7 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Simulation"
 tdrstyle.setTDRStyle()
 
-colours = [1,2,4,30,38,41]
+colours = [1,2,4,35,38,41]
 
 maxNEntries = 1e5
 
@@ -237,23 +237,23 @@ h_antiS_sumDaughters_openingsangle = TH1F('h_antiS_sumDaughters_openingsangle','
 #properties of the antiS daughters and granddaughters
 momenta_daughters_and_grandaughters_dir = fOut.mkdir("momenta_daughters_and_grandaughters")
 momenta_daughters_and_grandaughters_dir.cd()
-h_pt_Ks = TH1F("h_pt_Ks",";p_{t} (GeV); #Entries",80,0,8)
-h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{t} (GeV); Events/0.1GeV",80,0,8)
-h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{t} (GeV); Events/0.1GeV",80,0,8)
-h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV); Events/1GeV",80,0,80)
-h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",80,0,80)
-h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",80,0,80)
-h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",80,0,8,80,0,80)
-h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",80,0,8,80,0,80)
+h_pt_Ks = TH1F("h_pt_Ks",";p_{t} (GeV); #Entries",60,0,6)
+h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV); Events/1GeV",30,0,30)
+h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",30,0,30)
+h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",30,0,30)
+h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
+h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 
-h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",80,0,8)
-h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{t} (GeV); Events/0.1GeV",80,0,8)
-h_pt_AntiLambda_Pion = TH1F("h_pt_AntiLambda_Pion",";p_{t} (GeV); Events/0.1GeV",80,0,8)
-h_pz_AntiLambda = TH1F("h_pz_AntiLambda",";p_{z} (GeV); Events/1GeV",80,0,80)
-h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Events/1GeV",80,0,80)
-h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",80,0,80)
-h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",80,0,8,80,0,80)
-h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",80,0,8,80,0,80)
+h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_pt_AntiLambda_Pion = TH1F("h_pt_AntiLambda_Pion",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_pz_AntiLambda = TH1F("h_pz_AntiLambda",";p_{z} (GeV); Events/1GeV",30,0,30)
+h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Events/1GeV",30,0,30)
+h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",30,0,30)
+h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
+h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 
 #PCAs of the granddughters of the antiS
 PCA_granddaughters_dir = fOut.mkdir("PCA_granddaughters")
@@ -601,8 +601,8 @@ ll_TH1F = [
 ll_legend_text =  [
 ["K_{S}^{0} daughters","#bar{#Lambda} daughters"],
 ["K_{S}^{0} daughters","#bar{#Lambda} daughters"],
-["d_{0} #bar{#Lambda}-#bar{p}","d_{0} #bar{#Lambda}-#pi^+","d_{0} K_{S} daughters"],
-["d_{z} #bar{#Lambda}-#bar{p}","d_{z} #bar{#Lambda}-#pi^+","d_{z} K_{S} daughters"],
+["#bar{#Lambda}-#bar{p}","#bar{#Lambda}-#pi^{+}","K_{S} daughters"],
+["#bar{#Lambda}-#bar{p}","#bar{#Lambda}-#pi^{+}","K_{S} daughters"],
 ]
 for l in ll_TH1F:
 	for h in l:

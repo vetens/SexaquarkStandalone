@@ -12,7 +12,7 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Simulation"
 tdrstyle.setTDRStyle()
 
-colours = [1,2,4,30,38,41]
+colours = [1,2,4,35,38,41]
 
 # Set TDR styles
 #gROOT.LoadMacro("../tdrStyle/tdrstyle.C")
@@ -24,11 +24,12 @@ colours = [1,2,4,30,38,41]
 #fIn = TFile('/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_7/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_TrackMatchingOnHits.root', 'read')
 fIn = [
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial20/FlatTree/FlatTree_GEN_trial20.root', 'read'),
+TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial19/FlatTree/FlatTree_GEN_trial19.root', 'read'),
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial17/FlatTree/FlatTree_GEN_trial17.root', 'read'),
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial18/FlatTree/FlatTree_GEN_trial18.root', 'read'),
 ]
 
-mass = ["1.2","1.8","2.1"]
+mass = ["1.2","1.5","1.8","2.1"]
 
 plots_output_dir = "plots_GEN/"
 
@@ -40,8 +41,8 @@ iFile = 0
 for f in fIn:
 	tree = f.Get('FlatTreeProducerGEN/FlatTreeGENLevel') 
 
-	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{t} (GeV); Events/0.1GeV',200,0,20)
-	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV); Events/1GeV',100,0,100)
+	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{t} (GeV); Events/0.1GeV',100,0,10)
+	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV); Events/1GeV',80,0,80)
 	h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; Events/0.1#eta',160,-8,8)
 
 	h_antiS_eta_pt = TH2F('h_antiS_eta_pt',';#bar{S} #eta; #bar{S} p_{t} (GeV); Events/0.1#eta/0.1GeV',160,-8,8,100,0,10)

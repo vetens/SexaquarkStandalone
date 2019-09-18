@@ -1,0 +1,38 @@
+#cp plots_Tracking_AntiS_specific/c_teff_AntiLambdaPion_RECO_eff_lxy_antiS_acceptance_distribution_and_efficiency.pdf
+#cp 
+array=( 
+'macro_combined_FlatTree_Tracking_Skimmed_trial17_acceptance.root'
+'c_teff_fractionAllEvents_numberGranddaughters_7hits_eta_antiS.pdf'
+'c_teff_fractionAllEvents_numberGranddaughters_7hits_vz_antiS.pdf'
+'tprof2_fractionAllEvents_numberGranddaughters_7hits_vz_lxy_antiS.pdf'
+'c_teff_AntiLambdaPion_RECO_eff_lxy_antiS_acceptance_distribution_and_efficiency.pdf'
+'c_teff_AntiLambdaPion_RECO_eff_vz_antiS_acceptance_distribution_and_efficiency.pdf'
+'c_teff_AntiLambdaPion_RECO_eff_pt_antiS_acceptance_distribution_and_efficiency.pdf'
+'c_teff_AntiLambdaPion_RECO_eff_pz_antiS_acceptance_distribution_and_efficiency.pdf'
+'c_teff_AntiS_RECO_eff_pt_antiS_passed.pdf'
+'c_teff_AntiS_RECO_eff_pz_antiS_passed.pdf'
+'c_teff_AntiS_RECO_eff_eta_antiS_antiS_passed.pdf'
+'c_teff_AntiS_RECO_eff_lxy_antiS_passed.pdf'
+'c_teff_AntiS_RECO_eff_vz_antiS_passed.pdf'
+'c_h_AntiSGrandDaughter_pt_1.pdf'
+'c_h_AntiSGrandDaughter_pz_1.pdf'
+'c_h_AntiSGrandDaughter_lxy_1.pdf'
+'c_h_AntiSGrandDaughter_vz_1.pdf'
+'c_h_AntiSGrandDaughter_dxy_1.pdf'
+'c_h_AntiSGrandDaughter_dz_1.pdf'
+'c_h1_AntiS_RECO_Acc_eta.pdf'
+'c_h1_AntiS_RECO_Acc_lxy.pdf'
+'c_h1_AntiS_RECO_Acc_phi.pdf'
+'c_h1_AntiS_RECO_Acc_pt.pdf'
+'c_h1_AntiS_RECO_Acc_pz.pdf'
+'c_h1_AntiS_RECO_Acc_vz.pdf'
+'c_h_AntiS_massMinusNeutron.pdf'
+)
+
+source_dir="plots_Tracking_AntiS_specific/"
+dest_dir="plots_Tracking_AntiS_specific_important/"
+
+for i in "${array[@]}"
+do
+	cp $source_dir$i $dest_dir
+done

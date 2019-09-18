@@ -222,13 +222,13 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
 			//check if this is a reconstructable antiS, so should have 2 daughters of correct type, each daughter should have 2 daughters with the correct type
 			//the below implicitely neglects the duplitcate antiS due to looping, because only 1 of the duplicates will interact and give daughters
-			if(genParticle->numberOfDaughters()==0 && abs(genParticle->eta()) < 4) nTotalGiving0DaughtersGENSWithEtaSmallerThan4++;
+			if(genParticle->numberOfDaughters()==0 && abs(genParticle->eta()) < 4.3) nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3++;
 			//couning the number of antiS with only 1 daughter as below will also count the duplicates
 			//if(genParticle->numberOfDaughters()==1 && abs(genParticle->eta()) < 4) nTotalGiving1DaughtersGENSWithEtaSmallerThan4++;
 			if(genParticle->numberOfDaughters()==2){
 
 				nTotalGiving2DaughtersGENS++;
-				if(abs(genParticle->eta()) < 4 ) nTotalGiving2DaughtersGENSWithEtaSmallerThan4++;
+				if(abs(genParticle->eta()) < 4.3 ) nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3++;
 
 				int daughterParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle);//returns 3 if daughters from antiS are Ks and AntiLambda
  
@@ -265,7 +265,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
   nTotalUniqueGenS = nTotalUniqueGenS + v_antiS_momenta_and_itt.size();
   for(unsigned int s = 0; s <  v_antiS_momenta_and_itt.size(); s++ ){
-	if(abs(v_antiS_momenta_and_itt[s][0]) < 4) nTotalUniqueGenSWithEtaSmallerThan4++;
+	if(abs(v_antiS_momenta_and_itt[s][0]) < 4.3) nTotalUniqueGenSWithEtaSmallerThan4p3++;
   }
 
  } //end of analyzer
@@ -601,11 +601,11 @@ FlatTreeProducerGENSIM::~FlatTreeProducerGENSIM()
 
 	std::cout << "The total number GEN " << particle << " that were found is (this includes duplicates): " << nTotalGENS << std::endl; 
 	std::cout << "The total number of unique " << particle << ": " << nTotalUniqueGenS  << std::endl; 
-	std::cout << "The total number of unique " << particle << " with |eta| < 4: " << nTotalUniqueGenSWithEtaSmallerThan4  << std::endl; 
+	std::cout << "The total number of unique " << particle << " with |eta| < 4.3: " << nTotalUniqueGenSWithEtaSmallerThan4p3  << std::endl; 
 	std::cout << "The total number GEN " << particle << "  giving 2 daughters: " << nTotalGiving2DaughtersGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 2 daughters (should be the same as above, cause only antiS with |eta|<4 can interact and thus have 2 daughters): " << nTotalGiving2DaughtersGENSWithEtaSmallerThan4 << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 0 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalGiving0DaughtersGENSWithEtaSmallerThan4 << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4 giving 1 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalUniqueGenSWithEtaSmallerThan4 - nTotalGiving2DaughtersGENS - nTotalGiving0DaughtersGENSWithEtaSmallerThan4 << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 2 daughters (should be the same as above, cause only antiS with |eta|<4 can interact and thus have 2 daughters): " << nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 0 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
+	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 1 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalUniqueGenSWithEtaSmallerThan4p3 - nTotalGiving2DaughtersGENS - nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
 	std::cout << "The total number GEN " << particle << " giving 2 correct daughters and 4 granddaughters: " << nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl; 
 	std::cout << "The total number GEN " << particle << " decaying to ALL correct granddaughters is: " << nTotalCorrectGENS << std::endl;
 	std::cout << "so the branching ratio you extract for all charged decay is the division of the 2 previous lines: " << (double)nTotalCorrectGENS/(double)nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl;
@@ -613,9 +613,9 @@ FlatTreeProducerGENSIM::~FlatTreeProducerGENSIM()
 	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with pos eta is: " << nTotalGENSPosEta << std::endl;
         std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
 
-	std::cout << "So the efficiency factor you extract for the fact that you discard |eta| > 4 anti-S is (you could already have extracted this at GEN level): " <<  (double)nTotalUniqueGenSWithEtaSmallerThan4/(double)nTotalUniqueGenS << std::endl;
-	std::cout << "fraction of AntiS with |eta| < 4 which go to correct granddaughters: " << (double)nTotalCorrectGENS/(double)nTotalUniqueGenSWithEtaSmallerThan4 << std::endl;
-	std::cout << "The second efficiency factor is the number of these AntiS with |eta| < 4 which actually go to correct granddaughters AND interact in the beampipe: "<< (double)nTotalCorrectGENSInteractingInBeampipe/(double)nTotalUniqueGenSWithEtaSmallerThan4 << std::endl;
+	std::cout << "So the efficiency factor you extract for the fact that you discard |eta| > 4.3 anti-S is (you could already have extracted this at GEN level): " <<  (double)nTotalUniqueGenSWithEtaSmallerThan4p3/(double)nTotalUniqueGenS << std::endl;
+	std::cout << "fraction of AntiS with |eta| < 4.3 which go to correct granddaughters: " << (double)nTotalCorrectGENS/(double)nTotalUniqueGenSWithEtaSmallerThan4p3 << std::endl;
+	std::cout << "The second efficiency factor is the number of these AntiS with |eta| < 4.3 which actually go to correct granddaughters AND interact in the beampipe: "<< (double)nTotalCorrectGENSInteractingInBeampipe/(double)nTotalUniqueGenSWithEtaSmallerThan4p3 << std::endl;
 	
 
 }
