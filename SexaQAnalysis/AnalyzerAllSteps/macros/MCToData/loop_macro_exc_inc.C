@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 void splithist(double ratio=0.2){
   TVirtualPad* pmain = TVirtualPad::Pad();
   
@@ -115,6 +118,24 @@ void loop_macro_exc_inc(){
   //for Lambda
   //TFile *f1   = TFile::Open("Results/output_DataToMC_RunG_H_with_dxy_dz_min_PV_cut_reweighing_on_Lambda_vz_Dz_min_PV.root");
 
+   std::vector<const char *> v_file_name;
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_vz.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_lxy.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pt.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pt_tracks1.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pt_tracks2.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pz.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pz_tracks1.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_pz_tracks2.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_dxy_PV.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_dz.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_max_dxy_beamspot.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track1_dxy_beamspot.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track2_dxy_beamspot.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_max_dz_min_PV.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track1_dz_min_PV.dat");
+   v_file_name.push_back("Data_MC_plots/h_RECO_Ks_Track2_dz_min_PV.dat");
    
    std::vector<const char *> v_hist_name;
    v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_vz.pdf");
@@ -129,7 +150,11 @@ void loop_macro_exc_inc(){
    v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_dz.pdf");
    v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2.pdf");
    v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_max_dxy_beamspot.pdf");
+   v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track1_dxy_beamspot.pdf");
+   v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track2_dxy_beamspot.pdf");
    v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track1Track2_max_dz_min_PV.pdf");
+   v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track1_dz_min_PV.pdf");
+   v_hist_name.push_back("Data_MC_plots/h_RECO_Ks_Track2_dz_min_PV.pdf");
 
    std::vector<const char *> v_hist_data;
    v_hist_data.push_back("Data_Histos/h_RECO_Ks_vz");
@@ -144,7 +169,11 @@ void loop_macro_exc_inc(){
    v_hist_data.push_back("Data_Histos/h_RECO_Ks_dz");
    v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2");
    v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track1Track2_max_dxy_beamspot");
+   v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track1_dxy_beamspot");
+   v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track2_dxy_beamspot");
    v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track1Track2_max_dz_min_PV");
+   v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track1_dz_min_PV");
+   v_hist_data.push_back("Data_Histos/h_RECO_Ks_Track2_dz_min_PV");
 
    std::vector<const char *> v_hist_mc;
    v_hist_mc.push_back("MC_Histos/h_RECO_Ks_vz");
@@ -159,7 +188,11 @@ void loop_macro_exc_inc(){
    v_hist_mc.push_back("MC_Histos/h_RECO_Ks_dz");
    v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2");
    v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track1Track2_max_dxy_beamspot");
+   v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track1_dxy_beamspot");
+   v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track2_dxy_beamspot");
    v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track1Track2_max_dz_min_PV");
+   v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track1_dz_min_PV");
+   v_hist_mc.push_back("MC_Histos/h_RECO_Ks_Track2_dz_min_PV");
   
 	
    //for Lambda	
@@ -221,7 +254,7 @@ void loop_macro_exc_inc(){
       TH1D *mc     =(TH1D*)(f1->Get(v_hist_mc[i_h]));
 	
       //scale the MC with a given factor
-      mc->Scale(1.2);
+      mc->Scale(1.20298597518);
       //for lambda
       //mc->Scale(1.7);
 
@@ -262,6 +295,17 @@ void loop_macro_exc_inc(){
       Mont->Draw("peX0C");// rec/gen
       fixsplithist(data,Mont);
 
+      //loop over all the bins and write the DATA/MC ratio to a file
+       ofstream myfile;
+       myfile.open(v_file_name[i_h]);
+       myfile <<  "kinVariable" << "," << "DataOverMC" << "," << "DataOverMCError" << "\n";     
+     for(unsigned int i_bin = 1; i_bin <= Mont->GetXaxis()->GetNbins(); i_bin++){
+	double DataOverMC = Mont->GetBinContent(i_bin);
+	double DataOverMCError = Mont->GetBinError(i_bin);
+	double kinVariable = Mont->GetXaxis()->GetBinCenter(i_bin);
+	myfile << kinVariable << "," << DataOverMC << "," << DataOverMCError << "\n";
+      }
+      myfile.close();
       gStyle->SetOptStat(0);
       c1->Write();
       c1->SaveAs(v_hist_name[i_h],".pdf");

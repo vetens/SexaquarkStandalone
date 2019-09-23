@@ -28,6 +28,10 @@ inFiles = [TFile("/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQA
 
 fOut = TFile(plots_output_dir+'macro_combined_FlatTree_Tracking_Skimmed_trial17_acceptance.root','RECREATE')
 
+def printProgress(i):
+	if(i%10000 == 0):
+		print 'reached track: ', i, ': ', float(i)/float(min(maxEvents,tree.GetEntries()))*100, '%'
+
 #histos to plot the number of granddaughters with >= 7 tracker hits versus a certain parameter of the antiS
 tprof_numberGranddaughters_7hits_eta_antiS = TProfile('tprof_numberGranddaughters_7hits_eta_antiS',";#eta #bar{S};#final state particles with >= 7 numberOfTrackerLayers",20,-5,5) 
 tprof_numberGranddaughters_7hits_vz_interaction_antiS = TProfile('tprof_numberGranddaughters_7hits_vz_interaction_antiS',";vz(beamspot) interaction vertex #bar{S} (cm);#final state particles with >= 7 numberOfTrackerLayers",50,-100,100) 
@@ -39,6 +43,7 @@ teff_fractionAllEvents_numberGranddaughters_7hits_lxy_antiS= TEfficiency('teff_f
 tprof2_fractionAllEvents_numberGranddaughters_7hits_vz_lxy_antiS = TProfile2D('tprof2_fractionAllEvents_numberGranddaughters_7hits_vz_lxy_antiS',";v_{z}(beamspot) interaction vertex #bar{S} (cm);l_{0}(beamspot) interaction vertex #bar{S} (cm);event fracion #geq 7 numberOfTrackerLayers each final state particle",250,-125,125,1250,0,125) 
 teff_fractionAllEvents_numberGranddaughters_7hits_pt_antiS= TEfficiency('teff_fractionAllEvents_numberGranddaughters_7hits_pt_antiS',";p_{t} #bar{S} (GeV);event fracion #geq 7 numberOfTrackerLayers each final state particle",100,0,10) 
 teff_fractionAllEvents_numberGranddaughters_7hits_pz_antiS= TEfficiency('teff_fractionAllEvents_numberGranddaughters_7hits_pz_antiS',";p_{z} #bar{S} (GeV);event fracion #geq 7 numberOfTrackerLayers each final state particle",100,0,100) 
+#check the correlation between antiS being reconstructed and all tracks having larger than a certain amount of hits
 h2_allTracksMoreThan4Hits_efficiency = TH2I("h2_allTracksMoreThan4Hits_efficiency",";all tracks >= 5 hits?;#bar{S} reconstructed;",2,-0.5,1.5,2,-0.5,1.5)
 h2_allTracksMoreThan5Hits_efficiency = TH2I("h2_allTracksMoreThan5Hits_efficiency",";all tracks >= 6 hits?;#bar{S} reconstructed;",2,-0.5,1.5,2,-0.5,1.5)
 h2_allTracksMoreThan6Hits_efficiency = TH2I("h2_allTracksMoreThan6Hits_efficiency",";all tracks >= 7 hits?;#bar{S} reconstructed;",2,-0.5,1.5,2,-0.5,1.5)
@@ -106,8 +111,6 @@ teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambdaAntiPr
 teff_AntiLambdaAntiProton_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm); ",40,-100,100) 
 teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda}-#pi^{+}; ",40,0-0.5,40-0.5) 
 
-
-
 ll_efficiencies = [
 [teff_AntiS_RECO_eff_eta_antiS,teff_AntiS_RECO_eff_eta_antiS_antiS,teff_AntiS_RECO_eff_vz_antiS,teff_AntiS_RECO_eff_lxy_antiS,teff_AntiS_RECO_eff_pt_antiS,teff_AntiS_RECO_eff_pz_antiS,teff_AntiS_RECO_eff_dxy_antiS,teff_AntiS_RECO_eff_dz_antiS,teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS],
 [teff_Ks_RECO_eff_eta_antiS,teff_Ks_RECO_eff_eta_antiS_antiS,teff_Ks_RECO_eff_vz_antiS,teff_Ks_RECO_eff_lxy_antiS,teff_Ks_RECO_eff_pt_antiS,teff_Ks_RECO_eff_pz_antiS,teff_Ks_RECO_eff_dxy_antiS,teff_Ks_RECO_eff_dz_antiS,teff_Ks_RECO_eff_numberOfTrackerLayerHits_antiS],
@@ -122,7 +125,7 @@ for l in ll_efficiencies:
 		h.Clone()
 		h.SetDirectory(0)
 
-
+#create the same list of histograms as in ll_efficiencies but fill these only for antiS which have all granddaughters within tracker acceptance, where this is based on having >=7 hits on all tracks.
 ll_efficiencies_acceptance = []
 for l in range(0,len(ll_efficiencies)):
 	ll_efficiencies_acceptance.append([])
@@ -147,10 +150,10 @@ h1_AntiS_RECO_Acc_pt = TH1F("h1_AntiS_RECO_Acc_pt","; p_{t, sim #bar{S}} - p_{t,
 h1_AntiS_RECO_Acc_pz = TH1F("h1_AntiS_RECO_Acc_pz","; p_{z, sim #bar{S}} - p_{z, reco #bar{S}} (GeV);Events/0.1GeV",40,-2,2)
 
 #invariant mass of the antiS
-h_AntiS_massMinusNeutron = TH1F("h_AntiS_massMinusNeutron",";m_{#bar{S},obs} (GeV);Events/0.1GeV",180,-6,12) 
-h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda = TH2F("h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda","; m_{#bar{S},obs} (GeV); |#vec{p}_{K_{s}} + #vec{p}_{#bar{#Lambda}}| (GeV);Events/GeV^{2}",110,-5,6,60,0,40)
+h_AntiS_massMinusNeutron = TH1F("h_AntiS_massMinusNeutron",";m_{#bar{S},obs} RECO (GeV);Events/0.1GeV",180,-6,12) 
+h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda = TH2F("h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda","; m_{#bar{S},obs} (GeV); |#vec{p}_{K_{s}, RECO} + #vec{p}_{#bar{#Lambda}, RECO}| (GeV);Events/GeV^{2}",110,-5,6,60,0,40)
 
-#list of list for histograms containging kinematics of the granddaughters of the AntiS
+#list of list for histograms containging kinematics of the granddaughters of the AntiS, for AntiS which got reconstructed. These plots are necessary because they tell where you need to be sure that your tracking is properly described by MC. 
 h_AntiSGrandDaughter_lxy_1 = TH1F("h_AntiSGrandDaughter_lxy_1",";Simulated track l_{0}(creation vertex, beamspot) (cm);Events/cm",60,0,60) 
 h_AntiSGrandDaughter_vz_1 = TH1F("h_AntiSGrandDaughter_vz_1",";Simulated track v_{z}(creation vertex, beamspot) (cm);Events/10cm",40,-200,200) 
 h_AntiSGrandDaughter_dxy_1 = TH1F("h_AntiSGrandDaughter_dxy_1",";Simulated track d_{0}(beamspot) (cm);Events/cm",40,-20,20) 
@@ -181,6 +184,7 @@ ll_kinematics_granddaughters_of_RECO_AntiS = [
 #a list with counters for the reconstructed particles, so there are 7 entries for each of the 7 particles
 nAntiS = 0.
 nTotalReconstructed = [0.,0.,0.,0.,0.,0.,0.]
+#and count separately the reconstruction efficiency of the Ks, antiLambda and antiS if their respective daughters got reconstructed.
 nKsRECOIfBothDaughtersReco = 0.
 nKsTOTALIfBothDaughtersReco = 0.
 nAntiLambdaRECOIfBothDaughtersReco = 0.
@@ -197,48 +201,17 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 
 		nAntiS+=1
 
-		#my requirement for having reconstructed antiS
+		#my requirement for having reconstructed antiS: based on the 3D distance between the GEN and RECO interaction vertex of the antiS.
 		antiSReconstructed = tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < 0.5
 
 		if(i>maxEvents):
 			break
+		
+		printProgress(i)
 
-		if(i%10000 == 0):
-			print 'reached track: ', i, ': ', float(i)/float(min(maxEvents,tree.GetEntries()))*100, '%'
-
-		#count the antisS where all granddaughters have a certain amount of hits
-		NGrandDaughtersWithTrackerLayerHitsLargerThan4 = 0
-		NGrandDaughtersWithTrackerLayerHitsLargerThan5 = 0
-		NGrandDaughtersWithTrackerLayerHitsLargerThan6 = 0
-		for j in range(0,len(tree._tpsAntiS_type)):
-			#now look at _tpAntiS_type from 3 to 6, that are the granddaughters:
-			if(tree._tpsAntiS_type[j] >= 3 and tree._tpsAntiS_type[j] <= 6 ):
-				#print "particle type ", tree._tpsAntiS_type[j], " has numberOfTrackerLayerHits = " , tree._tpsAntiS_numberOfTrackerLayers[j]
-				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 5):
-					NGrandDaughtersWithTrackerLayerHitsLargerThan4 += 1
-				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 6):
-					NGrandDaughtersWithTrackerLayerHitsLargerThan5 += 1
-				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 7):
-					NGrandDaughtersWithTrackerLayerHitsLargerThan6 += 1
-
-		tprof_numberGranddaughters_7hits_eta_antiS.Fill(tree._tpsAntiS_eta[0],NGrandDaughtersWithTrackerLayerHitsLargerThan6)
-		tprof_numberGranddaughters_7hits_vz_interaction_antiS.Fill(tree._tpsAntiS_vz_beamspot[1],NGrandDaughtersWithTrackerLayerHitsLargerThan6) #interaction vertex is the creation vertex of the daughter
-		tprof_numberGranddaughters_7hits_lxy_interaction_antiS.Fill(tree._tpsAntiS_Lxy_beamspot[1],NGrandDaughtersWithTrackerLayerHitsLargerThan6) #interaction vertex is the creation vertex of the daughter
-
-		boolNGrandDaughtersWithTrackerLayerHitsLargerThan4 =  NGrandDaughtersWithTrackerLayerHitsLargerThan4==4
-		boolNGrandDaughtersWithTrackerLayerHitsLargerThan5 =  NGrandDaughtersWithTrackerLayerHitsLargerThan5==4
-		boolNGrandDaughtersWithTrackerLayerHitsLargerThan6 =  NGrandDaughtersWithTrackerLayerHitsLargerThan6==4
-
-		#plots having the fraction of all events with all granddaughters with more than 7 hits in function of a kinematic variable of the antiS
-		teff_fractionAllEvents_numberGranddaughters_7hits_eta_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_eta[0])
-		teff_fractionAllEvents_numberGranddaughters_7hits_phi_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_phi[0])
-		teff_fractionAllEvents_numberGranddaughters_7hits_vz_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_vz_beamspot[1])
-		teff_fractionAllEvents_numberGranddaughters_7hits_lxy_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_Lxy_beamspot[1])
-		tprof2_fractionAllEvents_numberGranddaughters_7hits_vz_lxy_antiS.Fill(tree._tpsAntiS_vz_beamspot[1],tree._tpsAntiS_Lxy_beamspot[1],boolNGrandDaughtersWithTrackerLayerHitsLargerThan6)
-		teff_fractionAllEvents_numberGranddaughters_7hits_pt_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_pt[0])
-		teff_fractionAllEvents_numberGranddaughters_7hits_pz_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_pz[0])
-		if(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6):
-			nAntiSWithAllGranddaughtersMoreThan6Hits+=1
+                #just a check of the tree: if a antiS got reconstructed then also all the daughters should be reconstructed.  
+                if(antiSReconstructed): 
+                        print tree._tpsAntiS_reconstructed[0], " ", tree._tpsAntiS_reconstructed[1], " ",tree._tpsAntiS_reconstructed[2], " ",tree._tpsAntiS_reconstructed[3], " ",tree._tpsAntiS_reconstructed[4], " ",tree._tpsAntiS_reconstructed[5], " ",tree._tpsAntiS_reconstructed[6]
 
 		#count the reconstructed particles with the requirement that there daughters got reconstructed
 		if(tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1):
@@ -250,9 +223,44 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				nAntiLambdaRECOIfBothDaughtersReco += 1
 			nAntiLambdaTOTALIfBothDaughtersReco += 1
 		if(tree._tpsAntiS_reconstructed[1] == 1 and tree._tpsAntiS_reconstructed[2] == 1):
-			if(tree._tpsAntiS_reconstructed[0] == 1):
+			if(antiSReconstructed):
 				nAntiSRECOIfBothDaughtersReco += 1
 			nAntiSTOTALIfBothDaughtersReco += 1
+
+		#count the number of granddaughters of this antiS which have >= a certain amount of hits
+		NGrandDaughtersWithTrackerLayerHitsLargerThan4 = 0
+		NGrandDaughtersWithTrackerLayerHitsLargerThan5 = 0
+		NGrandDaughtersWithTrackerLayerHitsLargerThan6 = 0
+		for j in range(0,len(tree._tpsAntiS_type)):
+			#now look at _tpAntiS_type from 3 to 6, this are the granddaughters:
+			if(tree._tpsAntiS_type[j] >= 3 and tree._tpsAntiS_type[j] <= 6 ):
+				#print "particle type ", tree._tpsAntiS_type[j], " has numberOfTrackerLayerHits = " , tree._tpsAntiS_numberOfTrackerLayers[j]
+				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 5):
+					NGrandDaughtersWithTrackerLayerHitsLargerThan4 += 1
+				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 6):
+					NGrandDaughtersWithTrackerLayerHitsLargerThan5 += 1
+				if(tree._tpsAntiS_numberOfTrackerLayers[j] >= 7):
+					NGrandDaughtersWithTrackerLayerHitsLargerThan6 += 1
+
+		tprof_numberGranddaughters_7hits_eta_antiS.Fill(tree._tpsAntiS_eta[0],NGrandDaughtersWithTrackerLayerHitsLargerThan6)
+		tprof_numberGranddaughters_7hits_vz_interaction_antiS.Fill(tree._tpsAntiS_vz_beamspot[1],NGrandDaughtersWithTrackerLayerHitsLargerThan6) #interaction vtx is the creation vtx of the daughter
+		tprof_numberGranddaughters_7hits_lxy_interaction_antiS.Fill(tree._tpsAntiS_Lxy_beamspot[1],NGrandDaughtersWithTrackerLayerHitsLargerThan6) #interaction vtx is the creation vtx of the daughter
+
+		boolNGrandDaughtersWithTrackerLayerHitsLargerThan4 =  NGrandDaughtersWithTrackerLayerHitsLargerThan4==4
+		boolNGrandDaughtersWithTrackerLayerHitsLargerThan5 =  NGrandDaughtersWithTrackerLayerHitsLargerThan5==4
+		boolNGrandDaughtersWithTrackerLayerHitsLargerThan6 =  NGrandDaughtersWithTrackerLayerHitsLargerThan6==4
+
+		#plots having the fraction of all events with all granddaughters with >= 7 hits in function of a kinematic variable of the antiS
+		teff_fractionAllEvents_numberGranddaughters_7hits_eta_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_eta[0])
+		teff_fractionAllEvents_numberGranddaughters_7hits_phi_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_phi[0])
+		teff_fractionAllEvents_numberGranddaughters_7hits_vz_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_vz_beamspot[1])
+		teff_fractionAllEvents_numberGranddaughters_7hits_lxy_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_Lxy_beamspot[1])
+		tprof2_fractionAllEvents_numberGranddaughters_7hits_vz_lxy_antiS.Fill(tree._tpsAntiS_vz_beamspot[1],tree._tpsAntiS_Lxy_beamspot[1],boolNGrandDaughtersWithTrackerLayerHitsLargerThan6)
+		teff_fractionAllEvents_numberGranddaughters_7hits_pt_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_pt[0])
+		teff_fractionAllEvents_numberGranddaughters_7hits_pz_antiS.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,tree._tpsAntiS_pz[0])
+		#counter for all the antiS which have all granddaughters producing >= 7 hits
+		if(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6):
+			nAntiSWithAllGranddaughtersMoreThan6Hits+=1
 
 		#now instead of looking at the NGrandDaughtersWithTrackerLayerHitsLargerThan6 as a proxy for tracking efficiency now look at the real tracking efficiency for antiS and its daughters
 		for i in range(0,7):#for all of the 7 particles
@@ -269,9 +277,8 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				particleReconstructed = antiSReconstructed
 
 			#make a global count of what got reconstructed
-			if(particleReconstructed):
+			if(particleReconstructed): #here I still count the Ks daughters separately
 				nTotalReconstructed[i] += 1
-					
 			
 			ll_efficiencies[index][0].Fill(particleReconstructed,tree._tpsAntiS_eta[i])
 			ll_efficiencies[index][1].Fill(particleReconstructed,tree._tpsAntiS_eta[0]) #always in function of eta of the original antiS
@@ -293,7 +300,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			ll_efficiencies[index][7].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
 			ll_efficiencies[index][8].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
 			
-			#it is almost a requirement for the antiS to be reconstructed that boolNGrandDaughtersWithTrackerLayerHitsLargerThan6 so now look for the remaining events what are the efficiencies
+			#it is almost a requirement for the antiS to be reconstructed that boolNGrandDaughtersWithTrackerLayerHitsLargerThan6 so now look for the events which have all final state particles falling in the acceptance what are the remaining inneficiencies
 			if(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6):
 				ll_efficiencies_acceptance[index][0].Fill(particleReconstructed,tree._tpsAntiS_eta[i])
 				ll_efficiencies_acceptance[index][1].Fill(particleReconstructed,tree._tpsAntiS_eta[0]) #always in function of eta of the original antiS
@@ -314,11 +321,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				ll_efficiencies_acceptance[index][6].Fill(particleReconstructed,tree._tpsAntiS_dxy_beamspot[i])
 				ll_efficiencies_acceptance[index][7].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
 				ll_efficiencies_acceptance[index][8].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
-			
 					
-		#just a check of the tree: if a antiS got reconstructed then also all the daughters should be reconstructed. 
-		if(antiSReconstructed):
-			print tree._tpsAntiS_reconstructed[0], " ", tree._tpsAntiS_reconstructed[1], " ",tree._tpsAntiS_reconstructed[2], " ",tree._tpsAntiS_reconstructed[3], " ",tree._tpsAntiS_reconstructed[4], " ",tree._tpsAntiS_reconstructed[5], " ",tree._tpsAntiS_reconstructed[6]
 		#accuracies:
 		if(antiSReconstructed):
 			h1_AntiS_RECO_Acc_eta.Fill(tree._tpsAntiS_eta[0]-tree._tpsAntiS_bestRECO_eta[0])
@@ -334,10 +337,10 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 		h2_allTracksMoreThan6Hits_efficiency.Fill(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6,antiSReconstructed)
 		h_AntiS_deltaLInteractionVertexAntiSmin.Fill(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0])
 			
-		#now select tracks which have the antiS properly reconstructed and check for these events how the kinematics look like.
+		#now select tracks which have the antiS properly reconstructed and check for these events how the kinematics look like of the final state particles.
 		if(antiSReconstructed):
 			h_AntiS_massMinusNeutron.Fill(tree._tpsAntiS_bestRECO_massMinusNeutron[0])
-			momentum_Ks_plus_Lambda = np.sqrt(  np.power(tree._tpsAntiS_pt[1]+tree._tpsAntiS_pt[2],2) + np.power(tree._tpsAntiS_pz[1]+tree._tpsAntiS_pz[2],2) )
+			momentum_Ks_plus_Lambda = np.sqrt(  np.power(tree._tpsAntiS_bestRECO_pt[1]+tree._tpsAntiS_bestRECO_pt[2],2) + np.power(tree._tpsAntiS_bestRECO_pz[1]+tree._tpsAntiS_bestRECO_pz[2],2) )
 			h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda.Fill(tree._tpsAntiS_bestRECO_massMinusNeutron[0],momentum_Ks_plus_Lambda)
 			for j in range(0,len(tree._tpsAntiS_type)):
 				#now look at _tpAntiS_type from 3 to 6, that are the granddaughters:
@@ -357,10 +360,17 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 					ll_kinematics_granddaughters_of_RECO_AntiS[index][5].Fill(tree._tpsAntiS_pz[j])	
 
 
+#plot kinematics of final state particles for which the antiS got reconstructed
+granddaughterkinematics_dir_of_RECO_AntiS = fOut.mkdir("granddaughterkinematics_of_RECO_AntiS") 
+granddaughterkinematics_dir_of_RECO_AntiS.cd() 
+for l in ll_kinematics_granddaughters_of_RECO_AntiS: 
+        for h in l: 
+                h.Write()
+
 nHistos = len(ll_kinematics_granddaughters_of_RECO_AntiS[0])
 n_granddaughters = len(ll_kinematics_granddaughters_of_RECO_AntiS)
 leg_granddaugthers = ["K_{S} daughters","#bar{#Lambda}-#pi^{+}","#bar{#Lambda}-#bar{p}"]
-for i in range(0,nHistos):#each list contains a list of histograms. he histos need to be overlaid one list to the other,
+for i in range(0,nHistos):#each list contains a list of histograms. the histos need to be overlaid one list to the other,
 	c_name = "c_"+ll_kinematics_granddaughters_of_RECO_AntiS[0][i].GetName()
 	c = TCanvas(c_name,"")
 	legend = TLegend(0.8,0.85,0.99,0.99)
@@ -385,6 +395,7 @@ for i in range(0,nHistos):#each list contains a list of histograms. he histos ne
 	c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 	c.Write()
 
+#some kinematics of the AntiS
 RECO_AntiS_dir = fOut.mkdir("RECO_AntiS")
 RECO_AntiS_dir.cd()
 h_AntiS_massMinusNeutron.Write()
@@ -404,7 +415,7 @@ c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 c.Write()
 h2_AntiS_inv_massMinusNeutron_p_Ks_plus_Lambda.Write()
 
-
+#for the number of tracker hits study
 numberTrackerHits_dir = fOut.mkdir("numberTrackerHits")
 numberTrackerHits_dir.cd()
 tprof_numberGranddaughters_7hits_eta_antiS.Write()
@@ -449,7 +460,7 @@ h2_allTracksMoreThan4Hits_efficiency.Write()
 h2_allTracksMoreThan5Hits_efficiency.Write()
 h2_allTracksMoreThan6Hits_efficiency.Write()
 
-
+#The reconstruction efficiencies of all the particles
 #list of directory names:
 l_dir_names = ["RECO_eff_antiS", "RECO_eff_Ks", "RECO_eff_antiLambda", "RECO_eff_Ks_daughters", "RECO_eff_antiLambda_pion", "RECO_eff_antiLambda_antiProton"]
 for il, l in enumerate(ll_efficiencies,start = 0):
@@ -485,6 +496,7 @@ for il, l in enumerate(ll_efficiencies,start = 0):
 		CMS_lumi.CMS_lumi(c, 0, 11)
 		c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 
+#reconstruction efficiencies of all the particles which have all final state particles within the accepatance
 l_dir_names = ["RECO_eff_antiS_acceptance", "RECO_eff_Ks_acceptance", "RECO_eff_antiLambda_acceptance", "RECO_eff_Ks_daughters_acceptance", "RECO_eff_antiLambda_pion_acceptance", "RECO_eff_antiLambda_antiProton_acceptance"]
 #l_particle = ["#bar{S}","Ks","Lambda","KsDaughters","AntiLambdaPion","AntiLambdaAntiProton"]
 for il, l in enumerate(ll_efficiencies_acceptance,start = 0):
@@ -549,7 +561,7 @@ for il, l in enumerate(ll_efficiencies_acceptance,start = 0):
 		c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 		c.Write()
 	
-
+#the accuracy plots
 antiS_RECO_accuracy_dir = fOut.mkdir("antiS_RECO_accuracy")
 antiS_RECO_accuracy_dir.cd()
 
@@ -574,14 +586,13 @@ for i in range(0,len(l_h)):
 	c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 	c.Write()
 
-granddaughterkinematics_dir_of_RECO_AntiS = fOut.mkdir("granddaughterkinematics_of_RECO_AntiS")
-granddaughterkinematics_dir_of_RECO_AntiS.cd()
-for l in ll_kinematics_granddaughters_of_RECO_AntiS:
-	for h in l:
-		h.Write()
 
 fOut.Close()
 
+
+
+
+#print some conclusions:
 
 print "Fraction of antiS with all granddaughters generating >= 7 tracker hits=: ", nAntiSWithAllGranddaughtersMoreThan6Hits, "/",nAntiS, " = ", nAntiSWithAllGranddaughtersMoreThan6Hits/nAntiS 
 

@@ -88,6 +88,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_Ks_daughter0_py",&_GEN_Ks_daughter0_py);
 	_tree->Branch("_GEN_Ks_daughter0_pz",&_GEN_Ks_daughter0_pz);
 	_tree->Branch("_GEN_Ks_daughter0_pt",&_GEN_Ks_daughter0_pt);
+	_tree->Branch("_GEN_Ks_daughter0_eta",&_GEN_Ks_daughter0_eta);
+	_tree->Branch("_GEN_Ks_daughter0_phi",&_GEN_Ks_daughter0_phi);
 	_tree->Branch("_GEN_Ks_daughter0_vx",&_GEN_Ks_daughter0_vx);
 	_tree->Branch("_GEN_Ks_daughter0_vy",&_GEN_Ks_daughter0_vy);
 	_tree->Branch("_GEN_Ks_daughter0_vz",&_GEN_Ks_daughter0_vz);
@@ -99,6 +101,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_Ks_daughter1_py",&_GEN_Ks_daughter1_py);
 	_tree->Branch("_GEN_Ks_daughter1_pz",&_GEN_Ks_daughter1_pz);
 	_tree->Branch("_GEN_Ks_daughter1_pt",&_GEN_Ks_daughter1_pt);
+	_tree->Branch("_GEN_Ks_daughter1_eta",&_GEN_Ks_daughter1_eta);
+	_tree->Branch("_GEN_Ks_daughter1_phi",&_GEN_Ks_daughter1_phi);
 	_tree->Branch("_GEN_Ks_daughter1_vx",&_GEN_Ks_daughter1_vx);
 	_tree->Branch("_GEN_Ks_daughter1_vy",&_GEN_Ks_daughter1_vy);
 	_tree->Branch("_GEN_Ks_daughter1_vz",&_GEN_Ks_daughter1_vz);
@@ -110,6 +114,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_AntiLambda_AntiProton_py",&_GEN_AntiLambda_AntiProton_py);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_pz",&_GEN_AntiLambda_AntiProton_pz);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_pt",&_GEN_AntiLambda_AntiProton_pt);
+	_tree->Branch("_GEN_AntiLambda_AntiProton_eta",&_GEN_AntiLambda_AntiProton_eta);
+	_tree->Branch("_GEN_AntiLambda_AntiProton_phi",&_GEN_AntiLambda_AntiProton_phi);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_vx",&_GEN_AntiLambda_AntiProton_vx);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_vy",&_GEN_AntiLambda_AntiProton_vy);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_vz",&_GEN_AntiLambda_AntiProton_vz);
@@ -121,6 +127,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_AntiLambda_Pion_py",&_GEN_AntiLambda_Pion_py);
 	_tree->Branch("_GEN_AntiLambda_Pion_pz",&_GEN_AntiLambda_Pion_pz);
 	_tree->Branch("_GEN_AntiLambda_Pion_pt",&_GEN_AntiLambda_Pion_pt);
+	_tree->Branch("_GEN_AntiLambda_Pion_eta",&_GEN_AntiLambda_Pion_eta);
+	_tree->Branch("_GEN_AntiLambda_Pion_phi",&_GEN_AntiLambda_Pion_phi);
 	_tree->Branch("_GEN_AntiLambda_Pion_vx",&_GEN_AntiLambda_Pion_vx);
 	_tree->Branch("_GEN_AntiLambda_Pion_vy",&_GEN_AntiLambda_Pion_vy);
 	_tree->Branch("_GEN_AntiLambda_Pion_vz",&_GEN_AntiLambda_Pion_vz);
@@ -339,6 +347,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_Ks_daughter0_pz = genParticle->daughter(0)->daughter(0)->pz();
 	TVector3 GEN_Ks_daughter0_momentum(genParticle->daughter(0)->daughter(0)->px(),genParticle->daughter(0)->daughter(0)->py(),genParticle->daughter(0)->daughter(0)->pz());
 	double GEN_Ks_daughter0_pt = genParticle->daughter(0)->daughter(0)->pt();
+	double GEN_Ks_daughter0_eta = genParticle->daughter(0)->daughter(0)->eta();
+	double GEN_Ks_daughter0_phi = genParticle->daughter(0)->daughter(0)->phi();
 	double GEN_Ks_daughter0_vx = genParticle->daughter(0)->daughter(0)->vx();
 	double GEN_Ks_daughter0_vy = genParticle->daughter(0)->daughter(0)->vy();
 	double GEN_Ks_daughter0_vz = genParticle->daughter(0)->daughter(0)->vz();
@@ -351,6 +361,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_Ks_daughter1_py = genParticle->daughter(0)->daughter(1)->py();
 	double GEN_Ks_daughter1_pz = genParticle->daughter(0)->daughter(1)->pz();
 	double GEN_Ks_daughter1_pt = genParticle->daughter(0)->daughter(1)->pt();
+	double GEN_Ks_daughter1_eta = genParticle->daughter(0)->daughter(1)->eta();
+	double GEN_Ks_daughter1_phi = genParticle->daughter(0)->daughter(1)->phi();
 	TVector3 GEN_Ks_daughter1_momentum(genParticle->daughter(0)->daughter(1)->px(),genParticle->daughter(0)->daughter(1)->py(),genParticle->daughter(0)->daughter(1)->pz());
 	double GEN_Ks_daughter1_vx = genParticle->daughter(0)->daughter(1)->vx();
 	double GEN_Ks_daughter1_vy = genParticle->daughter(0)->daughter(1)->vy();
@@ -371,6 +383,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_AntiLambda_AntiProton_py = AntiLambdaAntiProton->py();
 	double GEN_AntiLambda_AntiProton_pz = AntiLambdaAntiProton->pz();
 	double GEN_AntiLambda_AntiProton_pt = AntiLambdaAntiProton->pt();
+	double GEN_AntiLambda_AntiProton_eta = AntiLambdaAntiProton->eta();
+	double GEN_AntiLambda_AntiProton_phi = AntiLambdaAntiProton->phi();
 	TVector3 GEN_AntiLambda_AntiProton_momentum(AntiLambdaAntiProton->px(),AntiLambdaAntiProton->py(),AntiLambdaAntiProton->pz());
 	double GEN_AntiLambda_AntiProton_vx = AntiLambdaAntiProton->vx();
 	double GEN_AntiLambda_AntiProton_vy = AntiLambdaAntiProton->vy();
@@ -385,6 +399,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_AntiLambda_Pion_py = AntiLambdaPion->py();
 	double GEN_AntiLambda_Pion_pz = AntiLambdaPion->pz();
 	double GEN_AntiLambda_Pion_pt = AntiLambdaPion->pt();
+	double GEN_AntiLambda_Pion_eta = AntiLambdaPion->eta();
+	double GEN_AntiLambda_Pion_phi = AntiLambdaPion->phi();
 	TVector3 GEN_AntiLambda_Pion_momentum(AntiLambdaPion->px(),AntiLambdaPion->py(),AntiLambdaPion->pz());
 	double GEN_AntiLambda_Pion_vx = AntiLambdaPion->vx();
 	double GEN_AntiLambda_Pion_vy = AntiLambdaPion->vy();
@@ -499,6 +515,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_Ks_daughter0_py.push_back(GEN_Ks_daughter0_py); 
 	_GEN_Ks_daughter0_pz.push_back(GEN_Ks_daughter0_pz); 
 	_GEN_Ks_daughter0_pt.push_back(GEN_Ks_daughter0_pt); 
+	_GEN_Ks_daughter0_eta.push_back(GEN_Ks_daughter0_eta); 
+	_GEN_Ks_daughter0_phi.push_back(GEN_Ks_daughter0_phi); 
 	_GEN_Ks_daughter0_vx.push_back(GEN_Ks_daughter0_vx); 
 	_GEN_Ks_daughter0_vy.push_back(GEN_Ks_daughter0_vy); 
 	_GEN_Ks_daughter0_vz.push_back(GEN_Ks_daughter0_vz); 
@@ -510,6 +528,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_Ks_daughter1_py.push_back(GEN_Ks_daughter1_py); 
 	_GEN_Ks_daughter1_pz.push_back(GEN_Ks_daughter1_pz); 
 	_GEN_Ks_daughter1_pt.push_back(GEN_Ks_daughter1_pt); 
+	_GEN_Ks_daughter1_eta.push_back(GEN_Ks_daughter1_eta); 
+	_GEN_Ks_daughter1_phi.push_back(GEN_Ks_daughter1_phi); 
 	_GEN_Ks_daughter1_vx.push_back(GEN_Ks_daughter1_vx); 
 	_GEN_Ks_daughter1_vy.push_back(GEN_Ks_daughter1_vy); 
 	_GEN_Ks_daughter1_vz.push_back(GEN_Ks_daughter1_vz); 
@@ -521,6 +541,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_AntiLambda_AntiProton_py.push_back(GEN_AntiLambda_AntiProton_py);
 	_GEN_AntiLambda_AntiProton_pz.push_back(GEN_AntiLambda_AntiProton_pz);
 	_GEN_AntiLambda_AntiProton_pt.push_back(GEN_AntiLambda_AntiProton_pt);
+	_GEN_AntiLambda_AntiProton_eta.push_back(GEN_AntiLambda_AntiProton_eta);
+	_GEN_AntiLambda_AntiProton_phi.push_back(GEN_AntiLambda_AntiProton_phi);
 	_GEN_AntiLambda_AntiProton_vx.push_back(GEN_AntiLambda_AntiProton_vx);
 	_GEN_AntiLambda_AntiProton_vy.push_back(GEN_AntiLambda_AntiProton_vy);
 	_GEN_AntiLambda_AntiProton_vz.push_back(GEN_AntiLambda_AntiProton_vz);
@@ -532,6 +554,8 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_AntiLambda_Pion_py.push_back(GEN_AntiLambda_Pion_py);
 	_GEN_AntiLambda_Pion_pz.push_back(GEN_AntiLambda_Pion_pz);
 	_GEN_AntiLambda_Pion_pt.push_back(GEN_AntiLambda_Pion_pt);
+	_GEN_AntiLambda_Pion_eta.push_back(GEN_AntiLambda_Pion_eta);
+	_GEN_AntiLambda_Pion_phi.push_back(GEN_AntiLambda_Pion_phi);
 	_GEN_AntiLambda_Pion_vx.push_back(GEN_AntiLambda_Pion_vx);
 	_GEN_AntiLambda_Pion_vy.push_back(GEN_AntiLambda_Pion_vy);
 	_GEN_AntiLambda_Pion_vz.push_back(GEN_AntiLambda_Pion_vz);
@@ -688,6 +712,8 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_Ks_daughter0_py.clear(); 
 	_GEN_Ks_daughter0_pz.clear(); 
 	_GEN_Ks_daughter0_pt.clear(); 
+	_GEN_Ks_daughter0_eta.clear(); 
+	_GEN_Ks_daughter0_phi.clear(); 
 	_GEN_Ks_daughter0_vx.clear(); 
 	_GEN_Ks_daughter0_vy.clear(); 
 	_GEN_Ks_daughter0_vz.clear(); 
@@ -699,6 +725,8 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_Ks_daughter1_py.clear();
 	_GEN_Ks_daughter1_pz.clear();
 	_GEN_Ks_daughter1_pt.clear();
+	_GEN_Ks_daughter1_eta.clear();
+	_GEN_Ks_daughter1_phi.clear();
 	_GEN_Ks_daughter1_vx.clear();
 	_GEN_Ks_daughter1_vy.clear();
 	_GEN_Ks_daughter1_vz.clear();
@@ -710,6 +738,8 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_AntiLambda_AntiProton_py.clear();
 	_GEN_AntiLambda_AntiProton_pz.clear();
 	_GEN_AntiLambda_AntiProton_pt.clear();
+	_GEN_AntiLambda_AntiProton_eta.clear();
+	_GEN_AntiLambda_AntiProton_phi.clear();
 	_GEN_AntiLambda_AntiProton_vx.clear();
 	_GEN_AntiLambda_AntiProton_vy.clear();
 	_GEN_AntiLambda_AntiProton_vz.clear();
@@ -721,6 +751,8 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_AntiLambda_Pion_py.clear();
 	_GEN_AntiLambda_Pion_pz.clear();
 	_GEN_AntiLambda_Pion_pt.clear();
+	_GEN_AntiLambda_Pion_eta.clear();
+	_GEN_AntiLambda_Pion_phi.clear();
 	_GEN_AntiLambda_Pion_vx.clear();
 	_GEN_AntiLambda_Pion_vy.clear();
 	_GEN_AntiLambda_Pion_vz.clear();

@@ -245,6 +245,13 @@ h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",30,0,30)
 h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
+h2_eta_pt_Ks_daug0 = TH2F("h2_eta_pt_Ks_daug0",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pt_Ks_daug1 = TH2F("h2_eta_pt_Ks_daug1",";#eta;p_{t} (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pz_Ks_daug0 = TH2F("h2_eta_pz_Ks_daug0",";#eta;|p_{z}| (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_pz_Ks_daug1 = TH2F("h2_eta_pz_Ks_daug1",";#eta;|p_{z}| (GeV);  Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_p_Ks_daug0 = TH2F("h2_eta_p_Ks_daug0",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta;p (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+
 
 h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",60,0,6)
 h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{t} (GeV); Events/0.1GeV",60,0,6)
@@ -254,6 +261,12 @@ h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Ev
 h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",30,0,30)
 h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
+h2_eta_pt_AntiLambda_AntiProton = TH2F("h2_eta_pt_AntiLambda_AntiProton",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pt_AntiLambda_Pion = TH2F("h2_eta_pt_AntiLambda_Pion",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,30,0,3)
+h2_eta_pz_AntiLambda_AntiProton = TH2F("h2_eta_pz_AntiLambda_AntiProton",";|#eta;p_{z}| (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_pz_AntiLambda_Pion = TH2F("h2_eta_pz_AntiLambda_Pion",";#eta;|p_{z}| (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0,10)
+h2_eta_p_AntiLambda_AntiProton = TH2F("h2_eta_p_AntiLambda_AntiProton",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h2_eta_p_AntiLambda_Pion = TH2F("h2_eta_p_AntiLambda_Pion",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0.3,10.3)
 
 #PCAs of the granddughters of the antiS
 PCA_granddaughters_dir = fOut.mkdir("PCA_granddaughters")
@@ -334,6 +347,12 @@ for i in range(0,nEntries):
 	h_pz_Ks_daug1.Fill(abs(tree._GEN_Ks_daughter1_pz[0]))
 	h2_pt_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0], abs(tree._GEN_Ks_daughter0_pz[0]))
 	h2_pt_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0], abs(tree._GEN_Ks_daughter1_pz[0]))
+	h2_eta_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],tree._GEN_Ks_daughter0_pt[0])
+	h2_eta_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],tree._GEN_Ks_daughter1_pt[0])
+	h2_eta_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],abs(tree._GEN_Ks_daughter0_pz[0]))
+	h2_eta_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],abs(tree._GEN_Ks_daughter1_pz[0]))
+	h2_eta_p_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter0_pt[0],2)+np.power(tree._GEN_Ks_daughter0_pz[0],2)))
+	h2_eta_p_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter1_pt[0],2)+np.power(tree._GEN_Ks_daughter1_pz[0],2)))
 
 	h_dxy_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dxy[0])
 	h_dxy_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dxy[0])
@@ -349,6 +368,12 @@ for i in range(0,nEntries):
 	h_pz_AntiLambda_Pion.Fill(abs(tree._GEN_AntiLambda_Pion_pz[0]))
 	h2_pt_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
 	h2_pt_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0],abs(tree._GEN_AntiLambda_Pion_pz[0]))
+	h2_eta_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],tree._GEN_AntiLambda_AntiProton_pt[0])
+	h2_eta_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],tree._GEN_AntiLambda_Pion_pt[0])
+	h2_eta_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
+	h2_eta_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],abs(tree._GEN_AntiLambda_Pion_pz[0]))
+	h2_eta_p_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2)+np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2)))
+	h2_eta_p_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_Pion_pz[0],2)+np.power(tree._GEN_AntiLambda_Pion_pt[0],2)))
 
 	h_dxy_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_dxy[0])
 	h_dxy_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dxy[0])
@@ -455,6 +480,22 @@ for h in l_TH1F:
 
 h2_antiS_inv_mass_p.Write()
 h2_antiS_inv_mass_p_Ks_plus_Lambda.Write()
+
+l_TH2F = [h2_eta_pt_AntiLambda_Pion,h2_eta_pz_AntiLambda_Pion,h2_eta_p_AntiLambda_Pion]
+for h in l_TH2F:
+        h.SetDirectory(0)
+for h in l_TH2F:
+        c= TCanvas(h.GetName(),"");
+        c.SetRightMargin(0.2) #make room for the tile of the z scale
+        if(h.GetSumw2N() == 0):
+                h.Sumw2(kTRUE)
+        h.Scale(1./h.Integral(), "width");
+        h.Draw("colz")
+        h.SetStats(0)
+	c.SetLogz()
+        CMS_lumi.CMS_lumi(c, 0, 11)
+        c.SaveAs(plots_output_dir+h.GetName()+".pdf")
+        c.Write()
 
 
 c_h_neutron_momentum = TCanvas("c_"+h_neutron_momentum.GetName(),"");

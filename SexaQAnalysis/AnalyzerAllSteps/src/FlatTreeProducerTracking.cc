@@ -230,12 +230,33 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 	simRecCollP= &simRecCollL;
 	reco::SimToRecoCollection const & simRecColl= *simRecCollP;
 
+	int nUniqueAntiSInThisEvent = 0;
+	int nUniqueAntiSWithCorrectGranddaughtersThisEvent = 0;
+	int nUniqueAntiSWithCorrectGranddaughtersRECONSTRUCTEDThisEvent= 0;
 	for(size_t i=0; i<TPColl.size(); ++i) {
+	
+		const TrackingParticle& tp = TPColl[i];
+		if(tp.pdgId() != AnalyzerAllSteps::pdgIdAntiS)continue;
 
-	  	const TrackingParticle& tp = TPColl[i];
-		if(tp.pdgId() == AnalyzerAllSteps::pdgIdAntiS) FillTreesAntiSAndDaughters(tp, beamspot, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl);
- 		
+		//first check if the antiS is a duplicate: 
+		tv_iterator antiS_firstDecayVertex = tp.decayVertices_begin();
+		double antisDecayVx = (**antiS_firstDecayVertex).position().X(); double antisDecayVy = (**antiS_firstDecayVertex).position().Y(); double antisDecayVz = (**antiS_firstDecayVertex).position().Z();
+		//the duplicate antiS from the looping have their creation vertex at the same location as the production vertex
+		if(tp.vx()==antisDecayVx && tp.vy() == antisDecayVy && tp.vz() == antisDecayVz) continue;
+		nUniqueAntiSInThisEvent++;
+		
+
+		int returnCodeFillTreesAntiSAndDaughters = FillTreesAntiSAndDaughters(tp, beamspot, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl);
+ 		if(returnCodeFillTreesAntiSAndDaughters == 0 || returnCodeFillTreesAntiSAndDaughters == 1) nUniqueAntiSWithCorrectGranddaughtersThisEvent++;
+ 		if(returnCodeFillTreesAntiSAndDaughters == 1) nUniqueAntiSWithCorrectGranddaughtersRECONSTRUCTEDThisEvent++;
+
 	}
+	std::cout << "***************************************************************************************" << std::endl;
+	std::cout << "---->number of unique AntiS in this event: " << nUniqueAntiSInThisEvent << " <------" << std::endl;
+	std::cout << "---->number of unique AntiS with correct granddaughters in this event: " << nUniqueAntiSWithCorrectGranddaughtersThisEvent << " <------" << std::endl;
+	if(nUniqueAntiSInThisEvent == 1 && nUniqueAntiSWithCorrectGranddaughtersThisEvent == 1 && nUniqueAntiSWithCorrectGranddaughtersRECONSTRUCTEDThisEvent ==0) std::cout << "---->Found an event with only one unique AntiS and this AntiS goes to the correct granddaughters and is NOT reconstructed <------" << std::endl;
+	if(nUniqueAntiSInThisEvent == 1 && nUniqueAntiSWithCorrectGranddaughtersThisEvent == 1 && nUniqueAntiSWithCorrectGranddaughtersRECONSTRUCTEDThisEvent ==1) std::cout << "---->Found an event with only one unique AntiS and this AntiS goes to the correct granddaughters and is reconstructed <------" << std::endl;
+	std::cout << "***************************************************************************************" << std::endl;
   }
   else{
 	std::cout << "one of the collections for filling the tree for the antiS related particles is not valid:" << std::endl;
@@ -323,7 +344,7 @@ void FlatTreeProducerTracking::FillTreesTracks(const TrackingParticle& tp, TVect
 
 }
 
-void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl){
+int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl){
 
 	//loop through the trackingparticles to find the antiS daughters and granddaughters and save them so that you can compare later the dauhgters to the V0 collections using deltaR matching and the granddaughters to the track collection using track matching on hits
 
@@ -341,14 +362,11 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	int tp_it_AntiLambda_AntiProton = -1;
 
 	int numberOfGranddaughtersFound = 0;
-
 	
 	tv_iterator antiS_firstDecayVertex = tp.decayVertices_begin();
 	double antisDecayVx = (**antiS_firstDecayVertex).position().X(); double antisDecayVy = (**antiS_firstDecayVertex).position().Y(); double antisDecayVz = (**antiS_firstDecayVertex).position().Z();
 
-	//the duplicate antiS from the looping have their creation vertex at the same location as the production vertex
-	if(tp.vx()==antisDecayVx && tp.vy() == antisDecayVy && tp.vz() == antisDecayVz) return;
-
+	
         for(size_t j=0; j<TPColl.size(); ++j) {//now find the daughters which have a production vertex = decay vertex of the antiS
 
                 const TrackingParticle& tp_daughter = TPColl[j];
@@ -393,7 +411,7 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	totalNumberOfUniqueAntiS++;
 
 	//now only when there are 4 correct tp granddaughters found you have the chance to actually reconstruct them, so save only those in the tree
-	if(tp_it_Ks_posPion == -1 || tp_it_Ks_negPion == -1 || tp_it_AntiLambda_posPion == -1 || tp_it_AntiLambda_AntiProton == -1) return;
+	if(tp_it_Ks_posPion == -1 || tp_it_Ks_negPion == -1 || tp_it_AntiLambda_posPion == -1 || tp_it_AntiLambda_AntiProton == -1) return -1;
 	numberOfAntiSWithCorrectGranddaughters++;	
 
 	//but first: check if they were reconstructed.
@@ -457,6 +475,13 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	}
 	if( deltaRminAntiL <  AnalyzerAllSteps::deltaRCutV0RECOLambda) RECOAntiLambdaFound = true;
 
+	int returnCode = 0;
+	if(RECOAntiLambdaFound){
+			std::cout << "AntiS got RECONSTRUCTED!!!!!!!!!!!!!" << std::endl;
+			returnCode = 1;
+	}
+
+
 	//for the granddaughters you have to do this based on hit matching
 	//edm::Handle<reco::TrackToTrackingParticleAssociator> theAssociator;
 
@@ -469,12 +494,10 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 	TrackingParticleRef tpr_KsPosPion(h_TP,tp_it_Ks_posPion);
 
 	if(simRecColl.find(tpr_KsPosPion) != simRecColl.end()){
-		std::cout << "found tpr_KsPosPion in the collection" << std::endl;
 	        auto const & rt = simRecColl[tpr_KsPosPion];
 	        if (rt.size()!=0) {
 	          matchedTrackPointer_KsPosPion = rt.begin()->first.get();
 	          RECOKsPosPionFound  = true;
-		  std::cout << "putting RECOKsPosPionFound to true " << std::endl;
 	        }
 	}
 	else{
@@ -594,6 +617,7 @@ void FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle
 
 	_tree_tpsAntiS->Fill();
 	
+	return returnCode;
 }
 
 

@@ -153,20 +153,27 @@ for fIn in fIns:
 	print 'Number of entries in the treeZ: ', nEntriesZ
 	print 'Number of entries in the treePV: ', nEntriesPV
 
-	bins1 = np.arange(-300,-200,20)
-	bins2 = np.arange(-200,-100,10)
-	bins3 = np.arange(-100,-80,5)
-	bins4 = np.arange(-80,-70,2)
-	bins5 = np.arange(-70,-64,1.5)
-	bins6 = np.arange(-64,64,1)
-	bins7 = np.arange(64,70,1.5)
-	bins8 = np.arange(70,80,2)
-	bins9 = np.arange(80,100,5)
-	bins10 = np.arange(100,200,10)
-	bins11 = np.arange(200,300,20)
-	args = (bins1,bins2,bins3,bins4,bins5,bins6,bins7,bins8,bins9,bins10,bins11)
+#	bins1 = np.arange(-260,-200,20)
+#	bins2 = np.arange(-200,-160,8)
+#	bins3 = np.arange(-160,-130,6)
+#	bins4 = np.arange(-130,-110,4)
+#	bins5 = np.arange(-110,-80,2)
+#	bins6 = np.arange(-80,-70,2)
+#	bins7 = np.arange(-70,-64,1.5)
+#	bins8 = np.arange(-64,64,1)
+#	bins9 = np.arange(64,70,1.5)
+#	bins10 = np.arange(70,80,2)
+#	bins11 = np.arange(80,110,2)	
+#	bins12 = np.arange(110,130,4)	
+#	bins13 = np.arange(130,160,6)	
+#	bins14 = np.arange(160,200,8)	
+#	bins15 = np.arange(200,260,20)
+#	args = (bins1,bins2,bins3,bins4,bins5,bins6,bins7,bins8,bins9,bins10,bins11,bins12,bins13,bins14,bins15)
+	bins1 = np.arange(-150,-60,10)
+	bins2 = np.arange(-60,60,1)
+	bins3 = np.arange(60,150,10)
+	args = (bins1,bins2,bins3)
 	bins = np.concatenate(args)
-	print bins
 	h_RECO_Ks_vz = TH1F('h_RECO_Ks_vz'," ;Ks v_{z} (cm); #entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_vz_NOTWeighted = TH1F('h_RECO_Ks_vz_NOTWeighted'," ;Ks v_{z} (cm); #entries",len(bins)-1,array('d',bins))
 	bins1 = np.arange(0,50,1)
@@ -178,9 +185,10 @@ for fIn in fIns:
 	bins = np.concatenate(args)
 	h_RECO_Ks_lxy = TH1F('h_RECO_Ks_lxy'," ;Ks l_{0} (cm);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_lxy_NOTWeighted = TH1F('h_RECO_Ks_lxy_NOTWeighted'," ;Ks l_{0} (cm);#entries",len(bins)-1,array('d',bins))
-	bins1 = np.arange(0,8,0.2)
-	bins2 = np.arange(8,10.1,0.3)
-	args = (bins1,bins2)
+	bins1 = np.arange(0,2,0.1)
+	bins2 = np.arange(2,8,0.2)
+	bins3 = np.arange(8,10.1,0.3)
+	args = (bins1,bins2,bins3)
 	bins = np.concatenate(args)
 	h_RECO_Ks_pt = TH1F('h_RECO_Ks_pt',"; Ks p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pt_NOTWeighted = TH1F('h_RECO_Ks_pt_NOTWeighted',"; Ks p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
@@ -219,20 +227,59 @@ for fIn in fIns:
 	bins = [ 0, .5, 1, 1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,8,9,10,12,14,16 ]
 	h_RECO_Ks_Track1Track2_max_dxy_beamspot= TH1F('h_RECO_Ks_Track1Track2_max_dxy_beamspot',"; maxSigned[d_{0}(beamspot) track1, d_{0}(beamspot) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track1Track2_max_dxy_beamspot_ptCut1p2= TH1F('h_RECO_Ks_Track1Track2_max_dxy_beamspot_ptCut1p2',"; maxSigned[d_{0}(beamspot) track1, d_{0}(beamspot) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_Track1_dxy_beamspot= TH1F('h_RECO_Ks_Track1_dxy_beamspot',";d_{0}(beamspot) track1 (cm) ;#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_Track2_dxy_beamspot= TH1F('h_RECO_Ks_Track2_dxy_beamspot',";d_{0}(beamspot) track2 (cm) ;#entries",len(bins)-1,array('d',bins))
 	bins = [ -40,-35,-30,-28,-26,-24,-22,-20,-18,-16,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,30,35,40 ]
 	h_RECO_Ks_Track1Track2_max_dz_min_PV = TH1F('h_RECO_Ks_Track1Track2_max_dz_min_PV',"; maxSigned[d_{z}(best PV Ks) track1, d_{z}(best PV Ks) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track1Track2_max_dz_beamspot = TH1F('h_RECO_Ks_Track1Track2_max_dz_beamspot',"; maxSigned[d_{z}(beamspot) track1, d_{z}(beamspot) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_Track1_dz_min_PV = TH1F('h_RECO_Ks_Track1_dz_min_PV',"; d_{z}(best PV Ks) track1 (cm) ;#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_Track2_dz_min_PV = TH1F('h_RECO_Ks_Track2_dz_min_PV',"; d_{z}(best PV Ks) track2 (cm) ;#entries",len(bins)-1,array('d',bins))
 
-	histos= [h_RECO_Ks_vz, h_RECO_Ks_vz_NOTWeighted, h_RECO_Ks_lxy, h_RECO_Ks_lxy_NOTWeighted, h_RECO_Ks_pt, h_RECO_Ks_pt_NOTWeighted, h_RECO_Ks_pt_tracks1, h_RECO_Ks_pt_tracks2, h_RECO_Ks_pz, h_RECO_Ks_pz_NOTWeighted,h_RECO_Ks_pz_tracks1, h_RECO_Ks_pz_tracks2, h_RECO_Ks_dxy_PV, h_RECO_Ks_dxy_PV_NOTWeighted, h_RECO_Ks_dz, h_RECO_Ks_dz_NOTWeighted, h_RECO_Ks_eta, h_RECO_Ks_eta_NOTWeighted, h_RECO_Ks_phi, h_RECO_Ks_phi_NOTWeighted, h_RECO_Ks_Track1Track2_openingsAngle, h_RECO_Ks_Track1Track2_openingsAngle_NOTWeighted,h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2,h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p5,h_RECO_Ks_Track1Track2_max_dxy_beamspot,h_RECO_Ks_Track1Track2_max_dxy_beamspot_ptCut1p2,h_RECO_Ks_Track1Track2_max_dz_min_PV,h_RECO_Ks_Track1Track2_max_dz_beamspot] 
+	histos= [
+	h_RECO_Ks_vz, 
+	h_RECO_Ks_vz_NOTWeighted, 
+	h_RECO_Ks_lxy, 
+	h_RECO_Ks_lxy_NOTWeighted, 
+	h_RECO_Ks_pt, 
+	h_RECO_Ks_pt_NOTWeighted, 
+	h_RECO_Ks_pt_tracks1, 
+	h_RECO_Ks_pt_tracks2, 
+	h_RECO_Ks_pz, 
+	h_RECO_Ks_pz_NOTWeighted,
+	h_RECO_Ks_pz_tracks1, 
+	h_RECO_Ks_pz_tracks2, 
+	h_RECO_Ks_dxy_PV, 
+	h_RECO_Ks_dxy_PV_NOTWeighted, 
+	h_RECO_Ks_dz, 
+	h_RECO_Ks_dz_NOTWeighted, 
+	h_RECO_Ks_eta, 
+	h_RECO_Ks_eta_NOTWeighted, 
+	h_RECO_Ks_phi, 
+	h_RECO_Ks_phi_NOTWeighted, 
+	h_RECO_Ks_Track1Track2_openingsAngle, 
+	h_RECO_Ks_Track1Track2_openingsAngle_NOTWeighted,
+	h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p2,
+	h_RECO_Ks_Track1Track2_openingsAngle_ptCut1p5,
+	h_RECO_Ks_Track1Track2_max_dxy_beamspot,
+	h_RECO_Ks_Track1Track2_max_dxy_beamspot_ptCut1p2,
+	h_RECO_Ks_Track1_dxy_beamspot,
+	h_RECO_Ks_Track2_dxy_beamspot,
+	h_RECO_Ks_Track1Track2_max_dz_min_PV,
+	h_RECO_Ks_Track1Track2_max_dz_beamspot,
+	h_RECO_Ks_Track1_dz_min_PV,
+	h_RECO_Ks_Track2_dz_min_PV
+	] 
 	#check the reweighting
 	h_RECO_PV0_vz_MC_reweighted_to_data = TH1F('h_RECO_PV0_vz_MC_reweighted_to_data'," ;PV v_{z} (cm); #entries",200,-100,100)
 	h_RECO_PV0_vz_MC_NOTreweighted_to_data = TH1F('h_RECO_PV0_vz_MC_NOTreweighted_to_data',"; PV v_{z} (cm); #entries",200,-100,100)
 
 
 	for i in range(0,min_entries):
-		if(i%100000 == 0):
+		#if(i > 9e5):
+		#	continue
+		if(i%1e5 == 0):
 			print 'reached event ', i
-		
+	
 		treeZ.GetEntry(i)
 		treeKs.GetEntry(i)
 		treePV.GetEntry(i)
@@ -288,13 +335,13 @@ for fIn in fIns:
 
 				histos[4].Fill(treeKs._Ks_pt[j], PV_Z_reweighting_factor)
 				histos[5].Fill(treeKs._Ks_pt[j])
-				histos[6].Fill(treeKs._Ks_daughterTrack1_pt[j]) #daughters of the Ks are identical objects so can put them in same plot
-				histos[7].Fill(treeKs._Ks_daughterTrack2_pt[j])
+				histos[6].Fill(treeKs._Ks_daughterTrack1_pt[j],PV_Z_reweighting_factor) 
+				histos[7].Fill(treeKs._Ks_daughterTrack2_pt[j],PV_Z_reweighting_factor)
 
 				histos[8].Fill(treeKs._Ks_pz[j], PV_Z_reweighting_factor)
 				histos[9].Fill(treeKs._Ks_pz[j])
-				histos[10].Fill(treeKs._Ks_daughterTrack1_pz[j])
-				histos[11].Fill(treeKs._Ks_daughterTrack2_pz[j])
+				histos[10].Fill(treeKs._Ks_daughterTrack1_pz[j], PV_Z_reweighting_factor)
+				histos[11].Fill(treeKs._Ks_daughterTrack2_pz[j], PV_Z_reweighting_factor)
 
 				histos[12].Fill(treeKs._Ks_dxy_beamspot[j], PV_Z_reweighting_factor)
 				histos[13].Fill(treeKs._Ks_dxy_beamspot[j])
@@ -319,8 +366,12 @@ for fIn in fIns:
 				histos[24].Fill(maxSigned(treeKs._Ks_daughterTrack1_dxy_beamspot[j],treeKs._Ks_daughterTrack2_dxy_beamspot[j]), PV_Z_reweighting_factor)
 				if(treeKs._Ks_pt[j] > 1.2):
 					histos[25].Fill(maxSigned(treeKs._Ks_daughterTrack1_dxy_beamspot[j],treeKs._Ks_daughterTrack2_dxy_beamspot[j]), PV_Z_reweighting_factor)
-				histos[26].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_min_PV[j],treeKs._Ks_daughterTrack2_dz_min_PV[j]), PV_Z_reweighting_factor)
-				histos[27].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_beamspot[j],treeKs._Ks_daughterTrack2_dz_beamspot[j]), PV_Z_reweighting_factor)
+				histos[26].Fill(treeKs._Ks_daughterTrack1_dxy_beamspot[j], PV_Z_reweighting_factor)
+				histos[27].Fill(treeKs._Ks_daughterTrack2_dxy_beamspot[j], PV_Z_reweighting_factor)
+				histos[28].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_min_PV[j],treeKs._Ks_daughterTrack2_dz_min_PV[j]), PV_Z_reweighting_factor)
+				histos[29].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_beamspot[j],treeKs._Ks_daughterTrack2_dz_beamspot[j]), PV_Z_reweighting_factor)
+				histos[30].Fill(treeKs._Ks_daughterTrack1_dz_min_PV[j], PV_Z_reweighting_factor)
+				histos[31].Fill(treeKs._Ks_daughterTrack2_dz_min_PV[j], PV_Z_reweighting_factor)
 
 				if(iFile == 1): #for MC
 					h_RECO_PV0_vz_MC_reweighted_to_data.Fill(treePV._PV0_vz[0], PV_Z_reweighting_factor)
