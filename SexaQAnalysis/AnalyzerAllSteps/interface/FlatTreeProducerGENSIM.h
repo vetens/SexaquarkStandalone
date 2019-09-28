@@ -65,7 +65,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     std::vector<float> _S_charge;
     std::vector<float> _S_lxy_interaction_vertex, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_Mt,_S_chi2_ndof;
     std::vector<float> _n_M, _n_p;
-    std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_sumDaughters_openingsangle,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
+    std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_sumDaughters_openingsangle,_S_sumDaughters_deltaPhi,_S_sumDaughters_deltaEta,_S_sumDaughters_deltaR,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy;
     std::vector<float> _S_dxy_over_lxy,_Ks_dxy_over_lxy,_Lambda_dxy_over_lxy;
     std::vector<float> _S_dz,_Ks_dz,_Lambda_dz,_S_dz_min,_Ks_dz_min,_Lambda_dz_min;
