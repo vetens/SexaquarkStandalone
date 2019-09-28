@@ -17,6 +17,8 @@
 <use name="DataFormats/MuonReco"/>
 <use name="DataFormats/RecoCandidate"/>
 <use name="RecoMuon/TrackingTools"/>
+<use name="MagneticField/Records"/>
+<use name="MagneticField/VolumeBasedEngine"/>
 <flags EDM_PLUGIN="1"/>
 
 <export>
