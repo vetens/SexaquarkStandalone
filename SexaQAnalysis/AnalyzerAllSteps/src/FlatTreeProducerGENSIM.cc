@@ -46,6 +46,9 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_S_Ks_openingsangle",&_S_Ks_openingsangle);
 	_tree->Branch("_S_Lambda_openingsangle",&_S_Lambda_openingsangle);
 	_tree->Branch("_S_sumDaughters_openingsangle",&_S_sumDaughters_openingsangle);
+	_tree->Branch("_S_sumDaughters_deltaPhi",&_S_sumDaughters_deltaPhi);
+	_tree->Branch("_S_sumDaughters_deltaEta",&_S_sumDaughters_deltaEta);
+	_tree->Branch("_S_sumDaughters_deltaR",&_S_sumDaughters_deltaR);
 	_tree->Branch("_S_daughters_DeltaR",&_S_daughters_DeltaR);
 	_tree->Branch("_S_eta",&_S_eta);
 	_tree->Branch("_Ks_eta",&_Ks_eta);
@@ -323,6 +326,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GENOpeningsAngleAntiSLambda = AnalyzerAllSteps::openings_angle(vGENAntiSDaug1Momentum,vGENAntiSMomentum);
 	//the openingsangle between the GEN AntiS and the sum of the momenta of the daughters. Normally these should be pointing exactly in the direction of the mother, but due to the momentum of the neutron this is no longer the case
 	double S_sumDaughters_openingsangle = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum,vGENAntiSMomentum);	
+	double S_sumDaughters_deltaPhi = reco::deltaPhi((vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum).phi(),vGENAntiSMomentum.phi());	
+	double S_sumDaughters_deltaEta = (vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum).eta()-vGENAntiSMomentum.eta();	
+	double S_sumDaughters_deltaR =  sqrt(S_sumDaughters_deltaPhi*S_sumDaughters_deltaPhi+S_sumDaughters_deltaEta*S_sumDaughters_deltaEta);
 
 	double GENOpeningsAngleDaughters = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSDaug1Momentum);
         double GEN_dxy_daughter0 = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex, GENAntiSDaug0Momentum,beamspot);
@@ -476,6 +482,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_S_Ks_openingsangle.push_back(GENOpeningsAngleAntiSKs);
 	_S_Lambda_openingsangle.push_back(GENOpeningsAngleAntiSLambda);
 	_S_sumDaughters_openingsangle.push_back(S_sumDaughters_openingsangle);
+	_S_sumDaughters_deltaPhi.push_back(S_sumDaughters_deltaPhi);
+	_S_sumDaughters_deltaEta.push_back(S_sumDaughters_deltaEta);
+	_S_sumDaughters_deltaR.push_back(S_sumDaughters_deltaR);
 	_S_daughters_DeltaR.push_back(GENDeltaRDaughters);
 	_S_eta.push_back(genParticle->eta());
 	_Ks_eta.push_back(genParticle->daughter(0)->eta());
@@ -669,6 +678,9 @@ FlatTreeProducerGENSIM::Init()
 	_S_Ks_openingsangle.clear();
 	_S_Lambda_openingsangle.clear();
 	_S_sumDaughters_openingsangle.clear();
+	_S_sumDaughters_deltaPhi.clear();
+	_S_sumDaughters_deltaEta.clear();
+	_S_sumDaughters_deltaR.clear();
 	_S_daughters_DeltaR.clear();
 	_S_eta.clear();
 	_Ks_eta.clear();

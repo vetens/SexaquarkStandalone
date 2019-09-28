@@ -1,4 +1,4 @@
-from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT
+from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT,TProfile
 import numpy as np
 import copy
 from array import array
@@ -9,14 +9,8 @@ fIns = [
 #'/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_standardV0s/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root',
 
 #the adapted V0s:
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DoubleMuon_adaptedV0s/combined_FlatTreeV0_DoubleMuonData_Run_C_H.root',
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DoubleMuon_adaptedV0s/RunC_v1/combined_FlatTreeV0_DoubleMuonData_Run_C.root',
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DoubleMuon_adaptedV0s/RunD_v2/combined_FlatTreeV0_DoubleMuonData_Run_D.root',
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DoubleMuon_adaptedV0s/RunE_v3/combined_FlatTreeV0_DoubleMuonData_Run_E.root',
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DoubleMuon_adaptedV0s/RunH_v6/combined_FlatTreeV0_DoubleMuonData_Run_H.root',
-#'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DoubleMuon_adaptedV0s_extendedFlatTree6/RunG_v5/combined_FlatTreeV0_DoubleMuonData_Run_G.root',
 '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DoubleMuon_adaptedV0s_extendedFlatTree6/combined_FlatTreeV0_DoubleMuonData_Run_G_H.root',
-'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_adaptedV0s_extendedFlatTree6/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'
+'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_adaptedV0s_extendedFlatTree6/combined/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'
 ]
 
 def eff_error(data,MC):
@@ -35,74 +29,9 @@ fIn2 = TFile(fIns[1],'read')
 treeKs1 = fIn1.Get('FlatTreeProducerV0s/FlatTreeKs')
 treeKs2 = fIn2.Get('FlatTreeProducerV0s/FlatTreeKs')
 min_entries = min( treeKs1.GetEntries(), treeKs2.GetEntries() )
-#min_entries = 100000 
 print "the nentries in Data: " , treeKs1.GetEntries()
 print "the nentries in MC: " , treeKs2.GetEntries()
 print "the min_enties: ", min_entries
-
-#get the means of the PV_z distribution for data and MC. Use these values to offset the distributions later
-#treePV1 = fIn1.Get('FlatTreeProducerV0s/FlatTreePV')
-#treePV1.Draw("_PV0_vz>>hist_PVz_Data")
-#hist_PVz_Data = gROOT.FindObject('hist_PVz_Data')
-#mean_hist_PVz_Data = hist_PVz_Data.GetMean()
-#print "mean PV_z for Data ", mean_hist_PVz_Data
-#
-#treePV2 = fIn2.Get('FlatTreeProducerV0s/FlatTreePV')
-#treePV2.Draw("_PV0_vz>>hist_PVz_MC")
-#hist_PVz_MC = gROOT.FindObject('hist_PVz_MC')
-#mean_hist_PVz_MC = hist_PVz_MC.GetMean()
-#print "mean PV_z for MC ", mean_hist_PVz_MC
-#
-##get the means of the Ks_vz distributions for data and MC. Use these values to offset the distributions later. 
-#treeKs1.Draw("_Ks_vz>>hist_Ks_vz_Data")
-#hist_Ks_vz_Data = gROOT.FindObject('hist_Ks_vz_Data')
-#mean_hist_Ks_vz_Data = hist_Ks_vz_Data.GetMean()
-#print "mean Ks_vz for Data ", mean_hist_Ks_vz_Data 
-#
-#treeKs2.Draw("_Ks_vz>>hist_Ks_vz_MC")
-#hist_Ks_vz_MC = gROOT.FindObject('hist_Ks_vz_MC')
-#mean_hist_Ks_vz_MC = hist_Ks_vz_MC.GetMean()
-#print "mean Ks_vz for MC ", mean_hist_Ks_vz_MC 
-#
-##get the means of the _Ks_dz_PV distributions for data and MC. Use these values to offset the distributions later. 
-#treeKs1.Draw("_Ks_dz>>hist_Ks_dz_PV_data")
-#hist_Ks_dz_PV_data= gROOT.FindObject('hist_Ks_dz_PV_data')
-#mean_hist_Ks_dz_PV_Data = hist_Ks_dz_PV_data.GetMean()
-#print "mean Ks_dz_PV for Data ", mean_hist_Ks_dz_PV_Data
-#
-#treeKs2.Draw("_Ks_vz>>hist_Ks_dz_PV_MC")
-#hist_Ks_dz_PV_MC = gROOT.FindObject('hist_Ks_dz_PV_MC')
-#mean_hist_Ks_dz_PV_MC = hist_Ks_dz_PV_MC.GetMean()
-#print "mean Ks_dz_PV for MC ", mean_hist_Ks_dz_PV_MC 
-
-
-#first loop over the trees and look at the PV0 distribution in z both for DATA and MC. This is important as these distributions are different for data and MC, so you have to correct for this when calculating e.g. the vz
-#iFile = 0
-#h_RECO_PV0_vz_Data_shifted = TH1F('h_RECO_PV0_vz_Data_shifted'," ;PV vz (cm) - mean PV vz; #entries",200,-100,100)
-#h_RECO_PV0_vz_MC_shifted = TH1F('h_RECO_PV0_vz_MC_shifted'," ;PV vz - mean PV vz (cm); #entries",200,-100,100)
-#for fIn in fIns:
-#	fIn = TFile(fIn,'read')
-#	treePV  = fIn.Get('FlatTreeProducerV0s/FlatTreePV')
-#	for i in range(0,min_entries):
-#		treePV.GetEntry(i)
-#		if(iFile == 0):
-#			h_RECO_PV0_vz_Data_shifted.Fill(treePV._PV0_vz[0]-mean_hist_PVz_Data)	
-#		else:	
-#			h_RECO_PV0_vz_MC_shifted.Fill(treePV._PV0_vz[0]-mean_hist_PVz_MC)
-#	iFile = iFile+1	
-#
-#mean_vz_data = h_RECO_PV0_vz_Data_shifted.GetMean()
-#RMS_vz_data  = h_RECO_PV0_vz_Data_shifted.GetRMS()
-#mean_vz_MC   = h_RECO_PV0_vz_MC_shifted.GetMean()
-#RMS_vz_MC    = h_RECO_PV0_vz_MC_shifted.GetRMS()
-#
-##normalize the histogram of PV in data to later use it for reweighting 
-#h_RECO_PV0_vz_Data_shifted.Scale(1./h_RECO_PV0_vz_Data_shifted.Integral(), "width")
-#h_RECO_PV0_vz_MC_shifted.Scale(1./h_RECO_PV0_vz_MC_shifted.Integral(), "width")
-
-
-#print "Mean and RMS of PV Data: ", mean_vz_data, " ", RMS_vz_data
-#print "Mean and RMS of PV MC: ", mean_vz_MC, " ", RMS_vz_MC
 
 iFile = 0
 h_RECO_PV0_vz_Data= TH1F('h_RECO_PV0_vz_Data'," ;PV vz (cm); #entries",20000,-100,100)
@@ -118,18 +47,14 @@ for fIn in fIns:
 			h_RECO_PV0_vz_MC.Fill(treePV._PV0_vz[0])
 	iFile = iFile+1	
 
-
 #normalize the histogram of PV in data to later use it for reweighting 
 #h_RECO_PV0_vz_Data.Scale(1./h_RECO_PV0_vz_Data.Integral(), "width")
 #h_RECO_PV0_vz_MC.Scale(1./h_RECO_PV0_vz_MC.Integral(), "width")
-
-
 
 fOut = TFile('Results/output_DataToMC_RunG_H_with_dxy_dz_min_PV_reweighing_on_Ks_vz_Dz_min_PV.root','RECREATE')
 h_dummy =  TH1F('h_dummy'," x; y",20,0,10)
 histos_Data = [h_dummy]*9
 histos_MC = [h_dummy]*9
-
 
 nKshortPerEventData = []
 nKshortPerEventMC = []
@@ -153,28 +78,13 @@ for fIn in fIns:
 	print 'Number of entries in the treeZ: ', nEntriesZ
 	print 'Number of entries in the treePV: ', nEntriesPV
 
-#	bins1 = np.arange(-260,-200,20)
-#	bins2 = np.arange(-200,-160,8)
-#	bins3 = np.arange(-160,-130,6)
-#	bins4 = np.arange(-130,-110,4)
-#	bins5 = np.arange(-110,-80,2)
-#	bins6 = np.arange(-80,-70,2)
-#	bins7 = np.arange(-70,-64,1.5)
-#	bins8 = np.arange(-64,64,1)
-#	bins9 = np.arange(64,70,1.5)
-#	bins10 = np.arange(70,80,2)
-#	bins11 = np.arange(80,110,2)	
-#	bins12 = np.arange(110,130,4)	
-#	bins13 = np.arange(130,160,6)	
-#	bins14 = np.arange(160,200,8)	
-#	bins15 = np.arange(200,260,20)
-#	args = (bins1,bins2,bins3,bins4,bins5,bins6,bins7,bins8,bins9,bins10,bins11,bins12,bins13,bins14,bins15)
 	bins1 = np.arange(-150,-60,10)
 	bins2 = np.arange(-60,60,1)
 	bins3 = np.arange(60,150,10)
 	args = (bins1,bins2,bins3)
 	bins = np.concatenate(args)
 	h_RECO_Ks_vz = TH1F('h_RECO_Ks_vz'," ;Ks v_{z} (cm); #entries",len(bins)-1,array('d',bins))
+
 	bins1 = np.arange(0,50,1)
 	bins2 = np.arange(50,56,1.5)
 	bins3 = np.arange(56,65,1.8)
@@ -183,6 +93,7 @@ for fIn in fIns:
 	args = (bins1,bins2,bins3,bins4,bins5)
 	bins = np.concatenate(args)
 	h_RECO_Ks_lxy = TH1F('h_RECO_Ks_lxy'," ;Ks l_{0} (cm);#entries",len(bins)-1,array('d',bins))
+
 	bins0 = np.arange(0,0.8,0.02)
 	bins1 = np.arange(0.8,2,0.1)
 	bins2 = np.arange(2,8,0.2)
@@ -193,6 +104,7 @@ for fIn in fIns:
 	h_RECO_Ks_pt_tracks1 = TH1F('h_RECO_Ks_pt_tracks1',"; Ks daughter 1 p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pt_tracks2 = TH1F('h_RECO_Ks_pt_tracks2',"; Ks daughter 2 p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pt_tracks1_and_2 = TH1F('h_RECO_Ks_pt_tracks1_and_2',"; Ks daughter 1 and 2 p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
+
 	bins1 = np.arange(0,15,1)
 	bins2 = np.arange(15,21,1.5)
 	bins3 = np.arange(21,25,2)
@@ -204,6 +116,7 @@ for fIn in fIns:
 	h_RECO_Ks_pz_tracks2 = TH1F('h_RECO_Ks_pz_tracks2',"; Ks daughter 2 p_{z} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pz_tracks1_and_2 = TH1F('h_RECO_Ks_pz_tracks1_and_2',"; Ks daughter 1 and 2 p_{z} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_dxy_PV= TH1F('h_RECO_Ks_dxy_PV',"; Ks d_{0} (cm); #entries",100,-10,10)
+
 	bins = [ -30,-28,-26,-24,-22,-20,-18,-16,-14,-12,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,12,14,16,18,20,22,24,26,28,30 ]
 	bins1 = np.arange(-30,-20,2)
 	bins2 = np.arange(-20,-14,1.5)
@@ -213,10 +126,12 @@ for fIn in fIns:
 	args = (bins1,bins2,bins3,bins4,bins5)
 	bins = np.concatenate(args)
 	h_RECO_Ks_dz= TH1F('h_RECO_Ks_dz',";  Ks d_{z}(0,0,0) (cm); #entries",len(bins)-1,array('d',bins))
+
 	bins = [ 0, .5, 1, 1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,8,9,10,12,14,16 ]
 	h_RECO_Ks_Track1_dxy_beamspot= TH1F('h_RECO_Ks_Track1_dxy_beamspot',";d_{0}(beamspot) track1 (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track2_dxy_beamspot= TH1F('h_RECO_Ks_Track2_dxy_beamspot',";d_{0}(beamspot) track2 (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track1_and_2_dxy_beamspot= TH1F('h_RECO_Ks_Track1_and_2_dxy_beamspot',";d_{0}(beamspot) track1 and 2 (cm) ;#entries",len(bins)-1,array('d',bins))
+
 	bins = [ -40,-35,-30,-28,-26,-24,-22,-20,-18,-16,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,30,35,40 ]
 	h_RECO_Ks_Track1Track2_max_dz_min_PV = TH1F('h_RECO_Ks_Track1Track2_max_dz_min_PV',"; maxSigned[d_{z}(best PV Ks) track1, d_{z}(best PV Ks) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track1Track2_max_dz_beamspot = TH1F('h_RECO_Ks_Track1Track2_max_dz_beamspot',"; maxSigned[d_{z}(beamspot) track1, d_{z}(beamspot) track2]   Ks (cm) ;#entries",len(bins)-1,array('d',bins))
@@ -249,11 +164,14 @@ for fIn in fIns:
 	#check the reweighting
 	h_RECO_PV0_vz_MC_reweighted_to_data = TH1F('h_RECO_PV0_vz_MC_reweighted_to_data'," ;PV v_{z} (cm); #entries",200,-100,100)
 	h_RECO_PV0_vz_MC_NOTreweighted_to_data = TH1F('h_RECO_PV0_vz_MC_NOTreweighted_to_data',"; PV v_{z} (cm); #entries",200,-100,100)
+	#check the reweighing factor versus the _Ks_vz_dz_min_PV
+	tprof_Ks_vz_dz_min_PV_reweighing_factor = TProfile('tprof_Ks_vz_dz_min_PV_reweighing_factor',"; _Ks_vz_dz_min_PV (cm); reweighing factor",100,-50,50,0,2)
+	tprof_Ks_vz_reweighing_factor = TProfile('tprof_Ks_vz_reweighing_factor',"; _Ks_vz (cm); reweighing factor",300,-150,150,0,2)
 
 
 	for i in range(0,min_entries):
-	#	if(i > 2e5):
-	#		continue
+		#if(i > 10e5):
+		#	continue
 		if(i%1e5 == 0):
 			print 'reached event ', i
 	
@@ -275,12 +193,11 @@ for fIn in fIns:
 			#if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_PV0[j]) < 0.2) :
 			#require only Ks which point to a 'best PV'
 			if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_min_PV[j]) < 0.2) :
-			#require only Ks which point away in dz
+			#require only Ks which point away in dz from any PV
 			#if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_min_PV[j]) > 0.2) :
 			#require 'PU Ks' by asking for a Ks with large _Ks_dz_PV0, but small _Ks_dz_min_PV
 			#if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_PV0[j]) > 0.2 and abs(treeKs._Ks_dz_min_PV[j]) < 0.2) :
 
-			#if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0.) :
 				nKshortThisEvent+=1
 				x_axis_h_RECO_PV0_vz_Data = h_RECO_PV0_vz_Data.GetXaxis()
 				#bin_prob_h_RECO_PV0_vz_Data = x_axis_h_RECO_PV0_vz_Data.FindBin(treePV._PV0_vz[0]) #the bin which contains the prob of finding treePV._PV0_vz[0] in the data
@@ -296,11 +213,6 @@ for fIn in fIns:
 				if(prob_h_RECO_PV0_vz_MC > 0 and iFile == 1): #only reweigh for MC
 					PV_Z_reweighting_factor = prob_h_RECO_PV0_vz_Data/prob_h_RECO_PV0_vz_MC
 
-				#print "------------------------------------------------------------------------------------"
-				#print "PV_z: ", treePV._PV0_vz[0]
-				#print "PV_z shifted Data, prob: ", treePV._PV0_vz[0]-mean_hist_PVz_Data, " ", prob_h_RECO_PV0_vz_Data_shifted  
-				#print "PV_z shifted MC, prob: ", treePV._PV0_vz[0]-mean_hist_PVz_MC, " ", prob_h_RECO_PV0_vz_MC_shifted  
-				#print "reweighting factor: ",PV_Z_reweighting_factor
 				histos[0].Fill(treeKs._Ks_vz[j], PV_Z_reweighting_factor)
 
 				histos[1].Fill(treeKs._Ks_Lxy[j], PV_Z_reweighting_factor)
@@ -336,10 +248,9 @@ for fIn in fIns:
 				if(iFile == 1): #for MC
 					h_RECO_PV0_vz_MC_reweighted_to_data.Fill(treePV._PV0_vz[0], PV_Z_reweighting_factor)
 					h_RECO_PV0_vz_MC_NOTreweighted_to_data.Fill(treePV._PV0_vz[0], 1)
+					tprof_Ks_vz_dz_min_PV_reweighing_factor.Fill(treeKs._Ks_vz_dz_min_PV[j],PV_Z_reweighting_factor)
+					tprof_Ks_vz_reweighing_factor.Fill(treeKs._Ks_vz[j],PV_Z_reweighting_factor)
 
-
-				#for V0 pointing at the PV0
-				#if(abs(treeKs._Ks_dxy[j]) < 0.015  and abs(treeKs._Ks_dz_PV[j]) < 0.01 ):
 
 		if(iFile == 0):#for Data
 			nKshortPerEventData.append(nKshortThisEvent)
@@ -371,6 +282,9 @@ h_RECO_PV0_vz_MC_reweighted_to_data.Scale(1./h_RECO_PV0_vz_MC_reweighted_to_data
 h_RECO_PV0_vz_MC_reweighted_to_data.Write()
 h_RECO_PV0_vz_MC_NOTreweighted_to_data.Scale(1./h_RECO_PV0_vz_MC_NOTreweighted_to_data.Integral(), "width")
 h_RECO_PV0_vz_MC_NOTreweighted_to_data.Write()
+
+tprof_Ks_vz_dz_min_PV_reweighing_factor.Write()
+tprof_Ks_vz_reweighing_factor.Write()
 
 fOut.mkdir('Data_Histos')
 fOut.cd('Data_Histos')

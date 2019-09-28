@@ -15,19 +15,13 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-inputFileLocation = '/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed/CRAB_SimSexaq_trial17/crab_FlatTreeProducerTracking_trial17_14092019_v2/190914_134721/'
-nInputFiles = 11
 maxEvents = 1e99
 
-verbose = False
+verbose = True
 
 plots_output_dir = "plots_syst_evaluation/"
 
-inFiles =  []
-
-for i in range(1,nInputFiles+1):
-	inFiles.append(TFile(inputFileLocation+'combined_FlatTree_Tracking_Skimmed_trial17_part'+str(i)+'.root','read'))	
-inFiles = [TFile("/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/crab/hadd/combined_test_Be_4p3eta_FlatTreeProducerTracking_trial17.root",'read')]
+inFiles = [TFile("/pnfs/iihe/cms/store/user/lowette/crmc_Sexaq/Skimmed/CRAB_SimSexaq_trial17/crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1/190918_051631/combined_FlatTree_Tracking_Skimmed_trial17.root",'read')]
 
 fOut = TFile(plots_output_dir+'macro_syst_evaluation_antiS_RECO_eff.root','RECREATE')
 
@@ -35,11 +29,28 @@ def printProgress(i):
 	if(i%10000 == 0):
 		print 'reached track: ', i, ': ', float(i)/float(min(maxEvents,tree.GetEntries()))*100, '%'
 
+#define the fiducial region
+FidReg_minPt = 0.35
+FidReg_maxPt = 999999.
+
+FidReg_maxPz = 22.
+
+FidReg_minvz = -105
+FidReg_maxvz = 105
+
+FidReg_maxlxy = 49.5
+
+FidReg_maxdxy = 8.5
+
+FidReg_mindz = -27.
+FidReg_maxdz = 27.
+
+
 #the files with the correction factors
-corr_factors_pt = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_pt_tracks1.dat") #doesn't really matter if I use track 1 or track2
-corr_factors_pz = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_pz_tracks1.dat") #doesn't really matter if I use track 1 or track2
-corr_factors_dxy = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_Track1_dxy_beamspot.dat") #doesn't really matter if I use track 1 or track2
-corr_factors_dz = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_Track1_dz_min_PV.dat") #doesn't really matter if I use track 1 or track2
+corr_factors_pt = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_pt_tracks1_and_2.dat") 
+corr_factors_pz = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_pz_tracks1_and_2.dat") 
+corr_factors_dxy = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_Track1_and_2_dxy_beamspot.dat") 
+corr_factors_dz = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_Track1_and_2_dz_min_PV.dat") 
 corr_factors_lxy = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_lxy.dat") 
 corr_factors_vz = pd.read_csv("../MCToData/Data_MC_plots/h_RECO_Ks_vz.dat") 
 
@@ -53,9 +64,9 @@ h_corr_factor_vz = TH1F("corr_factor_vz",";correction factor vz;",100,0.2,1.8)
 h_corr_factor_this_antiS = TH1F("corr_factor_this_antiS",";correction factor;",100,0.2,1.8)
 
 #for each kinematic variable plot the correction factor of that kinematic variable versus the correction parameters of the others.
-nbins_corr_par = 100
-min_bin_corr_par = 0.6
-max_bin_corr_par = 1.6
+nbins_corr_par = 60
+min_bin_corr_par = 0.7
+max_bin_corr_par = 1.3
 #pt against the others
 h_corr_pt_pt = TH2F("h_corr_pt_pt",";pt correction factor; pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pt_pz = TH2F("h_corr_pt_pz",";pt correction factor; pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -113,10 +124,19 @@ ll_corr_eff = [
 [h_corr_vz_pt,h_corr_vz_pz,h_corr_vz_dxy,h_corr_vz_dz,h_corr_vz_lxy,h_corr_vz_vz]
 ]
 
+#for each final state particle check which are the cuts for the fiducial region where it gets killed
+h_FiducialRegionCuts_1 = TH1I("h_FiducialRegionCuts_1",";Failing fiducial region cuts;",10,-0.5,9.5)
+h_FiducialRegionCuts_2 = TH1I("h_FiducialRegionCuts_2",";Failing fiducial region cuts;",10,-0.5,9.5)
+h_FiducialRegionCuts_3 = TH1I("h_FiducialRegionCuts_3",";Failing fiducial region cuts;",10,-0.5,9.5)
+h_FiducialRegionCuts_4 = TH1I("h_FiducialRegionCuts_4",";Failing fiducial region cuts;",10,-0.5,9.5)
+l_h_FiducialRegionCuts = [h_FiducialRegionCuts_1,h_FiducialRegionCuts_2,h_FiducialRegionCuts_3,h_FiducialRegionCuts_4]
+
+
 #a list with counters for the reconstructed particles, so there are 7 entries for each of the 7 particles
 nAntiS = 0.
 nAntiSRecoAlsoOutsideFiducialRegion = 0.
 nAntiSRecoWeightedWithCorrFactors = 0.
+error_nAntiSRecoWeightedWithCorrFactors = 0.
 nTotalReconstructed = [0.,0.,0.,0.,0.,0.,0.]
 #and count separately the reconstruction efficiency of the Ks, antiLambda and antiS if their respective daughters got reconstructed.
 nKsRECOIfBothDaughtersReco = 0.
@@ -151,21 +171,28 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			dz = tree._tpsAntiS_dz_beamspot[i_par]	
 			lxy = tree._tpsAntiS_Lxy_beamspot[i_par]	
 			vz = tree._tpsAntiS_vz_beamspot[i_par]	
-			if(pt > 10 or pz > 22 or lxy > 60 or abs(vz) > 150  or dxy > 12 or abs(dz) > 35 ):
+			#if(pt > 10 or pz > 22 or lxy > 60 or abs(vz) > 150  or dxy > 12 or abs(dz) > 35 ):
+			if(pt < FidReg_minPt or pt > FidReg_maxPt or pz > FidReg_maxPz or lxy > FidReg_maxlxy or vz < FidReg_minvz or vz > FidReg_maxvz  or dxy > FidReg_maxdxy or dz < FidReg_mindz or dz > FidReg_maxdz ):
 				insideSystUncFiducialRegion = False
 			if(antiSReconstructed):
-				if(pt > 10):
-					print "particle ", i_par, " has a too large pt: ", pt, "for asigning good systematics"
-				if(pz > 22):
-					print "particle ", i_par, " has a too large pz: ", pz, "for asigning good systematics"
-				if(lxy > 60):
-					print "particle ", i_par, " has a too large lxy: ", lxy, "for asigning good systematics"
-				if(abs(vz)>150):
-					print "particle ", i_par, " has a too large abs(vz): ", abs(vz), "for asigning good systematics"
-				if(dxy>12):
-					print "particle ", i_par, " has a too large dxy: ", dxy, "for asigning good systematics"
-				if(abs(dz) > 35):
-					print "particle ", i_par, " has a too large abs(dz): ", abs(dz), "for asigning good systematics"
+				if(pt < FidReg_minPt):
+					l_h_FiducialRegionCuts[i_par-3].Fill(0)
+				if(pt > FidReg_maxPt):
+					l_h_FiducialRegionCuts[i_par-3].Fill(1)
+				if(pz > FidReg_maxPz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(2)
+				if(lxy > FidReg_maxlxy):
+					l_h_FiducialRegionCuts[i_par-3].Fill(3)
+				if(vz < FidReg_minvz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(4)
+				if(vz > FidReg_maxvz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(5)
+				if(dxy > FidReg_maxdxy):
+					l_h_FiducialRegionCuts[i_par-3].Fill(6)
+				if(dz < FidReg_mindz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(7)
+				if(dz > FidReg_maxdz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(8)
 
 		if(not insideSystUncFiducialRegion and antiSReconstructed):
 			print "AntiS got reconstructed but final state particles fall outside fiducial region"
@@ -194,33 +221,42 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			if(verbose):
 				print "#################################################################"
 			corr_factor_this_antiS = 1
+			error_corr_factor_this_antiS = 0
 			for i_par in [3,4,5,6]:
 				best_matching_variables = []
 				corrections_factors = []
+				corrections_factors_error = []
+				
 
 				pt = tree._tpsAntiS_pt[i_par]
 				best_matching_variables.append(corr_factors_pt.iloc[(corr_factors_pt['kinVariable']-pt).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_pt.iloc[(corr_factors_pt['kinVariable']-pt).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_pt.iloc[(corr_factors_pt['kinVariable']-pt).abs().argsort()[:1]]["DataOverMCError"].values[0])
 
 				pz = tree._tpsAntiS_pz[i_par]	
 				best_matching_variables.append(corr_factors_pz.iloc[(corr_factors_pz['kinVariable']-pz).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_pz.iloc[(corr_factors_pz['kinVariable']-pz).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_pz.iloc[(corr_factors_pz['kinVariable']-pz).abs().argsort()[:1]]["DataOverMCError"].values[0])
 
 				dxy = tree._tpsAntiS_dxy_beamspot[i_par]	
 				best_matching_variables.append(corr_factors_dxy.iloc[(corr_factors_dxy['kinVariable']-dxy).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_dxy.iloc[(corr_factors_dxy['kinVariable']-dxy).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_dxy.iloc[(corr_factors_dxy['kinVariable']-dxy).abs().argsort()[:1]]["DataOverMCError"].values[0])
 
 				dz = tree._tpsAntiS_dz_beamspot[i_par]	
 				best_matching_variables.append(corr_factors_dz.iloc[(corr_factors_dz['kinVariable']-dz).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_dz.iloc[(corr_factors_dz['kinVariable']-dz).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_dz.iloc[(corr_factors_dz['kinVariable']-dz).abs().argsort()[:1]]["DataOverMCError"].values[0])
 
 				lxy = tree._tpsAntiS_Lxy_beamspot[i_par]	
 				best_matching_variables.append(corr_factors_lxy.iloc[(corr_factors_lxy['kinVariable']-lxy).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_lxy.iloc[(corr_factors_lxy['kinVariable']-lxy).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_lxy.iloc[(corr_factors_lxy['kinVariable']-lxy).abs().argsort()[:1]]["DataOverMCError"].values[0])
 
 				vz = tree._tpsAntiS_vz_beamspot[i_par]	
 				best_matching_variables.append(corr_factors_vz.iloc[(corr_factors_vz['kinVariable']-vz).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_vz.iloc[(corr_factors_vz['kinVariable']-vz).abs().argsort()[:1]]["DataOverMC"].values[0])
+				corrections_factors_error.append(corr_factors_vz.iloc[(corr_factors_vz['kinVariable']-vz).abs().argsort()[:1]]["DataOverMCError"].values[0])
 		
 				#fill the correlation plots of the correction parameters:
 				for i in range(0,len(ll_corr_eff)):
@@ -229,19 +265,23 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				
 
 				corr_factor_this_particle = 1	
-				for c in corrections_factors:
-					corr_factor_this_particle = corr_factor_this_particle*c
+				error_corr_factor_this_particle = 0
+				for i_cor in range(0,len(corrections_factors)):
+					corr_factor_this_particle = corr_factor_this_particle*corrections_factors[i_cor]
+					error_corr_factor_this_particle = error_corr_factor_this_particle +  np.power(corrections_factors_error[i_cor],2)/np.power(corrections_factors[i_cor],2)
 				corr_factor_this_antiS = corr_factor_this_antiS * corr_factor_this_particle
+				error_corr_factor_this_antiS = error_corr_factor_this_antiS + error_corr_factor_this_particle 
 				if(verbose):
-					print "particle has pt: ", pt, " so the best found value is: ", best_matching_variables[0]," and the correction factor is: ", corrections_factors[0]
-					print "particle has pz: ", pz, " so the best found value is: ", best_matching_variables[1]," and the correction factor is: ", corrections_factors[1]
-					print "particle has dxy: ", dxy, " so the best found value is: ", best_matching_variables[2]," and the correction factor is: ", corrections_factors[2]
-					print "particle has dz: ", dz, " so the best found value is: ", best_matching_variables[3]," and the correction factor is: ", corrections_factors[3]
-					print "particle has lxy: ", lxy, " so the best found value is: ", best_matching_variables[4]," and the correction factor is: ", corrections_factors[4]
-					print "particle has vz: ", vz, " so the best found value is: ", best_matching_variables[5]," and the correction factor is: ", corrections_factors[5]
+					print "particle has pt: ", pt, " so the best found value is: ", best_matching_variables[0]," and the correction factor is: ", corrections_factors[0], " and the error is: ", corrections_factors_error[0]
+					print "particle has pz: ", pz, " so the best found value is: ", best_matching_variables[1]," and the correction factor is: ", corrections_factors[1], " and the error is: ", corrections_factors_error[1]
+					print "particle has dxy: ", dxy, " so the best found value is: ", best_matching_variables[2]," and the correction factor is: ", corrections_factors[2], " and the error is: ", corrections_factors_error[2]
+					print "particle has dz: ", dz, " so the best found value is: ", best_matching_variables[3]," and the correction factor is: ", corrections_factors[3], " and the error is: ", corrections_factors_error[3]
+					print "particle has lxy: ", lxy, " so the best found value is: ", best_matching_variables[4]," and the correction factor is: ", corrections_factors[4], " and the error is: ", corrections_factors_error[4]
+					print "particle has vz: ", vz, " so the best found value is: ", best_matching_variables[5]," and the correction factor is: ", corrections_factors[5], " and the error is: ", corrections_factors_error[5]
 					print "The overall correction factor for this particle: ", corr_factor_this_particle
 					print "-----------------------------------------------"
-			print "The overall correction factor for this antiS: ", corr_factor_this_antiS
+			error_corr_factor_this_antiS = corr_factor_this_antiS*np.sqrt(error_corr_factor_this_antiS)
+			print "The overall correction factor for this antiS: ", corr_factor_this_antiS, " with an error of: ", error_corr_factor_this_antiS
 			h_corr_factor_this_antiS.Fill(corr_factor_this_antiS)
 			h_corr_factor_pt.Fill(corrections_factors[0])
 			h_corr_factor_pz.Fill(corrections_factors[1])
@@ -250,6 +290,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			h_corr_factor_lxy.Fill(corrections_factors[4])
 			h_corr_factor_vz.Fill(corrections_factors[5])
 			nAntiSRecoWeightedWithCorrFactors = nAntiSRecoWeightedWithCorrFactors + corr_factor_this_antiS
+			error_nAntiSRecoWeightedWithCorrFactors = error_nAntiSRecoWeightedWithCorrFactors + np.power(error_corr_factor_this_antiS,2)
 
 		#now instead of looking at the NGrandDaughtersWithTrackerLayerHitsLargerThan6 as a proxy for tracking efficiency now look at the real tracking efficiency for antiS and its daughters
 		for i in range(0,7):#for all of the 7 particles
@@ -277,10 +318,26 @@ l_dir = ["pt","pz","dxy","dz","lxy","vz"]
 i = 0
 for l in ll_corr_eff:
 	corr_parameters_dir = fOut.mkdir("corr_parameters_"+l_dir[i])
-	i+=1
 	corr_parameters_dir.cd()
+	c = TCanvas("corr_parameters_"+l_dir[i],"corr_parameters_"+l_dir[i],800,600)
+	gStyle.SetOptStat(0)
+	c.Divide(2,3)
+	j = 1
 	for h in l:
+		c.cd(j)
+		h.Draw("colz")
+		h.GetXaxis().SetTitleSize(0.05)
+		h.GetYaxis().SetTitleSize(0.05)
 		h.Write()	
+		j+=1
+	c.Write()
+	c.SaveAs(plots_output_dir+"corr_parameters_"+l_dir[i]+".pdf")
+	i+=1
+
+FiducialCuts_dir = fOut.mkdir("FiducialCuts")
+FiducialCuts_dir.cd()
+for h in l_h_FiducialRegionCuts:
+	h.Write()
 
 
 fOut.Close()
@@ -301,6 +358,7 @@ for i_par, nominator in enumerate(nTotalReconstructed,start = 0):
 
 print "------------------------------------------"
 print "the reweighted reconstruction efficiency is: ", nAntiSRecoWeightedWithCorrFactors,"/",nAntiS, " = ", nAntiSRecoWeightedWithCorrFactors/nAntiS, "       --> so 1 out of: " , nAntiS/nAntiSRecoWeightedWithCorrFactors
+print "error on the reweighted reconstruction efficiency is: ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors), "/" , nAntiS, " = ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors)/nAntiS
 print "------------------------------------------"
 print "Ks if both daughters got reconstructed: ", nKsRECOIfBothDaughtersReco,"/",nKsTOTALIfBothDaughtersReco," = ", nKsRECOIfBothDaughtersReco/nKsTOTALIfBothDaughtersReco, "              --> so 1 out of :", nKsTOTALIfBothDaughtersReco/nKsRECOIfBothDaughtersReco
 print "AntiLambda if both daughters got reconstructed: ", nAntiLambdaRECOIfBothDaughtersReco,"/",nAntiLambdaTOTALIfBothDaughtersReco," = ", nAntiLambdaRECOIfBothDaughtersReco/nAntiLambdaTOTALIfBothDaughtersReco, "              --> so 1 out of :", nAntiLambdaTOTALIfBothDaughtersReco/nAntiLambdaRECOIfBothDaughtersReco

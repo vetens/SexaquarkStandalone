@@ -14,19 +14,13 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-inputFileLocation = '/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed/CRAB_SimSexaq_trial17/crab_FlatTreeProducerTracking_trial17_14092019_v2/190914_134721/'
-nInputFiles = 11
 maxEvents = 1e99
 
 plots_output_dir = "plots_Tracking_AntiS_specific/"
 
-inFiles =  []
+inFiles = [TFile("/pnfs/iihe/cms/store/user/lowette/crmc_Sexaq/Skimmed/CRAB_SimSexaq_trial17/crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1/190918_051631/combined_FlatTree_Tracking_Skimmed_trial17.root",'read')]
 
-for i in range(1,nInputFiles+1):
-	inFiles.append(TFile(inputFileLocation+'combined_FlatTree_Tracking_Skimmed_trial17_part'+str(i)+'.root','read'))	
-inFiles = [TFile("/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/crab/hadd/combined_test_Be_4p3eta_FlatTreeProducerTracking_trial17.root",'read')]
-
-fOut = TFile(plots_output_dir+'macro_combined_FlatTree_Tracking_Skimmed_trial17_acceptance.root','RECREATE')
+fOut = TFile(plots_output_dir+'macro_combined_FlatTree_Tracking_Skimmed_trial17.root','RECREATE')
 
 def printProgress(i):
 	if(i%10000 == 0):
@@ -180,6 +174,15 @@ ll_kinematics_granddaughters_of_RECO_AntiS = [
 [h_AntiSGrandDaughter_lxy_3,h_AntiSGrandDaughter_vz_3,h_AntiSGrandDaughter_dxy_3,h_AntiSGrandDaughter_dz_3,h_AntiSGrandDaughter_pt_3,h_AntiSGrandDaughter_pz_3],
 [h_AntiSGrandDaughter_lxy_4,h_AntiSGrandDaughter_vz_4,h_AntiSGrandDaughter_dxy_4,h_AntiSGrandDaughter_dz_4,h_AntiSGrandDaughter_pt_4,h_AntiSGrandDaughter_pz_4],
 ]
+
+h_V0FitterCuts_Ks = TH1I("h_V0FitterCuts_Ks","; does V0 for which both tracks surv V0Fitter track cuts get RECO (0 = reconstructed);",62,-1.5,60.5)
+h_V0FitterCuts_AntiLambda = TH1I("h_V0FitterCuts_AntiLambda","; does V0 for which both tracks surv V0Fitter track cuts get RECO (0 = reconstructed);",62,-1.5,60.5)
+h_tracks_V0FitterCuts_posPion_Ks = TH1I("h_tracks_V0FitterCuts_posPion_Ks",";does RECO track survive V0Fitter track cuts (0 = reconstructed);",62,-1.5,60.5)
+h_tracks_V0FitterCuts_negPion_Ks = TH1I("h_tracks_V0FitterCuts_negPion_Ks",";does RECO track survive V0Fitter track cuts (0 = reconstructed);",62,-1.5,60.5)
+h_tracks_V0FitterCuts_posPion_AntiLambda = TH1I("h_tracks_V0FitterCuts_posPion_AntiLambda",";does RECO track survive V0Fitter track cuts (0 = reconstructed);",62,-1.5,60.5)
+h_tracks_V0FitterCuts_antiProton_AntiLambda = TH1I("h_tracks_V0FitterCuts_antiProton_AntiLambda",";does RECO track survive V0Fitter track cuts (0 = reconstructed);",62,-1.5,60.5)
+l_h_V0FitterCuts = [h_V0FitterCuts_Ks,h_V0FitterCuts_AntiLambda,h_tracks_V0FitterCuts_posPion_Ks,h_tracks_V0FitterCuts_negPion_Ks,h_tracks_V0FitterCuts_posPion_AntiLambda,h_tracks_V0FitterCuts_antiProton_AntiLambda] 
+
 
 #a list with counters for the reconstructed particles, so there are 7 entries for each of the 7 particles
 nAntiS = 0.
@@ -359,6 +362,17 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 					ll_kinematics_granddaughters_of_RECO_AntiS[index][4].Fill(tree._tpsAntiS_pt[j])	
 					ll_kinematics_granddaughters_of_RECO_AntiS[index][5].Fill(tree._tpsAntiS_pz[j])	
 
+		#investigate the cuts in the V0Fitter:
+		for j in [1,2,3,4,5,6]:#for the V0s itself and for the tracks investigate the _tpsAntiS_returnCodeV0Fitter leaf which tells something about where the track or the V0 got cut (or survived the) V0Fitter
+			#the code stored in _tpsAntiS_bestRECO_returnCodeV0Fitter for the tracks is a bit special. It is actually a binary number (with a length of 5)
+			l_h_V0FitterCuts[j-1].Fill(tree._tpsAntiS_returnCodeV0Fitter[j])
+		#quick check, that if the V0 it flagged as reconstructed that then also both tracks are reconstructed:
+#		if(tree._tpsAntiS_reconstructed[1]):
+#			print tree._tpsAntiS_reconstructed[3], "; ", tree._tpsAntiS_reconstructed[4]
+
+
+
+
 
 #plot kinematics of final state particles for which the antiS got reconstructed
 granddaughterkinematics_dir_of_RECO_AntiS = fOut.mkdir("granddaughterkinematics_of_RECO_AntiS") 
@@ -378,7 +392,7 @@ for i in range(0,nHistos):#each list contains a list of histograms. the histos n
 		h = ll_kinematics_granddaughters_of_RECO_AntiS[j][i]
 		if(h.GetSumw2N() == 0):
 			h.Sumw2(kTRUE)
-		h.Scale(1./h.Integral(), "width");
+		#h.Scale(1./h.Integral(), "width");
 		if j == 1:
 			h.Draw("PCE1")
 		else:
@@ -403,7 +417,7 @@ c_name = "c_"+h_AntiS_massMinusNeutron.GetName()
 c = TCanvas(c_name,"")
 if(h_AntiS_massMinusNeutron.GetSumw2N() == 0):
 	h.Sumw2(kTRUE)
-h_AntiS_massMinusNeutron.Scale(1./h.Integral(), "width");
+#h_AntiS_massMinusNeutron.Scale(1./h.Integral(), "width");
 h_AntiS_massMinusNeutron.Draw("PCE1")
 h_AntiS_massMinusNeutron.SetLineColor(colours[0])
 h_AntiS_massMinusNeutron.SetLineWidth(2)
@@ -476,7 +490,7 @@ for il, l in enumerate(ll_efficiencies,start = 0):
 		c = TCanvas(c_name,"")
 		if(hc_PassedHistogram.GetSumw2N() == 0):
 			hc_PassedHistogram.Sumw2(kTRUE)
-		hc_PassedHistogram.Scale(1./hc_PassedHistogram.Integral(), "width");
+		#hc_PassedHistogram.Scale(1./hc_PassedHistogram.Integral(), "width");
 
 		if("pt" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1GeV")	
@@ -485,7 +499,8 @@ for il, l in enumerate(ll_efficiencies,start = 0):
 		elif("eta" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1#eta")	
 		elif("lxy" in hc_PassedHistogram.GetName()):
-			hc_PassedHistogram.GetYaxis().SetTitle("Events/cm")	
+			hc_PassedHistogram.GetYaxis().SetTitle("Events/cm")
+			c.SetLogy()	
 		elif("vz" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/5cm")	
 		hc_PassedHistogram.SetLineColor(colours[0])
@@ -575,7 +590,7 @@ for i in range(0,len(l_h)):
 	CMS_lumi.CMS_lumi(c, 0, 11)
 	if(h.GetSumw2N() == 0):
 		h.Sumw2(kTRUE)
-	h.Scale(1./h.Integral(), "width");
+	#h.Scale(1./h.Integral(), "width");
 	
 	h.SetLineColor(colours[0])
 	h.SetLineWidth(2)
@@ -586,6 +601,11 @@ for i in range(0,len(l_h)):
 	c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
 	c.Write()
 
+#the cuts in the V0Fitter
+V0FitterCuts_dir = fOut.mkdir("V0FitterCuts")
+V0FitterCuts_dir.cd()
+for h in l_h_V0FitterCuts:
+	h.Write()
 
 fOut.Close()
 

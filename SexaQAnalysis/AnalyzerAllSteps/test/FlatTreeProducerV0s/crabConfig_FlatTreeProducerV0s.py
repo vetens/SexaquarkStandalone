@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-day = "21082019"
+day = "25092019"
 version = "v1"
 
 config = Configuration()
@@ -16,7 +16,7 @@ config.JobType.priority = 100
 
 config.section_('Data') 
 config.Data.unitsPerJob = 25 
-config.Data.totalUnits = 239
+config.Data.totalUnits = 10000
 config.Data.publication = False
 config.Data.splitting = 'FileBased' 
 config.Data.outLFNDirBase = '/store/user/jdeclerc/MC/FlatTreeV0s' 
@@ -28,5 +28,5 @@ config.section_('User')
 config.User.voGroup = 'becms'
 
 config.section_('Site') 
-#config.Site.whitelist =['T2_BE_IIHE'] 
+config.Site.whitelist =['T2_BE_IIHE'] 
 config.Site.storageSite = 'T2_BE_IIHE'
