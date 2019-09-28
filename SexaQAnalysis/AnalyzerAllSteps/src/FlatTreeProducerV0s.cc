@@ -41,6 +41,11 @@ void FlatTreeProducerV0s::beginJob() {
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+
+	//for the GEN Ks: just fill tree with few variables so you have an idea if the GEN Ks are really correctly modeuled
+	_tree_GEN_Ks = fs->make <TTree>("FlatTreeGENKs","treeGENKs");
+	_tree_GEN_Ks->Branch("_GEN_Ks_mass",&_GEN_Ks_mass);
+	_tree_GEN_Ks->Branch("_GEN_Ks_pt",&_GEN_Ks_pt);
         
 	//for the Ks
 	_tree_Ks = fs->make <TTree>("FlatTreeKs","treeKs");
@@ -236,6 +241,19 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
+
+  if(h_genParticles.isValid()){//loop over the gen particles, find the Ks and save some of the kinematic variables at GEN level
+	for(unsigned int i = 0; i < h_genParticles->size(); ++i){
+		if(h_genParticles->at(i).pdgId() == AnalyzerAllSteps::pdgIdKs){
+			InitGENKs();
+			_GEN_Ks_mass.push_back(h_genParticles->at(i).mass());	
+			_GEN_Ks_pt.push_back(h_genParticles->at(i).pt());	
+			_tree_GEN_Ks->Fill();
+		}
+	}
+  }
+  else std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!genparticles collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
 
   //before you start filling the trees with reconstructed Ks and Lambdas in this event you have to check wether this event contains a Z boson candidate.
   bool ZCandidatePresent = false;
@@ -829,6 +847,12 @@ void FlatTreeProducerV0s::InitLambda()
         _Lambda_daughterTrack2_dz_000.clear();
 
 
+}
+
+void FlatTreeProducerV0s::InitGENKs()
+{
+	_GEN_Ks_mass.clear();
+	_GEN_Ks_pt.clear();
 }
 
 void FlatTreeProducerV0s::InitZ()

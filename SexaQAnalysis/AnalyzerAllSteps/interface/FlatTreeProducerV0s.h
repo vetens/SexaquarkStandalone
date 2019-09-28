@@ -34,6 +34,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+    void InitGENKs();
     void InitKs();
     void InitLambda();
     void InitZ();
@@ -72,8 +73,11 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     TTree* _tree_Z;   
     TTree* _tree_PV;
     TTree* _tree_beamspot;
+    TTree* _tree_GEN_Ks; 
 
     //definition of variables which should go to tree
+    //GEN Ks
+    std::vector<float> _GEN_Ks_mass,_GEN_Ks_pt;
     //Ks
     std::vector<float> _Ks_mass,_Ks_pt,_Ks_pz,_Ks_Lxy,_Ks_vz,_Ks_eta,_Ks_phi,_Ks_dxy_beamspot,_Ks_dxy_min_PV,_Ks_dxy_PV0,_Ks_dxy_000,_Ks_dz_beamspot,_Ks_dz_min_PV,_Ks_dz_PV0,_Ks_dz_000,_Ks_vz_dz_min_PV;
     std::vector<float> _Ks_deltaRBestMatchingGENParticle,_Ks_trackPair_mindeltaR,_Ks_trackPair_mass,_Ks_Track1Track2_openingsAngle, _Ks_Track1Track2_deltaR,_Ks_Track1_openingsAngle,_Ks_Track2_openingsAngle,_Ks_Track1_deltaR,_Ks_Track2_deltaR;
