@@ -32,7 +32,8 @@ FlatTreeProducerV0s::FlatTreeProducerV0s(edm::ParameterSet const& pset):
 
 
 {
-
+	HLTTagToken_ = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", "HLT"));
+	triggerPrescalesToken_ = consumes<pat::PackedTriggerPrescales>(edm::InputTag("patTrigger"));
 }
 
 
@@ -234,6 +235,13 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   edm::Handle<vector<reco::PFJet> > h_jets;
   iEvent.getByToken(m_jetsToken, h_jets);
 
+  //trigger information
+  edm::Handle< pat::PackedTriggerPrescales > triggerPrescales;
+  edm::Handle< edm::TriggerResults > HLTResHandle;
+  iEvent.getByToken(triggerPrescalesToken_, triggerPrescales);
+  iEvent.getByToken(HLTTagToken_, HLTResHandle);  
+
+
   //beamspot
   TVector3 beamspot(0,0,0);
   TVector3 beamspotVariance(0,0,0);
@@ -253,6 +261,26 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	}
   }
   else std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!genparticles collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+  if ( HLTResHandle.isValid() && !HLTResHandle.failedToGet() ) {
+
+	edm::RefProd<edm::TriggerNames> trigNames( &(iEvent.triggerNames( *HLTResHandle )) );
+	int ntrigs = (int)trigNames->size();
+
+	bool Found_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 = false;
+	bool Fired_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 = false;
+	for (int i = 0; i < ntrigs; i++) {
+	      std::cout << trigNames->triggerName(i) << std::endl;
+	      //if(trigNames->triggerName(i).find("HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5") != std::string::npos){
+		//	 Found_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 = true;
+		//	 Fired_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 = HLTResHandle->accept(i);			
+	      //}
+	}
+	std::cout << "Found HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5? " << Found_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 << " fired? " << Fired_HLT_DoubleMu23NoFiltersNoVtxDisplaced_v5 << std::endl;
+	std::cout << "----------------------------------------------" << std::endl;
+
+  }
+  else std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!HLTResHandle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
 
   //before you start filling the trees with reconstructed Ks and Lambdas in this event you have to check wether this event contains a Z boson candidate.

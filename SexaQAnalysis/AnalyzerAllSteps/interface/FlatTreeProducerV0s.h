@@ -8,6 +8,8 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+
 using namespace edm;
 using namespace std; 
 class FlatTreeProducerV0s : public edm::EDAnalyzer
@@ -66,6 +68,10 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0LToken;
     edm::EDGetTokenT<vector<reco::Muon> > m_muonsToken;
     edm::EDGetTokenT<vector<reco::PFJet> > m_jetsToken;
+
+    edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescalesToken_;
+    edm::EDGetTokenT<edm::TriggerResults> HLTTagToken_;
+
 
    
     TTree* _tree_Ks;   
