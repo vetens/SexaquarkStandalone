@@ -47,6 +47,22 @@ for fIn in fIns:
 			h_RECO_PV0_vz_MC.Fill(treePV._PV0_vz[0])
 	iFile = iFile+1	
 
+iFile = 0
+h_RECO_beamspot_vz_Data= TH1F('h_RECO_beamspot_vz_Data'," ;PV vz (cm); #entries",2000,-2,2)
+h_RECO_beamspot_vz_MC= TH1F('h_RECO_beamspot_vz_MC'," ;PV vz (cm); #entries",2000,-2,2)
+h_RECO_beamspot_vz_Data.SetDirectory(0)
+h_RECO_beamspot_vz_MC.SetDirectory(0)
+for fIn in fIns:
+	fIn = TFile(fIn,'read')
+	treeBeamspot  = fIn.Get('FlatTreeProducerV0s/FlatTreeBeamspot')
+	for i in range(0,min_entries):
+		treeBeamspot.GetEntry(i)
+		if(iFile == 0):
+			h_RECO_beamspot_vz_Data.Fill(treeBeamspot._beampot_vz[0])	
+		else:	
+			h_RECO_beamspot_vz_MC.Fill(treeBeamspot._beampot_vz[0])
+	iFile = iFile+1	
+
 #normalize the histogram of PV in data to later use it for reweighting 
 #h_RECO_PV0_vz_Data.Scale(1./h_RECO_PV0_vz_Data.Integral(), "width")
 #h_RECO_PV0_vz_MC.Scale(1./h_RECO_PV0_vz_MC.Integral(), "width")
@@ -69,14 +85,17 @@ for fIn in fIns:
 	treeKs = fIn.Get('FlatTreeProducerV0s/FlatTreeKs') 
 	treeZ = fIn.Get('FlatTreeProducerV0s/FlatTreeZ')
 	treePV = fIn.Get('FlatTreeProducerV0s/FlatTreePV')
+	treeBeamspot = fIn.Get('FlatTreeProducerV0s/FlatTreeBeamspot')
 
 	nEntriesKs = treeKs.GetEntries()
 	nEntriesZ = treeZ.GetEntries()
 	nEntriesPV = treePV.GetEntries()
+	nEntriesBeamspot = treeBeamspot.GetEntries()
 
 	print 'Number of entries in the treeKs: ', nEntriesKs
 	print 'Number of entries in the treeZ: ', nEntriesZ
 	print 'Number of entries in the treePV: ', nEntriesPV
+	print 'Number of entries in the treeBeamspot: ', nEntriesBeamspot
 
 	bins1 = np.arange(-150,-60,10)
 	bins2 = np.arange(-60,60,1)
@@ -84,6 +103,7 @@ for fIn in fIns:
 	args = (bins1,bins2,bins3)
 	bins = np.concatenate(args)
 	h_RECO_Ks_vz = TH1F('h_RECO_Ks_vz'," ;Ks v_{z} (cm); #entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_vz_beamspot = TH1F('h_RECO_Ks_vz_beamspot'," ;Ks v_{z} (beamspot) (cm); #entries",len(bins)-1,array('d',bins))
 
 	bins1 = np.arange(0,50,1)
 	bins2 = np.arange(50,56,1.5)
@@ -92,7 +112,7 @@ for fIn in fIns:
 	bins5 = np.arange(70,90,5)
 	args = (bins1,bins2,bins3,bins4,bins5)
 	bins = np.concatenate(args)
-	h_RECO_Ks_lxy = TH1F('h_RECO_Ks_lxy'," ;Ks l_{0} (cm);#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_lxy = TH1F('h_RECO_Ks_lxy'," ;Ks l_{0} (beamspot) (cm);#entries",len(bins)-1,array('d',bins))
 
 	bins0 = np.arange(0,0.8,0.02)
 	bins1 = np.arange(0.8,2,0.1)
@@ -138,9 +158,11 @@ for fIn in fIns:
 	h_RECO_Ks_Track1_dz_min_PV = TH1F('h_RECO_Ks_Track1_dz_min_PV',"; d_{z}(best PV Ks) track1 (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track2_dz_min_PV = TH1F('h_RECO_Ks_Track2_dz_min_PV',"; d_{z}(best PV Ks) track2 (cm) ;#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_Track1_and_2_dz_min_PV = TH1F('h_RECO_Ks_Track1_and_2_dz_min_PV',"; d_{z}(best PV Ks) track 1 and 2 (cm) ;#entries",len(bins)-1,array('d',bins))
+	h_RECO_Ks_Track1_and_2_dz_beamspot = TH1F('h_RECO_Ks_Track1_and_2_dz_beamspot',"; d_{z}(beamspot) track 1 and 2 (cm) ;#entries",len(bins)-1,array('d',bins))
 
 	histos= [
 	h_RECO_Ks_vz, 
+	h_RECO_Ks_vz_beamspot, 
 	h_RECO_Ks_lxy, 
 	h_RECO_Ks_pt, 
 	h_RECO_Ks_pt_tracks1, 
@@ -159,7 +181,8 @@ for fIn in fIns:
 	h_RECO_Ks_Track1Track2_max_dz_beamspot,
 	h_RECO_Ks_Track1_dz_min_PV,
 	h_RECO_Ks_Track2_dz_min_PV,
-	h_RECO_Ks_Track1_and_2_dz_min_PV
+	h_RECO_Ks_Track1_and_2_dz_min_PV,
+	h_RECO_Ks_Track1_and_2_dz_beamspot
 	] 
 	#check the reweighting
 	h_RECO_PV0_vz_MC_reweighted_to_data = TH1F('h_RECO_PV0_vz_MC_reweighted_to_data'," ;PV v_{z} (cm); #entries",200,-100,100)
@@ -167,17 +190,20 @@ for fIn in fIns:
 	#check the reweighing factor versus the _Ks_vz_dz_min_PV
 	tprof_Ks_vz_dz_min_PV_reweighing_factor = TProfile('tprof_Ks_vz_dz_min_PV_reweighing_factor',"; _Ks_vz_dz_min_PV (cm); reweighing factor",100,-50,50,0,2)
 	tprof_Ks_vz_reweighing_factor = TProfile('tprof_Ks_vz_reweighing_factor',"; _Ks_vz (cm); reweighing factor",300,-150,150,0,2)
-
+	#check the reweighing of the beamspot
+	h_RECO_beamspot_vz_MC_reweighted_to_data = TH1F('h_RECO_beamspot_vz_MC_reweighted_to_data'," ;beamspot v_{z} (cm); #entries",200,-100,100)
+	h_RECO_beamspot_vz_MC_NOTreweighted_to_data = TH1F('h_RECO_beamspot_vz_MC_NOTreweighted_to_data',"; beamspot v_{z} (cm); #entries",200,-100,100)
 
 	for i in range(0,min_entries):
-		#if(i > 10e5):
-		#	continue
+		if(i > 10e5):
+			continue
 		if(i%1e5 == 0):
 			print 'reached event ', i
 	
 		treeZ.GetEntry(i)
 		treeKs.GetEntry(i)
 		treePV.GetEntry(i)
+		treeBeamspot.GetEntry(i)
 		
 		nKshortThisEvent = 0
 	
@@ -199,13 +225,13 @@ for fIn in fIns:
 			#if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_PV0[j]) > 0.2 and abs(treeKs._Ks_dz_min_PV[j]) < 0.2) :
 
 				nKshortThisEvent+=1
+
+				#1st reweigihing factor
 				x_axis_h_RECO_PV0_vz_Data = h_RECO_PV0_vz_Data.GetXaxis()
-				#bin_prob_h_RECO_PV0_vz_Data = x_axis_h_RECO_PV0_vz_Data.FindBin(treePV._PV0_vz[0]) #the bin which contains the prob of finding treePV._PV0_vz[0] in the data
 				bin_prob_h_RECO_PV0_vz_Data = x_axis_h_RECO_PV0_vz_Data.FindBin(treeKs._Ks_vz_dz_min_PV[j]) 
 				prob_h_RECO_PV0_vz_Data = h_RECO_PV0_vz_Data.GetBinContent(bin_prob_h_RECO_PV0_vz_Data) #the actual probability
 
 				x_axis_h_RECO_PV0_vz_MC= h_RECO_PV0_vz_MC.GetXaxis()
-				#bin_prob_h_RECO_PV0_vz_MC= x_axis_h_RECO_PV0_vz_MC.FindBin(treePV._PV0_vz[0]) #the bin which contains the prob of finding treePV._PV0_vz[0] in the data
 				bin_prob_h_RECO_PV0_vz_MC= x_axis_h_RECO_PV0_vz_MC.FindBin(treeKs._Ks_vz_dz_min_PV[j]) 
 				prob_h_RECO_PV0_vz_MC= h_RECO_PV0_vz_MC.GetBinContent(bin_prob_h_RECO_PV0_vz_MC) #the actual probability
 
@@ -213,43 +239,68 @@ for fIn in fIns:
 				if(prob_h_RECO_PV0_vz_MC > 0 and iFile == 1): #only reweigh for MC
 					PV_Z_reweighting_factor = prob_h_RECO_PV0_vz_Data/prob_h_RECO_PV0_vz_MC
 
-				histos[0].Fill(treeKs._Ks_vz[j], PV_Z_reweighting_factor)
 
-				histos[1].Fill(treeKs._Ks_Lxy[j], PV_Z_reweighting_factor)
+				#2nd reweighing factor
+				x_axis_h_RECO_beamspot_vz_Data = h_RECO_beamspot_vz_Data.GetXaxis()
+				bin_prob_h_RECO_beamspot_vz_Data = x_axis_h_RECO_beamspot_vz_Data.FindBin(treeBeamspot._beampot_vz[0]) 
+				prob_h_RECO_beamspot_vz_Data = h_RECO_beamspot_vz_Data.GetBinContent(bin_prob_h_RECO_beamspot_vz_Data) #the actual probability
 
-				histos[2].Fill(treeKs._Ks_pt[j], PV_Z_reweighting_factor)
-				histos[3].Fill(treeKs._Ks_daughterTrack1_pt[j],PV_Z_reweighting_factor) 
-				histos[4].Fill(treeKs._Ks_daughterTrack2_pt[j],PV_Z_reweighting_factor)
-				histos[5].Fill(treeKs._Ks_daughterTrack1_pt[j],PV_Z_reweighting_factor)
-				histos[5].Fill(treeKs._Ks_daughterTrack2_pt[j],PV_Z_reweighting_factor)
+				x_axis_h_RECO_beamspot_vz_MC= h_RECO_beamspot_vz_MC.GetXaxis()
+				bin_prob_h_RECO_beamspot_vz_MC= x_axis_h_RECO_beamspot_vz_MC.FindBin(treeBeamspot._beampot_vz[0]) 
+				prob_h_RECO_beamspot_vz_MC= h_RECO_beamspot_vz_MC.GetBinContent(bin_prob_h_RECO_beamspot_vz_MC) #the actual probability
 
-				histos[6].Fill(treeKs._Ks_pz[j], PV_Z_reweighting_factor)
-				histos[7].Fill(treeKs._Ks_daughterTrack1_pz[j], PV_Z_reweighting_factor)
-				histos[8].Fill(treeKs._Ks_daughterTrack2_pz[j], PV_Z_reweighting_factor)
-				histos[9].Fill(treeKs._Ks_daughterTrack1_pz[j], PV_Z_reweighting_factor)
-				histos[9].Fill(treeKs._Ks_daughterTrack2_pz[j], PV_Z_reweighting_factor)
+				beamspot_Z_reweighting_factor = 1
+				if(prob_h_RECO_beamspot_vz_MC > 0 and iFile == 1): #only reweigh for MC
+					beamspot_Z_reweighting_factor = prob_h_RECO_beamspot_vz_Data/prob_h_RECO_beamspot_vz_MC
 
-				histos[10].Fill(treeKs._Ks_dxy_beamspot[j], PV_Z_reweighting_factor)
-
-				histos[11].Fill(treeKs._Ks_dz_000[j], PV_Z_reweighting_factor)
-
-				histos[12].Fill(treeKs._Ks_daughterTrack1_dxy_beamspot[j], PV_Z_reweighting_factor)
-				histos[13].Fill(treeKs._Ks_daughterTrack2_dxy_beamspot[j], PV_Z_reweighting_factor)
-				histos[14].Fill(treeKs._Ks_daughterTrack1_dxy_beamspot[j], PV_Z_reweighting_factor)
-				histos[14].Fill(treeKs._Ks_daughterTrack2_dxy_beamspot[j], PV_Z_reweighting_factor)
-
-				histos[15].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_min_PV[j],treeKs._Ks_daughterTrack2_dz_min_PV[j]), PV_Z_reweighting_factor)
-				histos[16].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_beamspot[j],treeKs._Ks_daughterTrack2_dz_beamspot[j]), PV_Z_reweighting_factor)
-				histos[17].Fill(treeKs._Ks_daughterTrack1_dz_min_PV[j], PV_Z_reweighting_factor)
-				histos[18].Fill(treeKs._Ks_daughterTrack2_dz_min_PV[j], PV_Z_reweighting_factor)
-				histos[19].Fill(treeKs._Ks_daughterTrack1_dz_min_PV[j], PV_Z_reweighting_factor)
-				histos[19].Fill(treeKs._Ks_daughterTrack2_dz_min_PV[j], PV_Z_reweighting_factor)
+				#if(iFile == 1):
+				#	print 'PV_Z_reweighting_factor: ' , str(PV_Z_reweighting_factor)
+				#	print 'beamspot_Z_reweighting_factor: ' , str(beamspot_Z_reweighting_factor)
 
 				if(iFile == 1): #for MC
 					h_RECO_PV0_vz_MC_reweighted_to_data.Fill(treePV._PV0_vz[0], PV_Z_reweighting_factor)
 					h_RECO_PV0_vz_MC_NOTreweighted_to_data.Fill(treePV._PV0_vz[0], 1)
 					tprof_Ks_vz_dz_min_PV_reweighing_factor.Fill(treeKs._Ks_vz_dz_min_PV[j],PV_Z_reweighting_factor)
 					tprof_Ks_vz_reweighing_factor.Fill(treeKs._Ks_vz[j],PV_Z_reweighting_factor)
+					h_RECO_beamspot_vz_MC_reweighted_to_data.Fill(treeBeamspot._beampot_vz[0], beamspot_Z_reweighting_factor)
+					h_RECO_beamspot_vz_MC_NOTreweighted_to_data.Fill(treeBeamspot._beampot_vz[0], 1)
+
+
+				histos[0].Fill(treeKs._Ks_vz[j], PV_Z_reweighting_factor)
+				histos[1].Fill(treeBeamspot._beampot_vz[0]-treeKs._Ks_vz[j], beamspot_Z_reweighting_factor)
+
+				histos[2].Fill(treeKs._Ks_Lxy[j], PV_Z_reweighting_factor)
+
+				histos[3].Fill(treeKs._Ks_pt[j], PV_Z_reweighting_factor)
+				histos[4].Fill(treeKs._Ks_daughterTrack1_pt[j],PV_Z_reweighting_factor) 
+				histos[5].Fill(treeKs._Ks_daughterTrack2_pt[j],PV_Z_reweighting_factor)
+				histos[6].Fill(treeKs._Ks_daughterTrack1_pt[j],PV_Z_reweighting_factor)
+				histos[6].Fill(treeKs._Ks_daughterTrack2_pt[j],PV_Z_reweighting_factor)
+
+				histos[7].Fill(treeKs._Ks_pz[j], PV_Z_reweighting_factor)
+				histos[8].Fill(treeKs._Ks_daughterTrack1_pz[j], PV_Z_reweighting_factor)
+				histos[9].Fill(treeKs._Ks_daughterTrack2_pz[j], PV_Z_reweighting_factor)
+				histos[10].Fill(treeKs._Ks_daughterTrack1_pz[j], PV_Z_reweighting_factor)
+				histos[10].Fill(treeKs._Ks_daughterTrack2_pz[j], PV_Z_reweighting_factor)
+
+				histos[11].Fill(treeKs._Ks_dxy_beamspot[j], PV_Z_reweighting_factor)
+
+				histos[12].Fill(treeKs._Ks_dz_000[j], PV_Z_reweighting_factor)
+
+				histos[13].Fill(treeKs._Ks_daughterTrack1_dxy_beamspot[j], PV_Z_reweighting_factor)
+				histos[14].Fill(treeKs._Ks_daughterTrack2_dxy_beamspot[j], PV_Z_reweighting_factor)
+				histos[15].Fill(treeKs._Ks_daughterTrack1_dxy_beamspot[j], PV_Z_reweighting_factor)
+				histos[15].Fill(treeKs._Ks_daughterTrack2_dxy_beamspot[j], PV_Z_reweighting_factor)
+
+				histos[16].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_min_PV[j],treeKs._Ks_daughterTrack2_dz_min_PV[j]), PV_Z_reweighting_factor)
+				histos[17].Fill(maxSigned(treeKs._Ks_daughterTrack1_dz_beamspot[j],treeKs._Ks_daughterTrack2_dz_beamspot[j]), PV_Z_reweighting_factor)
+				histos[18].Fill(treeKs._Ks_daughterTrack1_dz_min_PV[j], PV_Z_reweighting_factor)
+				histos[19].Fill(treeKs._Ks_daughterTrack2_dz_min_PV[j], PV_Z_reweighting_factor)
+				histos[20].Fill(treeKs._Ks_daughterTrack1_dz_min_PV[j], PV_Z_reweighting_factor)
+				histos[20].Fill(treeKs._Ks_daughterTrack2_dz_min_PV[j], PV_Z_reweighting_factor)
+				histos[21].Fill(treeKs._Ks_daughterTrack1_dz_beamspot[j], beamspot_Z_reweighting_factor)
+				histos[21].Fill(treeKs._Ks_daughterTrack2_dz_beamspot[j], beamspot_Z_reweighting_factor)
+
 
 
 		if(iFile == 0):#for Data
@@ -270,11 +321,11 @@ for fIn in fIns:
 
 fOut.mkdir('PV_Histos')
 fOut.cd('PV_Histos')
-h_RECO_PV0_vz_Data.Rebin(100)
+h_RECO_PV0_vz_Data.Rebin(10)
 h_RECO_PV0_vz_Data.Scale(1./h_RECO_PV0_vz_Data.Integral(), "width")
 h_RECO_PV0_vz_Data.Write()
 
-h_RECO_PV0_vz_MC.Rebin(100)
+h_RECO_PV0_vz_MC.Rebin(10)
 h_RECO_PV0_vz_MC.Scale(1./h_RECO_PV0_vz_MC.Integral(), "width")
 h_RECO_PV0_vz_MC.Write()
 
@@ -285,6 +336,20 @@ h_RECO_PV0_vz_MC_NOTreweighted_to_data.Write()
 
 tprof_Ks_vz_dz_min_PV_reweighing_factor.Write()
 tprof_Ks_vz_reweighing_factor.Write()
+
+h_RECO_beamspot_vz_Data.Rebin(100)
+h_RECO_beamspot_vz_Data.Scale(1./h_RECO_beamspot_vz_Data.Integral(), "width")
+h_RECO_beamspot_vz_Data.Write()
+
+h_RECO_beamspot_vz_MC.Rebin(100)
+h_RECO_beamspot_vz_MC.Scale(1./h_RECO_beamspot_vz_MC.Integral(), "width")
+h_RECO_beamspot_vz_MC.Write()
+
+#h_RECO_beamspot_vz_MC_reweighted_to_data.Scale(1./h_RECO_beamspot_vz_MC_reweighted_to_data.Integral(), "width")
+#h_RECO_beamspot_vz_MC_reweighted_to_data.Write()
+#h_RECO_beamspot_vz_MC_NOTreweighted_to_data.Scale(1./h_RECO_beamspot_vz_MC_NOTreweighted_to_data.Integral(), "width")
+#h_RECO_beamspot_vz_MC_NOTreweighted_to_data.Write()
+
 
 fOut.mkdir('Data_Histos')
 fOut.cd('Data_Histos')

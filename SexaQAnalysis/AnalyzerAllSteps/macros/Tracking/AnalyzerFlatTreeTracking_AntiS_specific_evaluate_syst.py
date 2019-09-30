@@ -158,7 +158,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 		nAntiS+=1
 
 		#my requirement for having reconstructed antiS: based on the 3D distance between the GEN and RECO interaction vertex of the antiS.
-		antiSReconstructed = tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < 0.5
+		antiSReconstructed = tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < 0.5 and tree._tpsAntiS_bestRECO_charge[0] == -1 
 		if(antiSReconstructed):
 			nAntiSRecoAlsoOutsideFiducialRegion+=1	
 
@@ -315,6 +315,8 @@ h_corr_factor_lxy.Write()
 h_corr_factor_vz.Write()
 
 l_dir = ["pt","pz","dxy","dz","lxy","vz"]
+#list of list for the correlation factors between the correction parameters
+ll_correlation_correction_factors = []
 i = 0
 for l in ll_corr_eff:
 	corr_parameters_dir = fOut.mkdir("corr_parameters_"+l_dir[i])
@@ -323,21 +325,54 @@ for l in ll_corr_eff:
 	gStyle.SetOptStat(0)
 	c.Divide(2,3)
 	j = 1
+	l_correlation_correction_factors = []
 	for h in l:
 		c.cd(j)
 		h.Draw("colz")
 		h.GetXaxis().SetTitleSize(0.05)
 		h.GetYaxis().SetTitleSize(0.05)
+		print "Correlation factors for ", h.GetName(), " is: ", h.GetCorrelationFactor()
 		h.Write()	
 		j+=1
+		l_correlation_correction_factors.append(h.GetCorrelationFactor())
+	ll_correlation_correction_factors.append(l_correlation_correction_factors)
 	c.Write()
 	c.SaveAs(plots_output_dir+"corr_parameters_"+l_dir[i]+".pdf")
 	i+=1
+print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+print ll_correlation_correction_factors
+print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+fOut.cd()
+text_labels = ["p_{t} correction factor","p_{z} correction factor", "d_{0} correction factor", "d_{z} correction factor", "l_{0} correction factor", "v_{z} correction factor"]
+h2_correlation_factors_corr_parameters = TH2D("h2_correlation_factors_corr_parameters",";;;correlation factor",6,-0.5,5.5,6,-0.5,5.5)
+
+c_name = "c_"+h2_correlation_factors_corr_parameters.GetName()
+c = TCanvas(c_name,"")
+
+for i in range(0,len(ll_correlation_correction_factors)):
+	for j in range(0,len(ll_correlation_correction_factors[0])):
+		h2_correlation_factors_corr_parameters.SetBinContent(i+1,j+1,ll_correlation_correction_factors[i][j])
+
+xax = h2_correlation_factors_corr_parameters.GetXaxis()
+yax = h2_correlation_factors_corr_parameters.GetYaxis()
+for i in range(0,len(text_labels)):
+	xax.SetBinLabel(i+1,text_labels[i])
+	yax.SetBinLabel(i+1,text_labels[i])
+
+xax.LabelsOption("v")
+#CMS_lumi.CMS_lumi(c, 0, 11)
+c.SetBottomMargin(3)
+c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")
+h2_correlation_factors_corr_parameters.Draw("colztext")
+c.Write()
+h2_correlation_factors_corr_parameters.Write()		
 
 FiducialCuts_dir = fOut.mkdir("FiducialCuts")
 FiducialCuts_dir.cd()
 for h in l_h_FiducialRegionCuts:
 	h.Write()
+
 
 
 fOut.Close()
