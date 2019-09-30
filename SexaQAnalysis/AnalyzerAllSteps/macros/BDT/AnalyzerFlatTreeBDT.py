@@ -15,34 +15,35 @@ tdrstyle.setTDRStyle()
 colours = [1,2,4,35,38,41]
 
 #you can use this script to compared different collections of S and antiS to eachother. The most common one is comparing Data-S-BKG to MC-AntiS-Signal. The other option is comparing MC-S-BKG to MC-AntiS-BKG to Data-S-BKG
-configuration = "compare_NEG_to_POS_InvMass" # "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" or "compare_NEG_to_POS_InvMass" 
-
+configuration = "all" # "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" or "compare_NEG_to_POS_InvMass" 
 
 # Open file
 #SignFile1 = ROOT.TFile.Open("/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerBDT/test_FlatTreeBDT_trial15.root")
 SignFile1 = TFile.Open("/pnfs/iihe/cms/store/user/lowette/crmc_Sexaq/Skimmed/CRAB_SimSexaq_trial17/crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1/190918_051631/combined_FlatTreeBDT_Skimmed_trial17_21.root")
 
-BkgFile  = TFile.Open("/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerBDT/test_FlatTreeBDT_SingleMuon_Run2016H.root")
+BkgFile  = TFile.Open("/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/SingleMuon/FlatTreeBDT_SingleMuon_Run2016H.root")
 
 # Get signal and background trees from file
 SignalTree1     = SignFile1.Get("FlatTreeProducerBDT/FlatTree")
 #I only want the antiS which match a GEN antiS in lxyz of the interaction vertex and the charge should also be negative
 gROOT.cd()
-selectedSignalTree1 = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0')
-selectedSignalTree1_posMass = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 &&   Alt$(_S_mass,0) > 0' )
-selectedSignalTree1_negMass = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) < 0')
+selectedSignalTree1 = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13' )
+#selectedSignalTree1 = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0')
+
+#selectedSignalTree1_posMass = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 &&   Alt$(_S_mass,0) > 0' )
+#selectedSignalTree1_negMass = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) < 0.5 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) < 0')
 
 
 BkgTree        = BkgFile.Get("FlatTreeProducerBDT/FlatTree")
 gROOT.cd()
 #for selecting MC S BKG: 
-selectedBkgTree_MC_S_BKG = SignalTree1.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) > 0 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0')
+selectedBkgTree_MC_S_BKG = SignalTree1.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) > 0 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13')
 #for selecting MC antiS BKG: 
-selectedBkgTree_MC_AntiS_BKG = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) > 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0')
+selectedBkgTree_MC_AntiS_BKG = SignalTree1.CopyTree('Alt$(_S_charge,0) == -1 && Alt$(_S_deltaLInteractionVertexAntiSmin,0) > 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13')
 #for selecting Data S BKG: ---> standard
-selectedBkgTree_Data_S_BKG = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0')
-selectedBkgTree_Data_S_BKG_posMass = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) > 0')
-selectedBkgTree_Data_S_BKG_negMass = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) < 0')
+selectedBkgTree_Data_S_BKG = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13')
+#selectedBkgTree_Data_S_BKG_posMass = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) > 0')
+#selectedBkgTree_Data_S_BKG_negMass = BkgTree.CopyTree('Alt$(_S_charge,0) == 1 && Alt$(_S_error_lxy_interaction_vertex,0) < 0.13 && (Alt$(_S_daughters_deltaphi,0) < -1 || Alt$(_S_daughters_deltaphi,0) > 1) && Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_mass,0) < 0')
 
 l_y_axis_ranges = [0.03,1,20,1.2,1.2,3,1.5,3.5,4.5,0.7,0.7,0.7,12,3,10,1,0.7,1,1.4,0.6]
 
@@ -76,7 +77,7 @@ for tree in l_tree:
 
 	h_Ks_vz_decay_vertex = TH1F('h_Ks_vz_decay_vertex','; v_{z} K_{s} decay vertex (cm); 1/N_{ev} Events/5GeV',84,-120,120)
 	h_S_lxy_interaction_vertex = TH1F('h_S_lxy_interaction_vertex','; l_{0} interaction vertex ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/cm',81,1.9,10)
-	h_S_error_lxy_interaction_vertex = TH1F('h_S_error_lxy_interaction_vertex','; #sigma(l_{0} interaction vertex ^{(}#bar{S} ^{)}) (cm); 1/N_{ev} Events/0.1mm',300,0,3)
+	h_S_error_lxy_interaction_vertex = TH1F('h_S_error_lxy_interaction_vertex','; #sigma(l_{0} interaction vertex ^{(}#bar{S} ^{)}) (cm); 1/N_{ev} Events/0.1mm',50,0,0.5)
 
 	h_S_daughters_deltaphi = TH1F('h_S_daughters_deltaphi','; #Delta#phi(K_{S}, ^{(} #bar{#Lambda} ^{)} ) (rad); 1/N_{ev} Events/0.1rad',70,-3.5,3.5)
 	h_S_daughters_deltaeta = TH1F('h_S_daughters_deltaeta','; #Delta#eta(K_{S}, ^{(} #bar{#Lambda} ^{)} ) ; 1/N_{ev} Events/0.1rad',60,-3,3)
@@ -105,8 +106,8 @@ for tree in l_tree:
 	nEntries = tree.GetEntries()
 	print 'Number of entries in the tree: ', nEntries
 	for i in range(0,nEntries):
-		if(i==5e4):
-			break
+#		if(i==5e4):
+#			break
 		if(i%1e4 == 0):
 			print "reached entry: ", i
 		tree.GetEntry(i)
@@ -171,7 +172,7 @@ for i in range(0,nHistos):#each list contains a list of histograms. Each list re
 			h.Scale(1./h.Integral(), "width");
 		h.GetYaxis().SetRangeUser(0.,l_y_axis_ranges[i])
 		if("dxy_over_lxy" in h.GetName()):
-			h.GetYaxis().SetRangeUser(1e-2,l_y_axis_ranges[i])
+			h.GetYaxis().SetRangeUser(1e-3,l_y_axis_ranges[i])
 		if("dz_min" in h.GetName()):
 			h.GetYaxis().SetRangeUser(1e-5,l_y_axis_ranges[i])
 		if j == 0:
