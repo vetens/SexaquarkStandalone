@@ -14,7 +14,7 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-maxEvents = 1e99
+maxEvents = 1e5
 
 plots_output_dir = "plots_Tracking_AntiS_specific/"
 
@@ -45,15 +45,16 @@ h2_allTracksMoreThan6Hits_efficiency = TH2I("h2_allTracksMoreThan6Hits_efficienc
 
 #reconstruction efficiencies of the antiS, based on the lxyz between the RECO and GEN interaction vertex
 h_AntiS_deltaLInteractionVertexAntiSmin = TH1F("h_AntiS_deltaLInteractionVertexAntiSmin",";min #DeltaL_{xyz}(RECO #bar{S},simulated #bar{S}) interaction vertex;Events/mm",1000,0,100) 
-teff_AntiS_RECO_eff_eta_antiS= TEfficiency('teff_AntiS_RECO_eff_eta_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_AntiS_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiS_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_AntiS_RECO_eff_vz_antiS= TEfficiency('teff_AntiS_RECO_eff_vz_antiS',";v_{z}(beamspot) interaction vertex simulated #bar{S} (cm);",40,-100,100) 
-teff_AntiS_RECO_eff_lxy_antiS= TEfficiency('teff_AntiS_RECO_eff_lxy_antiS',";l_{0}(beamspot) interaction vertex simulated #bar{S} (cm);",60,0,60) 
-teff_AntiS_RECO_eff_pt_antiS= TEfficiency('teff_AntiS_RECO_eff_pt_antiS',";p_{t} simulated #bar{S} (GeV); ",100,0,10) 
-teff_AntiS_RECO_eff_pz_antiS= TEfficiency('teff_AntiS_RECO_eff_pz_antiS',";p_{z} simulated #bar{S} (GeV); ",80,0,80) 
-teff_AntiS_RECO_eff_dxy_antiS= TEfficiency('teff_AntiS_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{S} (cm); ",40,-10,10) 
-teff_AntiS_RECO_eff_dz_antiS= TEfficiency('teff_AntiS_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{S} (cm); ",40,-100,100) 
-teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{S} ; ",40,0-0.5,40-0.5) 
+teff_AntiS_RECO_eff_eta_antiS= TEfficiency('teff_AntiS_RECO_eff_eta_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_AntiS_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiS_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_AntiS_RECO_eff_vz_antiS= TEfficiency('teff_AntiS_RECO_eff_vz_antiS',";v_{z}(beamspot) interaction vertex simulated #bar{S} (cm);Efficiency",40,-100,100) 
+teff_AntiS_RECO_eff_lxy_antiS= TEfficiency('teff_AntiS_RECO_eff_lxy_antiS',";l_{0}(beamspot) interaction vertex simulated #bar{S} (cm);Efficiency",200,0,20) 
+teff_AntiS_RECO_eff_pt_antiS= TEfficiency('teff_AntiS_RECO_eff_pt_antiS',";p_{t} simulated #bar{S} (GeV);Efficiency ",100,0,10) 
+teff_AntiS_RECO_eff_pz_antiS= TEfficiency('teff_AntiS_RECO_eff_pz_antiS',";p_{z} simulated #bar{S} (GeV);Efficiency ",80,0,80) 
+teff_AntiS_RECO_eff_p_antiS= TEfficiency('teff_AntiS_RECO_eff_p_antiS',";p simulated #bar{S} (GeV);Efficiency ",400,0,40) 
+teff_AntiS_RECO_eff_dxy_antiS= TEfficiency('teff_AntiS_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{S} (cm);Efficiency ",40,-10,10) 
+teff_AntiS_RECO_eff_dz_antiS= TEfficiency('teff_AntiS_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{S} (cm);Efficiency ",40,-100,100) 
+teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{S} ;Efficiency ",40,0-0.5,40-0.5) 
 #reco eff for the Ks
 teff_Ks_RECO_eff_eta_antiS= TEfficiency('teff_Ks_RECO_eff_eta_antiS',";#eta simulated K_{S};",100,-5,5) 
 teff_Ks_RECO_eff_eta_antiS_antiS= TEfficiency('teff_Ks_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
@@ -61,57 +62,62 @@ teff_Ks_RECO_eff_vz_antiS= TEfficiency('teff_Ks_RECO_eff_vz_antiS',";v_{z}(beams
 teff_Ks_RECO_eff_lxy_antiS= TEfficiency('teff_Ks_RECO_eff_lxy_antiS',";l_{0}(beamspot) decay vertex simulated K_{S} (cm);",60,0,60) 
 teff_Ks_RECO_eff_pt_antiS= TEfficiency('teff_Ks_RECO_eff_pt_antiS',";p_{t} simulated K_{S} (GeV); ",100,0,10) 
 teff_Ks_RECO_eff_pz_antiS= TEfficiency('teff_Ks_RECO_eff_pz_antiS',";p_{z} simulated K_{S} (GeV); ",80,0,80) 
+teff_Ks_RECO_eff_p_antiS= TEfficiency('teff_Ks_RECO_eff_p_antiS',";p simulated K_{S} (GeV); ",400,0,40) 
 teff_Ks_RECO_eff_dxy_antiS= TEfficiency('teff_Ks_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated K_{S} (cm); ",40,-10,10) 
 teff_Ks_RECO_eff_dz_antiS= TEfficiency('teff_Ks_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated K_{S} (cm); ",40,-100,100) 
 teff_Ks_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_Ks_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated K_{S} ; ",40,0-0.5,40-0.5) 
 #reco eff for the AntiLambda
-teff_AntiLambda_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambda_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda};",100,-5,5) 
-teff_AntiLambda_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambda_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_AntiLambda_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_vz_antiS',";v_{z}(beamspot) decay vertex simulated #bar{#Lambda} (cm);",40,-100,100) 
-teff_AntiLambda_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambda_RECO_eff_lxy_antiS',";l_{0}(beamspot) decay vertex simulated #bar{#Lambda} (cm);",60,0,60) 
-teff_AntiLambda_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambda_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda} (GeV); ",100,0,10) 
-teff_AntiLambda_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda} (GeV); ",80,0,80) 
-teff_AntiLambda_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambda_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda} (cm); ",40,-10,10) 
-teff_AntiLambda_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda} (cm); ",40,-100,100) 
-teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda} (cm); ",40,0-0.5,40-0.5) 
+teff_AntiLambda_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambda_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda};Efficiency",100,-5,5) 
+teff_AntiLambda_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambda_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_AntiLambda_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_vz_antiS',";v_{z}(beamspot) decay vertex simulated #bar{#Lambda} (cm);Efficiency",40,-100,100) 
+teff_AntiLambda_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambda_RECO_eff_lxy_antiS',";l_{0}(beamspot) decay vertex simulated #bar{#Lambda} (cm);Efficiency",60,0,60) 
+teff_AntiLambda_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambda_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda} (GeV);Efficiency ",100,0,10) 
+teff_AntiLambda_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda} (GeV);Efficiency ",80,0,80) 
+teff_AntiLambda_RECO_eff_p_antiS= TEfficiency('teff_AntiLambda_RECO_eff_p_antiS',";p simulated #bar{#Lambda} (GeV);Efficiency ",400,0,40) 
+teff_AntiLambda_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambda_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda} (cm);Efficiency ",40,-10,10) 
+teff_AntiLambda_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambda_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda} (cm);Efficiency ",40,-100,100) 
+teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda} (cm);Efficiency ",40,0-0.5,40-0.5) 
 #reco eff for the Ks daughter 0 and 1
-teff_Ksdaugthers_RECO_eff_eta_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_eta_antiS',";#eta simulated K_{S} daughters;",100,-5,5) 
-teff_Ksdaughters_RECO_eff_eta_antiS_antiS= TEfficiency('teff_Ksdaughters_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_Ksdaugthers_RECO_eff_vz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated K_{S} daughters (cm);",40,-100,100) 
-teff_Ksdaugthers_RECO_eff_lxy_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated K_{S} daughters (cm);",60,0,60) 
-teff_Ksdaugthers_RECO_eff_pt_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_pt_antiS',";p_{t} simulated K_{S} daughters (GeV); ",100,0,10) 
-teff_Ksdaugthers_RECO_eff_pz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_pz_antiS',";p_{z} simulated K_{S} daughters (GeV); ",80,0,80) 
-teff_Ksdaugthers_RECO_eff_dxy_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated K_{S} daughters (cm); ",40,-10,10) 
-teff_Ksdaugthers_RECO_eff_dz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated K_{S} daughters (cm); ",40,-100,100) 
-teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated K_{S} daughters; ",40,0-0.5,40-0.5) 
+teff_Ksdaugthers_RECO_eff_eta_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_eta_antiS',";#eta simulated K_{S} daughters;Efficiency",100,-5,5) 
+teff_Ksdaughters_RECO_eff_eta_antiS_antiS= TEfficiency('teff_Ksdaughters_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_Ksdaugthers_RECO_eff_vz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated K_{S} daughters (cm);Efficiency",40,-100,100) 
+teff_Ksdaugthers_RECO_eff_lxy_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated K_{S} daughters (cm);Efficiency",60,0,60) 
+teff_Ksdaugthers_RECO_eff_pt_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_pt_antiS',";p_{t} simulated K_{S} daughters (GeV);Efficiency ",100,0,10) 
+teff_Ksdaugthers_RECO_eff_pz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_pz_antiS',";p_{z} simulated K_{S} daughters (GeV);Efficiency ",80,0,80) 
+teff_Ksdaugthers_RECO_eff_p_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_p_antiS',";p simulated K_{S} daughters (GeV);Efficiency ",400,0,40) 
+teff_Ksdaugthers_RECO_eff_dxy_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated K_{S} daughters (cm);Efficiency ",40,-10,10) 
+teff_Ksdaugthers_RECO_eff_dz_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated K_{S} daughters (cm);Efficiency ",40,-100,100) 
+teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated K_{S} daughters;Efficiency ",40,0-0.5,40-0.5) 
 #reco eff for the soft pion from the AntiLambda
-teff_AntiLambdaPion_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda}-#pi^{+};",100,-5,5) 
-teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_AntiLambdaPion_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);",40,-100,100) 
-teff_AntiLambdaPion_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);",60,0,60) 
-teff_AntiLambdaPion_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda}-#pi^{+} (GeV); ",100,0,10) 
-teff_AntiLambdaPion_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}-#pi^{+} (GeV); ",80,0,80) 
-teff_AntiLambdaPion_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm); ",40,-10,10) 
-teff_AntiLambdaPion_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm); ",40,-100,100) 
-teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda}-#pi^{+}; ",40,0-0.5,40-0.5) 
+teff_AntiLambdaPion_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda}-#pi^{+};Efficiency",100,-5,5) 
+teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_AntiLambdaPion_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);Efficiency",40,-100,100) 
+teff_AntiLambdaPion_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);Efficiency",60,0,60) 
+teff_AntiLambdaPion_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda}-#pi^{+} (GeV);Efficiency ",100,0,10) 
+teff_AntiLambdaPion_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}-#pi^{+} (GeV);Efficiency ",80,0,80) 
+teff_AntiLambdaPion_RECO_eff_p_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_p_antiS',";p simulated #bar{#Lambda}-#pi^{+} (GeV);Efficiency ",400,0,40) 
+teff_AntiLambdaPion_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm);Efficiency ",40,-10,10) 
+teff_AntiLambdaPion_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm);Efficiency ",40,-100,100) 
+teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda}-#pi^{+};Efficiency ",40,0-0.5,40-0.5) 
 #reco eff for the antiproton from the AntiLambda
-teff_AntiLambdaAntiProton_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda}-#pi^{+};",100,-5,5) 
-teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};",100,-5,5) 
-teff_AntiLambdaAntiProton_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);",40,-100,100) 
-teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated #bar{#Lambda}-#pi^{+} (cm);",60,0,60) 
-teff_AntiLambdaAntiProton_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda}-#pi^{+} (GeV); ",100,0,10) 
-teff_AntiLambdaAntiProton_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}-#pi^{+} (GeV); ",80,0,80) 
-teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm); ",40,-10,10) 
-teff_AntiLambdaAntiProton_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda}-#pi^{+} (cm); ",40,-100,100) 
-teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda}-#pi^{+}; ",40,0-0.5,40-0.5) 
+teff_AntiLambdaAntiProton_RECO_eff_eta_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_eta_antiS',";#eta simulated #bar{#Lambda}-#bar{p};Efficiency",100,-5,5) 
+teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency",100,-5,5) 
+teff_AntiLambdaAntiProton_RECO_eff_vz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_vz_antiS',";v_{z}(beamspot) creation vertex simulated #bar{#Lambda}-#bar{p} (cm);Efficiency",40,-100,100) 
+teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS',";l_{0}(beamspot) creation vertex simulated #bar{#Lambda}-#bar{p} (cm);Efficiency",60,0,60) 
+teff_AntiLambdaAntiProton_RECO_eff_pt_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_pt_antiS',";p_{t} simulated #bar{#Lambda}-#bar{p} (GeV);Efficiency ",100,0,10) 
+teff_AntiLambdaAntiProton_RECO_eff_pz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}-#bar{p} (GeV);Efficiency ",80,0,80) 
+teff_AntiLambdaAntiProton_RECO_eff_p_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_p_antiS',";p simulated #bar{#Lambda}-#bar{p} (GeV);Efficiency ",400,0,40) 
+teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS',";d_{0}(beamspot) simulated #bar{#Lambda}-#bar{p} (cm);Efficiency ",40,-10,10) 
+teff_AntiLambdaAntiProton_RECO_eff_dz_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_dz_antiS',";d_{z}(beamspot) simulated #bar{#Lambda}-#bar{p} (cm);Efficiency ",40,-100,100) 
+teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS= TEfficiency('teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS',";numberOfTrackerLayerHits simulated #bar{#Lambda}-#bar{p};Efficiency ",40,0-0.5,40-0.5) 
 
 ll_efficiencies = [
-[teff_AntiS_RECO_eff_eta_antiS,teff_AntiS_RECO_eff_eta_antiS_antiS,teff_AntiS_RECO_eff_vz_antiS,teff_AntiS_RECO_eff_lxy_antiS,teff_AntiS_RECO_eff_pt_antiS,teff_AntiS_RECO_eff_pz_antiS,teff_AntiS_RECO_eff_dxy_antiS,teff_AntiS_RECO_eff_dz_antiS,teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS],
-[teff_Ks_RECO_eff_eta_antiS,teff_Ks_RECO_eff_eta_antiS_antiS,teff_Ks_RECO_eff_vz_antiS,teff_Ks_RECO_eff_lxy_antiS,teff_Ks_RECO_eff_pt_antiS,teff_Ks_RECO_eff_pz_antiS,teff_Ks_RECO_eff_dxy_antiS,teff_Ks_RECO_eff_dz_antiS,teff_Ks_RECO_eff_numberOfTrackerLayerHits_antiS],
-[teff_AntiLambda_RECO_eff_eta_antiS,teff_AntiLambda_RECO_eff_eta_antiS_antiS,teff_AntiLambda_RECO_eff_vz_antiS,teff_AntiLambda_RECO_eff_lxy_antiS,teff_AntiLambda_RECO_eff_pt_antiS,teff_AntiLambda_RECO_eff_pz_antiS,teff_AntiLambda_RECO_eff_dxy_antiS,teff_AntiLambda_RECO_eff_dz_antiS,teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS],
-[teff_Ksdaugthers_RECO_eff_eta_antiS,teff_Ksdaughters_RECO_eff_eta_antiS_antiS,teff_Ksdaugthers_RECO_eff_vz_antiS,teff_Ksdaugthers_RECO_eff_lxy_antiS,teff_Ksdaugthers_RECO_eff_pt_antiS,teff_Ksdaugthers_RECO_eff_pz_antiS,teff_Ksdaugthers_RECO_eff_dxy_antiS,teff_Ksdaugthers_RECO_eff_dz_antiS,teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS],
-[teff_AntiLambdaPion_RECO_eff_eta_antiS,teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS,teff_AntiLambdaPion_RECO_eff_vz_antiS,teff_AntiLambdaPion_RECO_eff_lxy_antiS,teff_AntiLambdaPion_RECO_eff_pt_antiS,teff_AntiLambdaPion_RECO_eff_pz_antiS,teff_AntiLambdaPion_RECO_eff_dxy_antiS,teff_AntiLambdaPion_RECO_eff_dz_antiS,teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS],
-[teff_AntiLambdaAntiProton_RECO_eff_eta_antiS,teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS,teff_AntiLambdaAntiProton_RECO_eff_vz_antiS,teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS,teff_AntiLambdaAntiProton_RECO_eff_pt_antiS,teff_AntiLambdaAntiProton_RECO_eff_pz_antiS,teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS,teff_AntiLambdaAntiProton_RECO_eff_dz_antiS,teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS]
+[teff_AntiS_RECO_eff_eta_antiS,teff_AntiS_RECO_eff_eta_antiS_antiS,teff_AntiS_RECO_eff_vz_antiS,teff_AntiS_RECO_eff_lxy_antiS,teff_AntiS_RECO_eff_pt_antiS,teff_AntiS_RECO_eff_pz_antiS,teff_AntiS_RECO_eff_p_antiS,teff_AntiS_RECO_eff_dxy_antiS,teff_AntiS_RECO_eff_dz_antiS,teff_AntiS_RECO_eff_numberOfTrackerLayerHits_antiS],
+[teff_Ks_RECO_eff_eta_antiS,teff_Ks_RECO_eff_eta_antiS_antiS,teff_Ks_RECO_eff_vz_antiS,teff_Ks_RECO_eff_lxy_antiS,teff_Ks_RECO_eff_pt_antiS,teff_Ks_RECO_eff_pz_antiS,teff_Ks_RECO_eff_p_antiS,teff_Ks_RECO_eff_dxy_antiS,teff_Ks_RECO_eff_dz_antiS,teff_Ks_RECO_eff_numberOfTrackerLayerHits_antiS],
+[teff_AntiLambda_RECO_eff_eta_antiS,teff_AntiLambda_RECO_eff_eta_antiS_antiS,teff_AntiLambda_RECO_eff_vz_antiS,teff_AntiLambda_RECO_eff_lxy_antiS,teff_AntiLambda_RECO_eff_pt_antiS,teff_AntiLambda_RECO_eff_pz_antiS,teff_AntiLambda_RECO_eff_p_antiS,teff_AntiLambda_RECO_eff_dxy_antiS,teff_AntiLambda_RECO_eff_dz_antiS,teff_AntiLambda_RECO_eff_numberOfTrackerLayerHits_antiS],
+[teff_Ksdaugthers_RECO_eff_eta_antiS,teff_Ksdaughters_RECO_eff_eta_antiS_antiS,teff_Ksdaugthers_RECO_eff_vz_antiS,teff_Ksdaugthers_RECO_eff_lxy_antiS,teff_Ksdaugthers_RECO_eff_pt_antiS,teff_Ksdaugthers_RECO_eff_pz_antiS,teff_Ksdaugthers_RECO_eff_p_antiS,teff_Ksdaugthers_RECO_eff_dxy_antiS,teff_Ksdaugthers_RECO_eff_dz_antiS,teff_Ksdaugthers_RECO_eff_numberOfTrackerLayerHits_antiS],
+[teff_AntiLambdaPion_RECO_eff_eta_antiS,teff_AntiLambdaPion_RECO_eff_eta_antiS_antiS,teff_AntiLambdaPion_RECO_eff_vz_antiS,teff_AntiLambdaPion_RECO_eff_lxy_antiS,teff_AntiLambdaPion_RECO_eff_pt_antiS,teff_AntiLambdaPion_RECO_eff_pz_antiS,teff_AntiLambdaPion_RECO_eff_p_antiS,teff_AntiLambdaPion_RECO_eff_dxy_antiS,teff_AntiLambdaPion_RECO_eff_dz_antiS,teff_AntiLambdaPion_RECO_eff_numberOfTrackerLayerHits_antiS],
+[teff_AntiLambdaAntiProton_RECO_eff_eta_antiS,teff_AntiLambdaAntiProton_RECO_eff_eta_antiS_antiS,teff_AntiLambdaAntiProton_RECO_eff_vz_antiS,teff_AntiLambdaAntiProton_RECO_eff_lxy_antiS,teff_AntiLambdaAntiProton_RECO_eff_pt_antiS,teff_AntiLambdaAntiProton_RECO_eff_pz_antiS,teff_AntiLambdaAntiProton_RECO_eff_p_antiS,teff_AntiLambdaAntiProton_RECO_eff_dxy_antiS,teff_AntiLambdaAntiProton_RECO_eff_dz_antiS,teff_AntiLambdaAntiProton_RECO_eff_numberOfTrackerLayerHits_antiS]
 ]
 
 for l in ll_efficiencies:
@@ -299,9 +305,10 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				ll_efficiencies[index][3].Fill(particleReconstructed,tree._tpsAntiS_Lxy_beamspot[i])
 			ll_efficiencies[index][4].Fill(particleReconstructed,tree._tpsAntiS_pt[i])
 			ll_efficiencies[index][5].Fill(particleReconstructed,tree._tpsAntiS_pz[i])
-			ll_efficiencies[index][6].Fill(particleReconstructed,tree._tpsAntiS_dxy_beamspot[i])
-			ll_efficiencies[index][7].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
-			ll_efficiencies[index][8].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
+			ll_efficiencies[index][6].Fill(particleReconstructed, np.sqrt(tree._tpsAntiS_pz[i]*tree._tpsAntiS_pz[i]+tree._tpsAntiS_pt[i]*tree._tpsAntiS_pt[i]) )
+			ll_efficiencies[index][7].Fill(particleReconstructed,tree._tpsAntiS_dxy_beamspot[i])
+			ll_efficiencies[index][8].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
+			ll_efficiencies[index][9].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
 			
 			#it is almost a requirement for the antiS to be reconstructed that boolNGrandDaughtersWithTrackerLayerHitsLargerThan6 so now look for the events which have all final state particles falling in the acceptance what are the remaining inneficiencies
 			if(boolNGrandDaughtersWithTrackerLayerHitsLargerThan6):
@@ -322,8 +329,9 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				ll_efficiencies_acceptance[index][4].Fill(particleReconstructed,tree._tpsAntiS_pt[i])
 				ll_efficiencies_acceptance[index][5].Fill(particleReconstructed,tree._tpsAntiS_pz[i])
 				ll_efficiencies_acceptance[index][6].Fill(particleReconstructed,tree._tpsAntiS_dxy_beamspot[i])
-				ll_efficiencies_acceptance[index][7].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
-				ll_efficiencies_acceptance[index][8].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
+				ll_efficiencies_acceptance[index][7].Fill(particleReconstructed, np.sqrt(tree._tpsAntiS_pz[i]*tree._tpsAntiS_pz[i]+tree._tpsAntiS_pt[i]*tree._tpsAntiS_pt[i]) )
+				ll_efficiencies_acceptance[index][8].Fill(particleReconstructed,tree._tpsAntiS_dz_beamspot[i])
+				ll_efficiencies_acceptance[index][9].Fill(particleReconstructed,tree._tpsAntiS_numberOfTrackerLayers[i])
 					
 		#accuracies:
 		if(antiSReconstructed):
@@ -492,9 +500,9 @@ for il, l in enumerate(ll_efficiencies,start = 0):
 			hc_PassedHistogram.Sumw2(kTRUE)
 		#hc_PassedHistogram.Scale(1./hc_PassedHistogram.Integral(), "width");
 
-		if("pt" in hc_PassedHistogram.GetName()):
+		if("pt" in hc_PassedHistogram.GetName() or "_p_" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1GeV")	
-		elif("pz" in hc_PassedHistogram.GetName()):
+		elif("pz" in hc_PassedHistogram.GetName() ):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/1GeV")	
 		elif("eta" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1#eta")	
@@ -563,7 +571,7 @@ for il, l in enumerate(ll_efficiencies_acceptance,start = 0):
 		elif("lxy" in hc_TotalHistogram.GetName()):
 			hc_TotalHistogram.Scale(8)
                         legend.AddEntry(hc_TotalHistogram,"Distribution x8","lep")
-		elif("pt" in hc_TotalHistogram.GetName() ):
+		elif("pt" in hc_TotalHistogram.GetName() or "_p_" in hc_PassedHistogram.GetName()):
 			hc_TotalHistogram.Scale(0.5)
                         legend.AddEntry(hc_TotalHistogram,"Distribution x0.25","lep")
 		else:	

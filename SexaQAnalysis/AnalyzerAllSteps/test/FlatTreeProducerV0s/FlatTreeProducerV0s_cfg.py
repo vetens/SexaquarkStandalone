@@ -13,7 +13,7 @@ options.register(
 	'flag to indicate data or MC')
 
 options.register(
-	'maxEvts',1,VarParsing.multiplicity.singleton,VarParsing.varType.int,
+	'maxEvts',-1,VarParsing.multiplicity.singleton,VarParsing.varType.int,
 	'flag to indicate max events to process')
 	
 options.isData==True

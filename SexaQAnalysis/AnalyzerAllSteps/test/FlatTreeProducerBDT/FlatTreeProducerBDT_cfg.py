@@ -2,8 +2,8 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-runningOnData = True #this flag is used for choosing whether you want to produce trees for data or for MC.  
-lookAtAntiS =   True #This flag should be False if you are running on data unless you want to unblind. If you are running on MC it should be True as you want to see the signal.
+runningOnData = False 
+lookAtAntiS =   True 
 
 options = VarParsing ('analysis')
 options.parseArguments()
@@ -13,7 +13,7 @@ options.register(
 	'flag to indicate data or MC')
 
 options.register(
-	'maxEvts',999999999,VarParsing.multiplicity.singleton,VarParsing.varType.int,
+	'maxEvts',-1,VarParsing.multiplicity.singleton,VarParsing.varType.int,
 	'flag to indicate max events to process')
 	
 options.isData==True
@@ -34,7 +34,7 @@ else:
     process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvts))
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(2000)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 process.source = cms.Source("PoolSource",

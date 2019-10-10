@@ -24,6 +24,8 @@ void FlatTreeProducerGENSIM::beginJob() {
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+
+
 	_treeAllAntiS = fs->make <TTree>("FlatTreeGENLevelAllAntiS","treeAllAntiS");
 	_treeAllAntiS->Branch("_S_eta_all",&_S_eta_all);
 
@@ -188,6 +190,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   vector<vector<float>> v_antiS_momenta_and_itt; 
   for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 	const reco::Candidate * genParticle = &h_genParticles->at(i);
+
   	if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
    	nTotalGENS++;	
 	/*if(v_antiS_momenta_and_itt.size() == 0){//to get the thing started save the first antiS you encounter to the vector and continue

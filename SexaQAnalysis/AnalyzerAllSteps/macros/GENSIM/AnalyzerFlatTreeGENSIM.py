@@ -18,11 +18,12 @@ maxNEntries = 1e5
 
 plots_output_dir = "plots_GENSIM/"
 
-fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTree_trial17.root', 'read')
+#fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTree_trial17.root', 'read')
+fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTree_GENSIM_trial17_1p8GeV_191006_132318.root','read')
 tree = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevel') 
 treeAllAntiS = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevelAllAntiS') 
 
-fOut = TFile('macro_test_FlatTree_GENSIM_trial17.root','RECREATE')
+fOut = TFile('macro_test_FlatTree_GENSIM_trial17_1p8GeV_191006_132318.root','RECREATE')
 
 eta_distribution_antiS_dir = fOut.mkdir("eta_distribution_antiS")
 eta_distribution_antiS_dir.cd()
@@ -243,8 +244,11 @@ h_antiS_sumDaughters_deltaR = TH1F('h_antiS_sumDaughters_deltaR','; #DeltaR(#vec
 momenta_daughters_and_grandaughters_dir = fOut.mkdir("momenta_daughters_and_grandaughters")
 momenta_daughters_and_grandaughters_dir.cd()
 h_pt_Ks = TH1F("h_pt_Ks",";p_{t} (GeV); #Entries",60,0,6)
+h_p_Ks = TH1F("h_p_Ks",";p (GeV); #Entries",6000,0,6)
 h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{t} (GeV); Events/0.1GeV",60,0,6)
 h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_p_Ks_daug0 = TH1F("h_p_Ks_daug0",";p (GeV); Events/0.001GeV",6000,0,6)
+h_p_Ks_daug1 = TH1F("h_p_Ks_daug1",";p (GeV); Events/0.001GeV",6000,0,6)
 h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",30,0,30)
@@ -259,8 +263,11 @@ h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta;p (GeV);  Events/(0.1#eta*0.
 
 
 h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_p_AntiLambda = TH1F("h_p_AntiLambda",";p (GeV); Events/0.001GeV",6000,0,6)
 h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{t} (GeV); Events/0.1GeV",60,0,6)
 h_pt_AntiLambda_Pion = TH1F("h_pt_AntiLambda_Pion",";p_{t} (GeV); Events/0.1GeV",60,0,6)
+h_p_AntiLambda_AntiProton = TH1F("h_p_AntiLambda_AntiProton",";} (GeV); Events/0.01GeV",6000,0,6)
+h_p_AntiLambda_Pion = TH1F("h_p_AntiLambda_Pion",";p (GeV); Events/0.01GeV",6000,0,6)
 h_pz_AntiLambda = TH1F("h_pz_AntiLambda",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",30,0,30)
@@ -350,8 +357,11 @@ for i in range(0,nEntries):
 	h2_antiS_inv_mass_p_Ks_plus_Lambda.Fill(tree._S_mass[0], np.sqrt( pow(tree._Ks_pz[0] + tree._Lambda_pz[0] , 2) + pow(tree._Ks_pt[0] + tree._Lambda_pt[0] , 2) ) )
 	
 	h_pt_Ks.Fill(tree._Ks_pt[0])
+	h_p_Ks.Fill( np.sqrt( tree._Ks_pt[0]*tree._Ks_pt[0] + tree._Ks_pz[0]*tree._Ks_pz[0] ) )
 	h_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0])
 	h_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0])
+	h_p_Ks_daug0.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter0_pt[0],2) + np.power(tree._GEN_Ks_daughter0_pz[0],2) ) )
+	h_p_Ks_daug1.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter1_pt[0],2) + np.power(tree._GEN_Ks_daughter1_pz[0],2) ) )
 	h_pz_Ks.Fill(abs(tree._Ks_pz[0]))
 	h_pz_Ks_daug0.Fill(abs(tree._GEN_Ks_daughter0_pz[0]))
 	h_pz_Ks_daug1.Fill(abs(tree._GEN_Ks_daughter1_pz[0]))
@@ -371,8 +381,11 @@ for i in range(0,nEntries):
 
 
 	h_pt_AntiLambda.Fill(tree._Lambda_pt[0])
+	h_p_AntiLambda.Fill( np.sqrt( tree._Lambda_pt[0]*tree._Lambda_pt[0] + tree._Lambda_pz[0]*tree._Lambda_pz[0] ) )
 	h_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0])
 	h_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0])
+	h_p_AntiLambda_AntiProton.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2) + np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2) ) )
+	h_p_AntiLambda_Pion.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_Pion_pt[0],2) +  np.power(tree._GEN_AntiLambda_Pion_pz[0],2) ) )
 	h_pz_AntiLambda.Fill(abs(tree._Lambda_pz[0]))
 	h_pz_AntiLambda_AntiProton.Fill(abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
 	h_pz_AntiLambda_Pion.Fill(abs(tree._GEN_AntiLambda_Pion_pz[0]))

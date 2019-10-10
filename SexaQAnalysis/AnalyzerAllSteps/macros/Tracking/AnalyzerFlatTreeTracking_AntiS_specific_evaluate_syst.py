@@ -15,7 +15,7 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-maxEvents = 1e99
+maxEvents = 1e5
 
 verbose = True
 
@@ -23,7 +23,7 @@ plots_output_dir = "plots_syst_evaluation/"
 
 inFiles = [TFile("/pnfs/iihe/cms/store/user/lowette/crmc_Sexaq/Skimmed/CRAB_SimSexaq_trial17/crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1/190918_051631/combined_FlatTree_Tracking_Skimmed_trial17.root",'read')]
 
-fOut = TFile(plots_output_dir+'macro_syst_evaluation_antiS_RECO_eff.root','RECREATE')
+fOut = TFile(plots_output_dir+'macro_syst_evaluation_antiS_RECO_eff2.root','RECREATE')
 
 def printProgress(i):
 	if(i%10000 == 0):
@@ -40,6 +40,7 @@ FidReg_maxvz = 105
 
 FidReg_maxlxy = 49.5
 
+FidReg_mindxy = 0.
 FidReg_maxdxy = 8.5
 
 FidReg_mindz = -27.
@@ -172,7 +173,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			lxy = tree._tpsAntiS_Lxy_beamspot[i_par]	
 			vz = tree._tpsAntiS_vz_beamspot[i_par]	
 			#if(pt > 10 or pz > 22 or lxy > 60 or abs(vz) > 150  or dxy > 12 or abs(dz) > 35 ):
-			if(pt < FidReg_minPt or pt > FidReg_maxPt or pz > FidReg_maxPz or lxy > FidReg_maxlxy or vz < FidReg_minvz or vz > FidReg_maxvz  or dxy > FidReg_maxdxy or dz < FidReg_mindz or dz > FidReg_maxdz ):
+			if(pt < FidReg_minPt or pt > FidReg_maxPt or pz > FidReg_maxPz or lxy > FidReg_maxlxy or vz < FidReg_minvz or vz > FidReg_maxvz or dxy < FidReg_mindxy  or dxy > FidReg_maxdxy or dz < FidReg_mindz or dz > FidReg_maxdz ):
 				insideSystUncFiducialRegion = False
 			if(antiSReconstructed):
 				if(pt < FidReg_minPt):
@@ -187,12 +188,14 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 					l_h_FiducialRegionCuts[i_par-3].Fill(4)
 				if(vz > FidReg_maxvz):
 					l_h_FiducialRegionCuts[i_par-3].Fill(5)
-				if(dxy > FidReg_maxdxy):
+				if(dxy < FidReg_mindxy):
 					l_h_FiducialRegionCuts[i_par-3].Fill(6)
-				if(dz < FidReg_mindz):
+				if(dxy > FidReg_maxdxy):
 					l_h_FiducialRegionCuts[i_par-3].Fill(7)
-				if(dz > FidReg_maxdz):
+				if(dz < FidReg_mindz):
 					l_h_FiducialRegionCuts[i_par-3].Fill(8)
+				if(dz > FidReg_maxdz):
+					l_h_FiducialRegionCuts[i_par-3].Fill(9)
 
 		if(not insideSystUncFiducialRegion and antiSReconstructed):
 			print "AntiS got reconstructed but final state particles fall outside fiducial region"
