@@ -11,7 +11,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     virtual ~FlatTreeProducerBDT();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-    void FillBranches(const reco::VertexCompositeCandidate * antiS, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV,  bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles);    
+    void FillBranches(const reco::VertexCompositeCandidate * antiS, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV,  bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L);    
 
   private:
     int nTotalRECOS=0;
@@ -59,7 +59,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     //definition of variables which should go to tree
     std::vector<float> _S_charge;
     std::vector<float> _S_deltaLInteractionVertexAntiSmin;
-    std::vector<float> _S_lxy_interaction_vertex, _S_error_lxy_interaction_vertex,_Ks_lxy_decay_vertex,_Lambda_lxy_decay_vertex,_S_mass,_S_chi2_ndof;
+    std::vector<float> _S_lxy_interaction_vertex, _S_lxy_interaction_vertex_000, _S_error_lxy_interaction_vertex,_S_error_lxy_interaction_vertex_000,_Ks_lxy_decay_vertex,_Lambda_lxy_decay_vertex,_S_mass,_S_chi2_ndof;
     std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy,_S_dxy_dzPVmin,_Ks_dxy_dzPVmin,_Lambda_dxy_dzPVmin;
     std::vector<float> _S_dxy_over_lxy,_Ks_dxy_over_lxy,_Lambda_dxy_over_lxy;
@@ -69,7 +69,11 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     std::vector<float> _S_vz_interaction_vertex,_Ks_vz_decay_vertex,_Lambda_vz_decay_vertex;
     std::vector<float> _S_vx,_S_vy,_S_vz;
     std::vector<float> _Lambda_mass,_Ks_mass;
-    
+
+    std::vector<float> _RECO_Lambda_daughter0_charge,_RECO_Lambda_daughter0_pt,_RECO_Lambda_daughter0_pz,_RECO_Lambda_daughter0_dxy_beamspot,_RECO_Lambda_daughter0_dz_beamspot;   
+    std::vector<float> _RECO_Lambda_daughter1_charge,_RECO_Lambda_daughter1_pt,_RECO_Lambda_daughter1_pz,_RECO_Lambda_daughter1_dxy_beamspot,_RECO_Lambda_daughter1_dz_beamspot;   
+    std::vector<float> _RECO_Ks_daughter0_charge,_RECO_Ks_daughter0_pt,_RECO_Ks_daughter0_pz,_RECO_Ks_daughter0_dxy_beamspot,_RECO_Ks_daughter0_dz_beamspot;   
+    std::vector<float> _RECO_Ks_daughter1_charge,_RECO_Ks_daughter1_pt,_RECO_Ks_daughter1_pz,_RECO_Ks_daughter1_dxy_beamspot,_RECO_Ks_daughter1_dz_beamspot;   
 
     std::vector<float> _nGENAntiSWithCorrectGranddaughters;
 

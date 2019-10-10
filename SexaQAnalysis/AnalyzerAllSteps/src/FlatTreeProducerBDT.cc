@@ -44,7 +44,9 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_deltaLInteractionVertexAntiSmin",&_S_deltaLInteractionVertexAntiSmin);
 	_tree->Branch("_S_lxy_interaction_vertex",&_S_lxy_interaction_vertex);
+	_tree->Branch("_S_lxy_interaction_vertex_000",&_S_lxy_interaction_vertex_000);
 	_tree->Branch("_S_error_lxy_interaction_vertex",&_S_error_lxy_interaction_vertex);
+	_tree->Branch("_S_error_lxy_interaction_vertex_000",&_S_error_lxy_interaction_vertex_000);
 	_tree->Branch("_Ks_lxy_decay_vertex",&_Ks_lxy_decay_vertex);
 	_tree->Branch("_Lambda_lxy_decay_vertex",&_Lambda_lxy_decay_vertex);
 	_tree->Branch("_S_mass",&_S_mass);
@@ -96,6 +98,31 @@ void FlatTreeProducerBDT::beginJob() {
 
 	_tree->Branch("_Lambda_mass",&_Lambda_mass);
 	_tree->Branch("_Ks_mass",&_Ks_mass);
+
+	_tree->Branch("_RECO_Lambda_daughter0_charge",&_RECO_Lambda_daughter0_charge);
+	_tree->Branch("_RECO_Lambda_daughter0_pt",&_RECO_Lambda_daughter0_pt);
+	_tree->Branch("_RECO_Lambda_daughter0_pz",&_RECO_Lambda_daughter0_pz);
+	_tree->Branch("_RECO_Lambda_daughter0_dxy_beamspot",&_RECO_Lambda_daughter0_dxy_beamspot);
+	_tree->Branch("_RECO_Lambda_daughter0_dz_beamspot",&_RECO_Lambda_daughter0_dz_beamspot);
+
+	_tree->Branch("_RECO_Lambda_daughter1_charge",&_RECO_Lambda_daughter1_charge);
+	_tree->Branch("_RECO_Lambda_daughter1_pt",&_RECO_Lambda_daughter1_pt);
+	_tree->Branch("_RECO_Lambda_daughter1_pz",&_RECO_Lambda_daughter1_pz);
+	_tree->Branch("_RECO_Lambda_daughter1_dxy_beamspot",&_RECO_Lambda_daughter1_dxy_beamspot);
+	_tree->Branch("_RECO_Lambda_daughter1_dz_beamspot",&_RECO_Lambda_daughter1_dz_beamspot);
+
+	
+	_tree->Branch("_RECO_Ks_daughter0_charge",&_RECO_Ks_daughter0_charge);
+	_tree->Branch("_RECO_Ks_daughter0_pt",&_RECO_Ks_daughter0_pt);
+	_tree->Branch("_RECO_Ks_daughter0_pz",&_RECO_Ks_daughter0_pz);
+	_tree->Branch("_RECO_Ks_daughter0_dxy_beamspot",&_RECO_Ks_daughter0_dxy_beamspot);
+	_tree->Branch("_RECO_Ks_daughter0_dz_beamspot",&_RECO_Ks_daughter0_dz_beamspot);
+
+	_tree->Branch("_RECO_Ks_daughter1_charge",&_RECO_Ks_daughter1_charge);
+	_tree->Branch("_RECO_Ks_daughter1_pt",&_RECO_Ks_daughter1_pt);
+	_tree->Branch("_RECO_Ks_daughter1_pz",&_RECO_Ks_daughter1_pz);
+	_tree->Branch("_RECO_Ks_daughter1_dxy_beamspot",&_RECO_Ks_daughter1_dxy_beamspot);
+	_tree->Branch("_RECO_Ks_daughter1_dz_beamspot",&_RECO_Ks_daughter1_dz_beamspot);
 
         _tree_counter = fs->make <TTree>("FlatTreeCounter","tree_counter");
 	_tree_counter->Branch("_nGENAntiSWithCorrectGranddaughters",&_nGENAntiSWithCorrectGranddaughters);
@@ -153,7 +180,7 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   if(h_sCands.isValid()){
       for(unsigned int i = 0; i < h_sCands->size(); ++i){//loop all S candidates
 	const reco::VertexCompositeCandidate * antiS = &h_sCands->at(i);
-	FillBranches(antiS, beamspot, beamspotVariance, h_offlinePV,m_runningOnData,  h_genParticles);
+	FillBranches(antiS, beamspot, beamspotVariance, h_offlinePV,m_runningOnData,  h_genParticles, h_V0Ks,  h_V0L);
       }
   }
 
@@ -166,16 +193,18 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 
 
-void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles){
+void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L){
 
 	TVector3 RECOAntiSInteractionVertex(RECO_S->vx(),RECO_S->vy(),RECO_S->vz());//this is the interaction vertex of the antiS and the neutron. Check in the skimming code if you want to check.
+	double RECOLxy_interactionVertex_000 = sqrt(RECOAntiSInteractionVertex.X()*RECOAntiSInteractionVertex.X() + RECOAntiSInteractionVertex.Y()*RECOAntiSInteractionVertex.Y() );
+	double RECOLxy_interactionVertex_000_error = 1/RECOLxy_interactionVertex_000*sqrt( pow(RECOAntiSInteractionVertex.X(),2)*pow(RECO_S->vertexCovariance(0,0),2 ) + pow(RECOAntiSInteractionVertex.Y(),2)*pow(RECO_S->vertexCovariance(1,1),2 ) );
 	double RECOLxy_interactionVertex = AnalyzerAllSteps::lxy(beamspot,RECOAntiSInteractionVertex);
 
 	//if running on MC and the RECO_S charge is negative and the RECO_S has an interaction vertex which is far enough in lxy, check if this is a real AntiS by looking at the difference in lxyz between the RECO and the GEN antiS. Save this deltaLInteractionVertexAntiSmin in the tree, like this later I can easily select in the tree on signal antiS and background antiS
         double deltaLInteractionVertexAntiSmin = 999.;
 
+	
 	if(!m_runningOnData && RECO_S->charge() == -1  && RECOLxy_interactionVertex >= AnalyzerAllSteps::MinLxyCut){
-		
 		if(h_genParticles.isValid()){
 			for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT and only for the ones with the correct pdgId check if this RECO antiS is matching a GEN particle and is thus not a fake antiS
 				if(h_genParticles->at(i).pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
@@ -187,7 +216,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 				}
 
 		       }
-		}	
+		}
 	}
 
 
@@ -273,10 +302,71 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	}
 
 
+	//for the granddaughters: problem is the Ks and Lambda as daughter of the AntiS do not have daughters, so I need to go through the reconstructed Ks and Lambda collection and find the best matching ones
+	//for the Lambda
+	const reco::Candidate* Lambda_fromAntiS = RECO_S->daughter(0);
+	const reco::Candidate* Ks_fromAntiS = RECO_S->daughter(1);
+
+	double deltaRMinLambda = 999;
+	double bestMatchingLambda = 0;
+	for(unsigned int i_l = 0; i_l <  h_V0L->size(); i_l++){
+		double deltaPhi = reco::deltaPhi(h_V0L->at(i_l).phi() , Lambda_fromAntiS->phi());
+		double deltaEta = h_V0L->at(i_l).eta() - Lambda_fromAntiS->eta();
+		double deltaR = sqrt( deltaPhi*deltaPhi + deltaEta*deltaEta);
+		if(deltaR < deltaRMinLambda){deltaRMinLambda=deltaR;bestMatchingLambda=i_l;}
+	}
+
+	const reco::VertexCompositeCandidate Lambda = h_V0L->at(bestMatchingLambda); 
+
+	double deltaRMinKs = 999;
+	double bestMatchingKs = 0;
+	for(unsigned int i_k = 0; i_k <  h_V0Ks->size(); i_k++){
+		double deltaPhi = reco::deltaPhi(h_V0Ks->at(i_k).phi() , Ks_fromAntiS->phi());
+		double deltaEta = h_V0Ks->at(i_k).eta() - Ks_fromAntiS->eta();
+		double deltaR = sqrt( deltaPhi*deltaPhi + deltaEta*deltaEta);
+		if(deltaR < deltaRMinKs){deltaRMinKs=deltaR;bestMatchingKs=i_k;}
+	}
+	const reco::VertexCompositeCandidate Ks = h_V0Ks->at(bestMatchingKs);
+	 
+	//track1
+	double RECO_Lambda_daughter0_charge = Lambda.daughter(0)->charge();
+	double RECO_Lambda_daughter0_pt = Lambda.daughter(0)->pt();
+	double RECO_Lambda_daughter0_pz = Lambda.daughter(0)->pz();
+	TVector3 RECO_Lambda_Daughter0Momentum( Lambda.daughter(0)->px(), Lambda.daughter(0)->py(), Lambda.daughter(0)->pz() );	
+	TVector3 RECO_Lambda_Daughter0Vertex( Lambda.daughter(0)->vx(), Lambda.daughter(0)->vy(), Lambda.daughter(0)->vz() );	
+	double RECO_Lambda_daughter0_dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(RECO_Lambda_Daughter0Vertex, RECO_Lambda_Daughter0Momentum, beamspot);
+	double RECO_Lambda_daughter0_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Lambda_Daughter0Vertex, RECO_Lambda_Daughter0Momentum, beamspot);
+	//track2	
+	double RECO_Lambda_daughter1_charge = Lambda.daughter(1)->charge();
+	double RECO_Lambda_daughter1_pt = Lambda.daughter(1)->pt();
+	double RECO_Lambda_daughter1_pz = Lambda.daughter(1)->pz();
+	TVector3 RECO_Lambda_Daughter1Momentum( Lambda.daughter(1)->px(), Lambda.daughter(1)->py(), Lambda.daughter(1)->pz() );	
+	TVector3 RECO_Lambda_Daughter1Vertex( Lambda.daughter(1)->vx(), Lambda.daughter(1)->vy(), Lambda.daughter(1)->vz() );	
+	double RECO_Lambda_daughter1_dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(RECO_Lambda_Daughter1Vertex, RECO_Lambda_Daughter1Momentum, beamspot);
+	double RECO_Lambda_daughter1_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Lambda_Daughter1Vertex, RECO_Lambda_Daughter1Momentum, beamspot);
+
+	//for the Ks
+	//track1
+	double RECO_Ks_daughter0_charge = Ks.daughter(0)->charge();
+	double RECO_Ks_daughter0_pt = Ks.daughter(0)->pt();
+	double RECO_Ks_daughter0_pz = Ks.daughter(0)->pz();
+	TVector3 RECO_Ks_Daughter0Momentum( Ks.daughter(0)->px(), Ks.daughter(0)->py(), Ks.daughter(0)->pz() );	
+	TVector3 RECO_Ks_Daughter0Vertex( Ks.daughter(0)->vx(), Ks.daughter(0)->vy(), Ks.daughter(0)->vz() );	
+	double RECO_Ks_daughter0_dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(RECO_Ks_Daughter0Vertex, RECO_Ks_Daughter0Momentum, beamspot);
+	double RECO_Ks_daughter0_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Ks_Daughter0Vertex, RECO_Ks_Daughter0Momentum, beamspot);
+	//track2	
+	double RECO_Ks_daughter1_charge = Ks.daughter(1)->charge();
+	double RECO_Ks_daughter1_pt = Ks.daughter(1)->pt();
+	double RECO_Ks_daughter1_pz = Ks.daughter(1)->pz();
+	TVector3 RECO_Ks_Daughter1Momentum( Ks.daughter(1)->px(), Ks.daughter(1)->py(), Ks.daughter(1)->pz() );	
+	TVector3 RECO_Ks_Daughter1Vertex( Ks.daughter(1)->vx(), Ks.daughter(1)->vy(), Ks.daughter(1)->vz() );	
+	double RECO_Ks_daughter1_dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(RECO_Ks_Daughter1Vertex, RECO_Ks_Daughter1Momentum, beamspot);
+	double RECO_Ks_daughter1_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Ks_Daughter1Vertex, RECO_Ks_Daughter1Momentum, beamspot);
+
 
 	//if the RECO S particle fails one of the below cuts than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice for computational reasons
 	//if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut)return;
-	if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut  )return;
+	if(RECOLxy_interactionVertex_000 < AnalyzerAllSteps::MinLxyCut  )return;
 
 
 	nSavedRECOS++;
@@ -287,7 +377,9 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	_S_deltaLInteractionVertexAntiSmin.push_back(deltaLInteractionVertexAntiSmin);
 
 	_S_lxy_interaction_vertex.push_back(RECOLxy_interactionVertex);
+	_S_lxy_interaction_vertex_000.push_back(RECOLxy_interactionVertex_000);
 	_S_error_lxy_interaction_vertex.push_back(RECOErrorLxy_interactionVertex);
+	_S_error_lxy_interaction_vertex_000.push_back(RECOLxy_interactionVertex_000_error);
 	_Ks_lxy_decay_vertex.push_back(RECOLxy_Ks);
 	_Lambda_lxy_decay_vertex.push_back(RECOLxy_Lambda);
 	_S_mass.push_back(RECO_Smass);
@@ -329,18 +421,63 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	_Lambda_pz.push_back(RECO_S->daughter(0)->pz());
 	_Ks_pz.push_back(RECO_S->daughter(1)->pz());
 
-	_S_vz_interaction_vertex.push_back(RECO_S->vz());
-        _Lambda_vz_decay_vertex.push_back(RECOAntiSDaug0Vertex.Z());
-        _Ks_vz_decay_vertex.push_back(RECOAntiSDaug1Vertex.Z());
+	_S_vz_interaction_vertex.push_back(RECO_S->vz()-beamspot.Z());
+        _Lambda_vz_decay_vertex.push_back(RECOAntiSDaug0Vertex.Z()-beamspot.Z());
+        _Ks_vz_decay_vertex.push_back(RECOAntiSDaug1Vertex.Z()-beamspot.Z());
 
 	_S_vx.push_back(RECO_S->vx());	
 	_S_vy.push_back(RECO_S->vy());	
-	_S_vz.push_back(RECO_S->vz());	
+	_S_vz.push_back(RECO_S->vz()-beamspot.Z());	
 
 	_Lambda_mass.push_back(RECO_S->daughter(0)->mass());
 	_Ks_mass.push_back(RECO_S->daughter(1)->mass());
 
+	_RECO_Lambda_daughter0_charge.push_back(RECO_Lambda_daughter0_charge);
+	_RECO_Lambda_daughter0_pt.push_back(RECO_Lambda_daughter0_pt);
+	_RECO_Lambda_daughter0_pz.push_back(RECO_Lambda_daughter0_pz);
+	_RECO_Lambda_daughter0_dxy_beamspot.push_back(RECO_Lambda_daughter0_dxy_beamspot);
+	_RECO_Lambda_daughter0_dz_beamspot.push_back(RECO_Lambda_daughter0_dz_beamspot);
+
+	_RECO_Lambda_daughter1_charge.push_back(RECO_Lambda_daughter1_charge);
+	_RECO_Lambda_daughter1_pt.push_back(RECO_Lambda_daughter1_pt);
+	_RECO_Lambda_daughter1_pz.push_back(RECO_Lambda_daughter1_pz);
+	_RECO_Lambda_daughter1_dxy_beamspot.push_back(RECO_Lambda_daughter1_dxy_beamspot);
+	_RECO_Lambda_daughter1_dz_beamspot.push_back(RECO_Lambda_daughter1_dz_beamspot);
+
+	_RECO_Ks_daughter0_charge.push_back(RECO_Ks_daughter0_charge);
+	_RECO_Ks_daughter0_pt.push_back(RECO_Ks_daughter0_pt);
+	_RECO_Ks_daughter0_pz.push_back(RECO_Ks_daughter0_pz);
+	_RECO_Ks_daughter0_dxy_beamspot.push_back(RECO_Ks_daughter0_dxy_beamspot);
+	_RECO_Ks_daughter0_dz_beamspot.push_back(RECO_Ks_daughter0_dz_beamspot);
+
+	_RECO_Ks_daughter1_charge.push_back(RECO_Ks_daughter1_charge);
+	_RECO_Ks_daughter1_pt.push_back(RECO_Ks_daughter1_pt);
+	_RECO_Ks_daughter1_pz.push_back(RECO_Ks_daughter1_pz);
+	_RECO_Ks_daughter1_dxy_beamspot.push_back(RECO_Ks_daughter1_dxy_beamspot);
+	_RECO_Ks_daughter1_dz_beamspot.push_back(RECO_Ks_daughter1_dz_beamspot);
+
   	_tree->Fill();
+
+
+	//very temporary: for the SingleElectron2016 RunG I found some S which have a high BDT variable. Now try to find exactly the events where these S occur
+	bool foundHighBDTS = false;
+	if(_S_eta[0] == -2.99413752556) foundHighBDTS = true;
+	if(_S_eta[0] == 1.80451142788) foundHighBDTS = true;
+	if(_S_eta[0] == 2.85730171204) foundHighBDTS = true;
+	if(_S_eta[0] == 2.88255834579) foundHighBDTS = true;
+	if(_S_eta[0] == 2.62389588356)  foundHighBDTS = true;
+	if(_S_eta[0] == 1.38479459286) foundHighBDTS = true;
+	if(_S_eta[0] == 1.48003470898) foundHighBDTS = true;
+	//if(_S_eta[0] == -2.99413752556 &&  _S_lxy_interaction_vertex[0] == 2.0698633194 && _S_vz_interaction_vertex[0] == -9.11111164093) foundHighBDTS = true;
+	//if(_S_eta[0] == 1.80451142788 &&  _S_lxy_interaction_vertex[0] == 2.48056674004 && _S_vz_interaction_vertex[0] == 12.9399452209) foundHighBDTS = true;
+	//if(_S_eta[0] == 2.85730171204 &&  _S_lxy_interaction_vertex[0] == 2.09732484818 && _S_vz_interaction_vertex[0] == 11.9825458527) foundHighBDTS = true;
+	//if(_S_eta[0] == 2.88255834579 &&  _S_lxy_interaction_vertex[0] == 2.19579172134 && _S_vz_interaction_vertex[0] == 14.0933685303) foundHighBDTS = true;
+	//if(_S_eta[0] == 2.62389588356 &&  _S_lxy_interaction_vertex[0] == 2.3096203804 && _S_vz_interaction_vertex[0] == 9.77902030945) foundHighBDTS = true;
+	//if(_S_eta[0] == 1.38479459286 &&  _S_lxy_interaction_vertex[0] == 2.16217327118 && _S_vz_interaction_vertex[0] == 4.99546194077) foundHighBDTS = true;
+	//if(_S_eta[0] == 1.48003470898 &&  _S_lxy_interaction_vertex[0] == 2.01532459259 && _S_vz_interaction_vertex[0] == 9.65248298645) foundHighBDTS = true;
+
+	if(foundHighBDTS)std::cout << "found an S which matches the S with high BDT _S_eta, _S_lxy_interaction_vertex, _S_vz_interaction_vertex: " << _S_eta[0] << ", " << _S_lxy_interaction_vertex[0] << "," << _S_vz_interaction_vertex[0]  << std::endl; 
+
 
 }
 
@@ -409,7 +546,9 @@ void FlatTreeProducerBDT::Init()
 	_S_deltaLInteractionVertexAntiSmin.clear();
 
     	_S_lxy_interaction_vertex.clear();
+    	_S_lxy_interaction_vertex_000.clear();
         _S_error_lxy_interaction_vertex.clear();
+        _S_error_lxy_interaction_vertex_000.clear();
 	_Ks_lxy_decay_vertex.clear();
 	_Lambda_lxy_decay_vertex.clear();
         _S_mass.clear();
@@ -462,6 +601,29 @@ void FlatTreeProducerBDT::Init()
 	_Lambda_mass.clear();
 	_Ks_mass.clear();
 
+	_RECO_Lambda_daughter0_charge.clear();
+	_RECO_Lambda_daughter0_pt.clear();
+	_RECO_Lambda_daughter0_pz.clear();
+	_RECO_Lambda_daughter0_dxy_beamspot.clear();
+	_RECO_Lambda_daughter0_dz_beamspot.clear();
+
+	_RECO_Lambda_daughter1_charge.clear();
+	_RECO_Lambda_daughter1_pt.clear();
+	_RECO_Lambda_daughter1_pz.clear();
+	_RECO_Lambda_daughter1_dxy_beamspot.clear();
+	_RECO_Lambda_daughter1_dz_beamspot.clear();
+
+	_RECO_Ks_daughter0_charge.clear();
+	_RECO_Ks_daughter0_pt.clear();
+	_RECO_Ks_daughter0_pz.clear();
+	_RECO_Ks_daughter0_dxy_beamspot.clear();
+	_RECO_Ks_daughter0_dz_beamspot.clear();
+	
+	_RECO_Ks_daughter1_charge.clear();
+	_RECO_Ks_daughter1_pt.clear();
+	_RECO_Ks_daughter1_pz.clear();
+	_RECO_Ks_daughter1_dxy_beamspot.clear();
+	_RECO_Ks_daughter1_dz_beamspot.clear();
 
 }
 
