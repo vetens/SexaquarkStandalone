@@ -1,6 +1,6 @@
 #from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT
 from ROOT import *
-
+import numpy as np
 import sys
 sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
 import  CMS_lumi, tdrstyle
@@ -12,7 +12,7 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Simulation"
 tdrstyle.setTDRStyle()
 
-colours = [1,2,4,30,38,41]
+colours = [1,2,4,35,38,41]
 
 # Set TDR styles
 #gROOT.LoadMacro("../tdrStyle/tdrstyle.C")
@@ -24,11 +24,12 @@ colours = [1,2,4,30,38,41]
 #fIn = TFile('/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_7/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_TrackMatchingOnHits.root', 'read')
 fIn = [
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial20/FlatTree/FlatTree_GEN_trial20.root', 'read'),
+TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial19/FlatTree/FlatTree_GEN_trial19.root', 'read'),
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial17/FlatTree/FlatTree_GEN_trial17.root', 'read'),
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial18/FlatTree/FlatTree_GEN_trial18.root', 'read'),
 ]
 
-mass = ["1.2","1.8","2.1"]
+mass = ["1.2","1.5","1.8","2.1"]
 
 plots_output_dir = "plots_GEN/"
 
@@ -40,9 +41,11 @@ iFile = 0
 for f in fIn:
 	tree = f.Get('FlatTreeProducerGEN/FlatTreeGENLevel') 
 
-	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{t} (GeV); Events/0.1GeV',200,0,20)
-	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV); Events/1GeV',100,0,100)
+	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{t} (GeV); Events/0.1GeV',100,0,10)
+	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV); Events/1GeV',80,0,80)
 	h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; Events/0.1#eta',160,-8,8)
+	h_antiS_vz = TH1F('h_antiS_vz','; #bar{S} absolute creation vertex z (cm) ; Events/cm',40,-20,20)
+	h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} absolute creation vertex l_{0} (cm) ; Events/mm',20,-1,1)
 
 	h_antiS_eta_pt = TH2F('h_antiS_eta_pt',';#bar{S} #eta; #bar{S} p_{t} (GeV); Events/0.1#eta/0.1GeV',160,-8,8,100,0,10)
 	h_antiS_eta_pz = TH2F('h_antiS_eta_pz',';#bar{S} #eta; #bar{S} |p_{z}| (GeV); #Entries/0.1#eta/1GeV',160,-8,8,100,0,100)
@@ -58,10 +61,13 @@ for f in fIn:
 		h_antiS_pt.Fill(tree._S_pt[0])
 		h_antiS_pz.Fill(tree._S_pz[0])
 		h_antiS_eta.Fill(tree._S_eta[0])
+		h_antiS_vz.Fill(tree._S_vz[0])
+		h_antiS_lxy.Fill( np.sqrt( np.power(tree._S_vx[0],2) + np.power(tree._S_vy[0],2) ))
+
 		h_antiS_eta_pt.Fill(tree._S_eta[0],tree._S_pt[0])
 		h_antiS_eta_pz.Fill(tree._S_eta[0],abs(tree._S_pz[0]))
 
-	TH1_l = [h_antiS_pt,h_antiS_pz,h_antiS_eta]
+	TH1_l = [h_antiS_pt,h_antiS_pz,h_antiS_eta,h_antiS_vz,h_antiS_lxy]
 	for h in TH1_l:
 		h.SetDirectory(0) 
 	TH1_ll.append(TH1_l)

@@ -56,8 +56,8 @@ using namespace std;
 class AnalyzerAllSteps : public edm::EDAnalyzer
  {
   public:
-    static constexpr double deltaRCutV0RECOKs = 0.1;
-    static constexpr double deltaRCutV0RECOLambda = 0.1;
+    static constexpr double deltaRCutV0RECOKs = 0.01;
+    static constexpr double deltaRCutV0RECOLambda = 0.01;
     static constexpr double deltaRCutRECOAntiS = 0.1;
     static constexpr double deltaLCutInteractionVertexAntiSmin = 0.5;
 

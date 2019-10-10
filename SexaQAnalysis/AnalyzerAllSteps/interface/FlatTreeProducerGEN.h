@@ -16,7 +16,7 @@ class FlatTreeProducerGEN : public edm::EDAnalyzer
 
   private:
     int nTotalGENS=0;
-    int nTotalGENSEtaSmallerThan4=0;
+    int nTotalGENSEtaSmallerThan4p3=0;
     int nTotalGENSNegEta=0;
     int nTotalGENSPosEta=0;
     bool m_lookAtAntiS;

@@ -73,7 +73,7 @@ void FlatTreeProducerGEN::analyze(edm::Event const& iEvent, edm::EventSetup cons
 			nTotalGENS++;	
 			if(genParticle->eta()>0)nTotalGENSPosEta++;	
 			if(genParticle->eta()<0)nTotalGENSNegEta++;
-			if(abs(genParticle->eta())<4)nTotalGENSEtaSmallerThan4++;
+			if(abs(genParticle->eta())<4.3)nTotalGENSEtaSmallerThan4p3++;
 				
 			FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance);
 
@@ -167,9 +167,9 @@ FlatTreeProducerGEN::~FlatTreeProducerGEN()
 	
 
 	std::cout << "The total number GEN " << particle << " that were found is: " << nTotalGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << " that have |eta| < 4 is: " << nTotalGENSEtaSmallerThan4 << std::endl;
-	std::cout << "So the total number of GEN " << particle << " with |eta| > 4 is: " << nTotalGENS - nTotalGENSEtaSmallerThan4 << std::endl;
-	std::cout << "So the efficiency factor due to the |eta| < 4 requirement in the SIM step is: " << (double)nTotalGENSEtaSmallerThan4/(double)nTotalGENS << std::endl; 
+	std::cout << "The total number GEN " << particle << " that have |eta| < 4 is: " << nTotalGENSEtaSmallerThan4p3 << std::endl;
+	std::cout << "So the total number of GEN " << particle << " with |eta| > 4 is: " << nTotalGENS - nTotalGENSEtaSmallerThan4p3 << std::endl;
+	std::cout << "So the efficiency factor due to the |eta| < 4 requirement in the SIM step is: " << (double)nTotalGENSEtaSmallerThan4p3/(double)nTotalGENS << std::endl; 
 	std::cout << "The total number GEN " << particle << " that were found with pos eta is: " << nTotalGENSPosEta << std::endl; 
 	std::cout << "The total number GEN " << particle << " that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
 }

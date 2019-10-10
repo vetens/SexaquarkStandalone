@@ -73,6 +73,10 @@ process.validation = cms.Sequence(
 )
 
 process.load("SexaQAnalysis.AnalyzerAllSteps.FlatTreeProducerTracking_cfi")
+process.FlatTreeProducerTracking.innerHitPosCut = -1
+process.FlatTreeProducerTracking.cosThetaXYCut = -1
+process.FlatTreeProducerTracking.kShortMassCut = 0.03
+process.FlatTreeProducerTracking.lambdaMassCut = 0.015
 #process.FlatTreeProducerTracking.runningOnData = runningOnData
 #process.FlatTreeProducerTracking.lookAtAntiS = lookAtAntiS
 #process.flattreeproducer = cms.Path(process.FlatTreeProducerTracking)

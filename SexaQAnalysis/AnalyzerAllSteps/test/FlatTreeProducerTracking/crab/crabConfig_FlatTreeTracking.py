@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 
-day = "14092019"
-version = "v2"
+day = "25092019"
+version = "v1"
 
 config = Configuration()
 config.section_('General')
@@ -22,7 +22,7 @@ config.Data.splitting = 'FileBased'
 config.Data.outLFNDirBase = '/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed' 
 #config.Data.outLFNDirBase = '/store/user/jdeclerc/data_Sexaq/Analyzed/trialK' 
 #config.Data.userInputFiles = open('/user/jdeclerc/CMSSW_8_0_30/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/inputFiles.txt').readlines() 
-config.Data.inputDataset = '/CRAB_SimSexaq_trial17/lowette-crab_Step1_Step2_Skimming_FlatTree_trial17_11092019_v1-32495b8a10b3c75b4b47363607561447/USER'
+config.Data.inputDataset = '/CRAB_SimSexaq_trial17/lowette-crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1-2505f7beb84a3355642eda5d077db79a/USER'
 config.Data.inputDBS = 'phys03'
 #config.Data.outputPrimaryDataset = "CRAB_AnalyzerAllStep2_WithPU2016NeutrinoGun_tryToFix_8_"+day+'_'+version
 #config.Data.outputPrimaryDataset = "CRAB_AnalyzerAllSkimmed_Data_completely_disabled_cosThetaXYCut_innerHitPosCut_"+day+'_'+version

@@ -32,7 +32,8 @@ FlatTreeProducerV0s::FlatTreeProducerV0s(edm::ParameterSet const& pset):
 
 
 {
-
+	HLTTagToken_ = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", "HLT"));
+	triggerPrescalesToken_ = consumes<pat::PackedTriggerPrescales>(edm::InputTag("patTrigger"));
 }
 
 
@@ -41,6 +42,11 @@ void FlatTreeProducerV0s::beginJob() {
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+
+	//for the GEN Ks: just fill tree with few variables so you have an idea if the GEN Ks are really correctly modeuled
+	_tree_GEN_Ks = fs->make <TTree>("FlatTreeGENKs","treeGENKs");
+	_tree_GEN_Ks->Branch("_GEN_Ks_mass",&_GEN_Ks_mass);
+	_tree_GEN_Ks->Branch("_GEN_Ks_pt",&_GEN_Ks_pt);
         
 	//for the Ks
 	_tree_Ks = fs->make <TTree>("FlatTreeKs","treeKs");
@@ -229,6 +235,13 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   edm::Handle<vector<reco::PFJet> > h_jets;
   iEvent.getByToken(m_jetsToken, h_jets);
 
+  //trigger information
+  edm::Handle< pat::PackedTriggerPrescales > triggerPrescales;
+  edm::Handle< edm::TriggerResults > HLTResHandle;
+  iEvent.getByToken(triggerPrescalesToken_, triggerPrescales);
+  iEvent.getByToken(HLTTagToken_, HLTResHandle);  
+
+
   //beamspot
   TVector3 beamspot(0,0,0);
   TVector3 beamspotVariance(0,0,0);
@@ -236,6 +249,40 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
+
+  if(h_genParticles.isValid()){//loop over the gen particles, find the Ks and save some of the kinematic variables at GEN level
+	for(unsigned int i = 0; i < h_genParticles->size(); ++i){
+		if(h_genParticles->at(i).pdgId() == AnalyzerAllSteps::pdgIdKs){
+			InitGENKs();
+			_GEN_Ks_mass.push_back(h_genParticles->at(i).mass());	
+			_GEN_Ks_pt.push_back(h_genParticles->at(i).pt());	
+			_tree_GEN_Ks->Fill();
+		}
+	}
+  }
+
+  bool Fired_HLT_Mu17_Mu8_DZ_v = false;
+  bool Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;
+  //std::cout << "-----------------------------------------------" << std::endl;
+  if ( HLTResHandle.isValid() && !HLTResHandle.failedToGet() ) {
+
+	edm::RefProd<edm::TriggerNames> trigNames( &(iEvent.triggerNames( *HLTResHandle )) );
+	int ntrigs = (int)trigNames->size();
+	for (int i = 0; i < ntrigs; i++) {
+
+	      //if(HLTResHandle->accept(i) == 1)std::cout << trigNames->triggerName(i) << " : " << HLTResHandle->accept(i) << std::endl;
+
+	      if(trigNames->triggerName(i).find("HLT_Mu17_Mu8_DZ_v") != std::string::npos){
+			 Fired_HLT_Mu17_Mu8_DZ_v = HLTResHandle->accept(i);			
+	      }
+	      if(trigNames->triggerName(i).find("HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v") != std::string::npos){
+			 Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = HLTResHandle->accept(i);			
+	      }
+	}
+
+  }
+  else std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!HLTResHandle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
 
   //before you start filling the trees with reconstructed Ks and Lambdas in this event you have to check wether this event contains a Z boson candidate.
   bool ZCandidatePresent = false;
@@ -245,6 +292,12 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   double dz_PV_muon2 = 999.;
   double pTMuMu = 999.;
   double nLooseMuons = 0; 
+//  double ptMuon1 = 0; 
+//  double ptMuon2 = 0; 
+//  double phiMuon1 = 0; 
+//  double phiMuon2 = 0; 
+//  double etaMuon1 = 0; 
+//  double etaMuon2 = 0; 
   if(h_muons.isValid()){
 	for(unsigned int i = 0; i < h_muons->size(); ++i){
 
@@ -253,7 +306,6 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 		if(h_muons->at(i).pt() < 20) continue;	
 		if(fabs(h_muons->at(i).eta()) > 2.4) continue;	
 		if(! IsolationCriterium(h_muons->at(i))) continue;
-
 		//number of loose muons will be used later to veto events with more than 2 loose muons.	
 		bool muon1Loose = muon::isLooseMuon(h_muons->at(i));
                 if(muon1Loose) nLooseMuons++;
@@ -280,7 +332,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 			for(unsigned int k = 0; k < h_jets->size(); ++k){
 
-				if(h_jets->at(k).pt() < 30) continue;
+				if(h_jets->at(k).pt() < 30) continue;//should be .energy()  ????
 				double deltaPhiJetZ = reco::deltaPhi(p4ZCandidate.phi(),h_jets->at(k).phi());
 				//if the jet is outside of the phi-cone with opening pi/4 around the backToBack of the Z then this jet can affect the cleanlyness of the the transverse region
 				bool jetInBackToBackRegion = false;
@@ -305,13 +357,22 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 			TVector3 muon1Vertex(h_muons->at(i).vx(),h_muons->at(i).vy(),h_muons->at(i).vz());
 			TVector3 muon1Momentum(h_muons->at(i).px(),h_muons->at(i).py(),h_muons->at(i).pz());
-			dz_PV_muon1  = AnalyzerAllSteps::dz_line_point(muon1Vertex,muon1Momentum,PV0);
+			//dz_PV_muon1  = AnalyzerAllSteps::dz_line_point(muon1Vertex,muon1Momentum,PV0);
+			dz_PV_muon1  =  h_muons->at(i).muonBestTrack()->dz( h_offlinePV->at(0).position()) ;
 
 			TVector3 muon2Vertex(h_muons->at(j).vx(),h_muons->at(j).vy(),h_muons->at(j).vz());
 			TVector3 muon2Momentum(h_muons->at(j).px(),h_muons->at(j).py(),h_muons->at(j).pz());
-			dz_PV_muon2  = AnalyzerAllSteps::dz_line_point(muon2Vertex,muon2Momentum,PV0);
+			//dz_PV_muon2  = AnalyzerAllSteps::dz_line_point(muon2Vertex,muon2Momentum,PV0);
+			dz_PV_muon2  =  h_muons->at(j).muonBestTrack()->dz( h_offlinePV->at(0).position()) ;
 
 			pTMuMu  = sqrt( pow( h_muons->at(i).px() + h_muons->at(j).px() , 2 ) +  pow( h_muons->at(i).py() + h_muons->at(j).py() , 2 ) );
+
+			//ptMuon1 = h_muons->at(i).pt();		
+			//ptMuon2 = h_muons->at(j).pt();		
+			//etaMuon1 = h_muons->at(i).eta();		
+			//etaMuon2 = h_muons->at(j).eta();		
+			//phiMuon1 = h_muons->at(i).phi();		
+			//phiMuon2 = h_muons->at(j).phi();		
 		}
 
 
@@ -321,10 +382,19 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
   //now that you have the phi of the Z candidate you know in which direction the hard event goes, so now look at the V0s in the underlying event, which are the V0s which are not in the deltaPhi cone of the hard event, this cone is defined as 60° around the Z and 60° around the Z in the back to back
 
-  if(ZCandidatePresent  &&  nLooseMuons <= 2 && abs(dz_PV_muon1)  < 0.01 && abs(dz_PV_muon2) < 0.01 && abs(ZCandidateMass - 91.1876) < 15/2){
+  if(ZCandidatePresent  &&  nLooseMuons <= 2 && abs(dz_PV_muon1)  < 0.5 && abs(dz_PV_muon2) < 0.5 && abs(ZCandidateMass - 91.1876) < 15/2){
 
 	std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
 
+  	std::cout << "Fired_HLT_Mu17_Mu8_DZ_v: " << Fired_HLT_Mu17_Mu8_DZ_v << std::endl;
+  	std::cout << "Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v: " << Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v << std::endl;
+	std::cout << "OR of the previous 2: " << (Fired_HLT_Mu17_Mu8_DZ_v || Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v) << std::endl;
+//	std::cout << "ptMuon1 = " << ptMuon1 << std::endl;
+//	std::cout << "ptMuon2 = " << ptMuon2 << std::endl;
+//	std::cout << "etaMuon1 = " << etaMuon1 << std::endl;
+//	std::cout << "etaMuon2 = " << etaMuon2 << std::endl;
+//	std::cout << "phiMuon1 = " << phiMuon1 << std::endl;
+//	std::cout << "phiMuon2 = " << phiMuon2 << std::endl;
 	
 	//save some variables to the Z tree
 	InitZ();
@@ -393,7 +463,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 	math::XYZPoint beamspotPoint(beamspot.X(),beamspot.Y(),beamspot.Z());
 	
 	//loop over the GEN particles and try to find a Kshort which mathches this RECO Kshort. Then save the status of this particle so you know from where it comes: PV, material or maybe a fake?
-	//int bestMatchingGENParticle = -1;
+	int bestMatchingGENParticle = -1;
 	double deltaRBestMatchingGENParticle = 99;
 	if(h_genParticles.isValid() && V0Type == "Ks"){
 		for(unsigned int i = 0; i < h_genParticles->size(); ++i){
@@ -403,7 +473,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 				double deltaEta = abs(h_genParticles->at(i).eta() - RECOV0->eta()); 
 				double deltaR = sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta);
 				if(deltaR < deltaRBestMatchingGENParticle){ 
-					//bestMatchingGENParticle = i;
+					bestMatchingGENParticle = i;
 					deltaRBestMatchingGENParticle = deltaR;
 				}
 
@@ -420,7 +490,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 				double deltaEta = abs(h_genParticles->at(i).eta() - RECOV0->eta()); 
 				double deltaR = sqrt(deltaPhi*deltaPhi+deltaEta*deltaEta);
 				if(deltaR < deltaRBestMatchingGENParticle){ 
-					//bestMatchingGENParticle = i;
+					bestMatchingGENParticle = i;
 					deltaRBestMatchingGENParticle = deltaR;
 				}
 
@@ -428,6 +498,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 
 		}		
 	}
+
 
         TVector3 V0CreationVertex(RECOV0->vx(),RECOV0->vy(),RECOV0->vz());
         double Lxy = AnalyzerAllSteps::lxy(beamspot,V0CreationVertex);
@@ -627,7 +698,16 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 
 
 	}
-	
+
+	//just a consitency check: if deltaR is small then also the 3D distance between the GEN decay vertex and the RECO decay vertex should be small
+	if( RECOV0->mass() > 0.48 && RECOV0->mass() < 0.52 &&  abs(RECOV0->eta()) < 2 && dxy_beamspot < 0.1 && dxy_beamspot > 0. && abs(dz_PV0) < 0.2 ){
+		std::cout << "number of daughters: "<< h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() << std::endl;
+		if(deltaRBestMatchingGENParticle < 0.01 && h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() > 0){
+			double distance = sqrt(  pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx() - RECOV0->vx() ,2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy() - RECOV0->vy(),2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz() - RECOV0->vz(),2) );
+			double GEN_lxyz = sqrt( pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz(),2) );
+			std::cout << "Found a GEN Ks matching a RECO Ks in deltaR, the 3D distance between GEN and RECO decay vertex is: "<< distance << " the GEN lxyz is: " << GEN_lxyz << std::endl;
+		}
+	}	
 
 }
 
@@ -829,6 +909,12 @@ void FlatTreeProducerV0s::InitLambda()
         _Lambda_daughterTrack2_dz_000.clear();
 
 
+}
+
+void FlatTreeProducerV0s::InitGENKs()
+{
+	_GEN_Ks_mass.clear();
+	_GEN_Ks_pt.clear();
 }
 
 void FlatTreeProducerV0s::InitZ()
