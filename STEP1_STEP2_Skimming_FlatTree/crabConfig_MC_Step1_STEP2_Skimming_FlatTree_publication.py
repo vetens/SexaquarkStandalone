@@ -1,27 +1,29 @@
 from WMCore.Configuration import Configuration
 
-day = "26082019"
+day = "01102019"
 version = "v1"
+trial = "20"
+
 
 config = Configuration()
 config.section_('General')
 config.General.transferOutputs = True
 config.General.transferLogs = True
-config.General.requestName = 'Step1_Step2_Skimming_FlatTree_trial16_'+day+'_'+version 
+config.General.requestName = 'Step1_Step2_Skimming_FlatTree_trial'+trial+'_'+day+'_'+version 
 
 config.section_('JobType') 
 config.JobType.pluginName = 'Analysis' 
-config.JobType.psetName = 'master_STEP1_STEP2_Skimming_FlatTree_SLIMMED_cfg.py' 
-config.JobType.maxMemoryMB = 2500
+config.JobType.psetName = 'master_STEP1_STEP2_Skimming_FlatTree_SLIMMED_KEEP_EVENTS_IN_SKIMMING_cfg.py' 
+config.JobType.maxMemoryMB = 3000
 
 config.section_('Data') 
 config.Data.unitsPerJob = 1 
 config.Data.totalUnits = 10000
 config.Data.publication = True 
 config.Data.splitting = 'FileBased' 
-config.Data.outLFNDirBase = '/store/user/jdeclerc/crmc_Sexaq/Skimmed' 
+config.Data.outLFNDirBase = '/store/user/lowette/crmc_Sexaq/Skimmed' 
 #config.Data.userInputFiles = open('/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30/src/STEP2_Sexaq/crabSlimmedFEVT/inputFiles.txt').readlines()
-config.Data.inputDataset = '/CRAB_SimSexaq_trial16/jdeclerc-crab_SIMSexaq_trial16_11082019_v2-33065c3a8a979241c5e811e20eaee23d/USER'
+config.Data.inputDataset = '/CRAB_SimSexaq_trial20/jdeclerc-crab_SIMSexaq_trial20_25092019_v1-a7cb68d7cf5d76ee8e348e9af891b382/USER'
 config.Data.inputDBS = 'phys03'
 #config.Data.outputPrimaryDataset = "crab_Step2SexaqWithPU2016NeutrinoGun_tryToFix_8_trial11"
 config.Data.ignoreLocality = True
