@@ -17,11 +17,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
   private:
     int nTotalGENS=0;
     int nTotalUniqueGenS=0;
-    int nTotalUniqueGenSWithEtaSmallerThan4p3=0;
     int nTotalGiving2DaughtersGENS=0;
-    int nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3=0;
-    int nTotalGiving1DaughtersGENSWithEtaSmallerThan4p3=0;
-    int nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3=0;
     int nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS=0;
     int nTotalCorrectGENS=0;
     int nTotalCorrectGENSInteractingInBeampipe=0;
@@ -29,6 +25,14 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     int nTotalGENSNegEta=0;
     bool m_lookAtAntiS;
     bool m_runningOnData; 
+
+    double  nTotalUniqueGenS_weighted =0.;
+    double  nTotalGiving2DaughtersGENS_weighted = 0.;
+    double  nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS_weighted = 0.;
+    double  nTotalCorrectGENS_weighted = 0.;
+    double  nTotalCorrectGENSInteractingInBeampipe_weighted = 0.;
+    double  nTotalGENSPosEta_weighted = 0.;
+    double  nTotalGENSNegEta_weighted = 0.;
 
     virtual void beginJob();
     virtual void analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup);
@@ -58,31 +62,33 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     TTree* _tree;   
 
     //definition of variables which should go to _treeAllAntiS
-    std::vector<float> _S_eta_all;
+    std::vector<float> _S_eta_all,_S_event_weighting_factor_all;
+    std::vector<int> _S_reconstructable_all;
 
     //definition of variables which should go to _tree
     std::vector<float> _S_n_loops;
     std::vector<float> _S_charge;
+    std::vector<float> _S_event_weighting_factor;
     std::vector<float> _S_lxy_interaction_vertex, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_Mt,_S_chi2_ndof;
     std::vector<float> _n_M, _n_p;
     std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_sumDaughters_openingsangle,_S_sumDaughters_deltaPhi,_S_sumDaughters_deltaEta,_S_sumDaughters_deltaR,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy;
     std::vector<float> _S_dxy_over_lxy,_Ks_dxy_over_lxy,_Lambda_dxy_over_lxy;
     std::vector<float> _S_dz,_Ks_dz,_Lambda_dz,_S_dz_min,_Ks_dz_min,_Lambda_dz_min;
-    std::vector<float> _deltaR_sumDaughterMomenta_antiSMomentum; 
+    std::vector<float> _deltaR_sumDaughterMomenta_antiSMomentum,_Ks_openings_angle_displacement_momentum,_Lambda_openings_angle_displacement_momentum; 
     std::vector<float> _S_pt,_Ks_pt,_Lambda_pt;
     std::vector<float> _S_pz,_Ks_pz,_Lambda_pz;
     std::vector<float> _S_vx_interaction_vertex,_S_vy_interaction_vertex,_S_vz_interaction_vertex;
     std::vector<float> _S_vx,_S_vy,_S_vz;
 
     std::vector<float> _GEN_Ks_daughter0_px,_GEN_Ks_daughter0_py,_GEN_Ks_daughter0_pz,_GEN_Ks_daughter0_pt,_GEN_Ks_daughter0_eta,_GEN_Ks_daughter0_phi;
-    std::vector<float> _GEN_Ks_daughter0_vx,_GEN_Ks_daughter0_vy,_GEN_Ks_daughter0_vz,_GEN_Ks_daughter0_lxy,_GEN_Ks_daughter0_dxy,_GEN_Ks_daughter0_dz;
+    std::vector<float> _GEN_Ks_daughter0_vx,_GEN_Ks_daughter0_vy,_GEN_Ks_daughter0_vz,_GEN_Ks_daughter0_lxy,_GEN_Ks_daughter0_dxy,_GEN_Ks_daughter0_dz,_GEN_Ks_daughter0_openings_angle_displacement_momentum;
     std::vector<float> _GEN_Ks_daughter1_px,_GEN_Ks_daughter1_py,_GEN_Ks_daughter1_pz,_GEN_Ks_daughter1_pt,_GEN_Ks_daughter1_eta,_GEN_Ks_daughter1_phi;
-    std::vector<float> _GEN_Ks_daughter1_vx,_GEN_Ks_daughter1_vy,_GEN_Ks_daughter1_vz,_GEN_Ks_daughter1_lxy,_GEN_Ks_daughter1_dxy,_GEN_Ks_daughter1_dz;
+    std::vector<float> _GEN_Ks_daughter1_vx,_GEN_Ks_daughter1_vy,_GEN_Ks_daughter1_vz,_GEN_Ks_daughter1_lxy,_GEN_Ks_daughter1_dxy,_GEN_Ks_daughter1_dz,_GEN_Ks_daughter1_openings_angle_displacement_momentum;
     std::vector<float> _GEN_AntiLambda_AntiProton_px,_GEN_AntiLambda_AntiProton_py,_GEN_AntiLambda_AntiProton_pz,_GEN_AntiLambda_AntiProton_pt,_GEN_AntiLambda_AntiProton_eta,_GEN_AntiLambda_AntiProton_phi;
-    std::vector<float> _GEN_AntiLambda_AntiProton_vx,_GEN_AntiLambda_AntiProton_vy,_GEN_AntiLambda_AntiProton_vz,_GEN_AntiLambda_AntiProton_lxy,_GEN_AntiLambda_AntiProton_dxy,_GEN_AntiLambda_AntiProton_dz;
+    std::vector<float> _GEN_AntiLambda_AntiProton_vx,_GEN_AntiLambda_AntiProton_vy,_GEN_AntiLambda_AntiProton_vz,_GEN_AntiLambda_AntiProton_lxy,_GEN_AntiLambda_AntiProton_dxy,_GEN_AntiLambda_AntiProton_dz,_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum;
     std::vector<float> _GEN_AntiLambda_Pion_px,_GEN_AntiLambda_Pion_py,_GEN_AntiLambda_Pion_pz,_GEN_AntiLambda_Pion_pt,_GEN_AntiLambda_Pion_phi,_GEN_AntiLambda_Pion_eta;
-    std::vector<float> _GEN_AntiLambda_Pion_vx,_GEN_AntiLambda_Pion_vy,_GEN_AntiLambda_Pion_vz,_GEN_AntiLambda_Pion_lxy,_GEN_AntiLambda_Pion_dxy,_GEN_AntiLambda_Pion_dz;
+    std::vector<float> _GEN_AntiLambda_Pion_vx,_GEN_AntiLambda_Pion_vy,_GEN_AntiLambda_Pion_vz,_GEN_AntiLambda_Pion_lxy,_GEN_AntiLambda_Pion_dxy,_GEN_AntiLambda_Pion_dz,_GEN_AntiLambda_Pion_openings_angle_displacement_momentum;
     
     std::vector<float> _GEN_Ks_daughter0_numberOfTrackerLayers,_GEN_Ks_daughter1_numberOfTrackerLayers,_GEN_AntiLambda_AntiProton_numberOfTrackerLayers,_GEN_AntiLambda_Pion_numberOfTrackerLayers;
     std::vector<float> _GEN_Ks_daughter0_numberOfTrackerHits,_GEN_Ks_daughter1_numberOfTrackerHits,_GEN_AntiLambda_AntiProton_numberOfTrackerHits,_GEN_AntiLambda_Pion_numberOfTrackerHits;

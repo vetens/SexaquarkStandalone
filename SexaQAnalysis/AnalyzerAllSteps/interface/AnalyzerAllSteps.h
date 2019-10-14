@@ -83,7 +83,11 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     static constexpr double dzAntiSPVminCut = 2.;
     static constexpr double vzAntiSInteractionVertexCut = 4.;//zero background: 5
     static constexpr double antiSEtaCut = 1.3;//zero background: 1.5
-	
+
+    //the location of the center of the beampipe in x and y, from https://arxiv.org/pdf/1807.03289.pdf
+    static constexpr double center_beampipe_x = 0.124; //cm
+    static constexpr double center_beampipe_y = 0.27; //cm
+		
 
     //some pdgIds
     const static int pdgIdAntiS = -1020000020;
@@ -113,6 +117,9 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     int static getDaughterParticlesTypes(const reco::Candidate * genParticle);
     int static trackQualityAsInt(const reco::Track *track);
     std::vector<double> static isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp);
+    double static EventWeightingFactor(double etaAntiS);
+
+
      };
 
 #endif

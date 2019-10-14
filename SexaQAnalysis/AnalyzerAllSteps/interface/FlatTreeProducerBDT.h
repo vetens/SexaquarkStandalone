@@ -59,7 +59,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     //definition of variables which should go to tree
     std::vector<float> _S_charge;
     std::vector<float> _S_deltaLInteractionVertexAntiSmin;
-    std::vector<float> _S_lxy_interaction_vertex, _S_lxy_interaction_vertex_000, _S_error_lxy_interaction_vertex,_S_error_lxy_interaction_vertex_000,_Ks_lxy_decay_vertex,_Lambda_lxy_decay_vertex,_S_mass,_S_chi2_ndof;
+    std::vector<float> _S_lxy_interaction_vertex, _S_lxy_interaction_vertex_beampipeCenter, _S_error_lxy_interaction_vertex,_S_error_lxy_interaction_vertex_beampipeCenter,_Ks_lxy_decay_vertex,_Lambda_lxy_decay_vertex,_S_mass,_S_chi2_ndof,_S_event_weighting_factor;
     std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy,_S_dxy_dzPVmin,_Ks_dxy_dzPVmin,_Lambda_dxy_dzPVmin;
     std::vector<float> _S_dxy_over_lxy,_Ks_dxy_over_lxy,_Lambda_dxy_over_lxy;

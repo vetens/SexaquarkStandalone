@@ -246,4 +246,8 @@ std::vector<double> AnalyzerAllSteps::isTpGrandDaughterAntiS(TrackingParticleCol
  
  return returnVector;
 
+}
+
+double AnalyzerAllSteps::EventWeightingFactor(double etaAntiS){
+	return 1/TMath::Sin(etaAntiS);
 }   

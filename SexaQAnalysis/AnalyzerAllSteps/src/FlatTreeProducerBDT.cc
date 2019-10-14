@@ -44,13 +44,14 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_deltaLInteractionVertexAntiSmin",&_S_deltaLInteractionVertexAntiSmin);
 	_tree->Branch("_S_lxy_interaction_vertex",&_S_lxy_interaction_vertex);
-	_tree->Branch("_S_lxy_interaction_vertex_000",&_S_lxy_interaction_vertex_000);
+	_tree->Branch("_S_lxy_interaction_vertex_beampipeCenter",&_S_lxy_interaction_vertex_beampipeCenter);
 	_tree->Branch("_S_error_lxy_interaction_vertex",&_S_error_lxy_interaction_vertex);
-	_tree->Branch("_S_error_lxy_interaction_vertex_000",&_S_error_lxy_interaction_vertex_000);
+	_tree->Branch("_S_error_lxy_interaction_vertex_beampipeCenter",&_S_error_lxy_interaction_vertex_beampipeCenter);
 	_tree->Branch("_Ks_lxy_decay_vertex",&_Ks_lxy_decay_vertex);
 	_tree->Branch("_Lambda_lxy_decay_vertex",&_Lambda_lxy_decay_vertex);
 	_tree->Branch("_S_mass",&_S_mass);
 	_tree->Branch("_S_chi2_ndof",&_S_chi2_ndof);
+	_tree->Branch("_S_event_weighting_factor",&_S_event_weighting_factor);
 
 	_tree->Branch("_S_daughters_deltaphi",&_S_daughters_deltaphi);
 	_tree->Branch("_S_daughters_deltaeta",&_S_daughters_deltaeta);
@@ -196,14 +197,16 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L){
 
 	TVector3 RECOAntiSInteractionVertex(RECO_S->vx(),RECO_S->vy(),RECO_S->vz());//this is the interaction vertex of the antiS and the neutron. Check in the skimming code if you want to check.
-	double RECOLxy_interactionVertex_000 = sqrt(RECOAntiSInteractionVertex.X()*RECOAntiSInteractionVertex.X() + RECOAntiSInteractionVertex.Y()*RECOAntiSInteractionVertex.Y() );
-	double RECOLxy_interactionVertex_000_error = 1/RECOLxy_interactionVertex_000*sqrt( pow(RECOAntiSInteractionVertex.X(),2)*pow(RECO_S->vertexCovariance(0,0),2 ) + pow(RECOAntiSInteractionVertex.Y(),2)*pow(RECO_S->vertexCovariance(1,1),2 ) );
+	double RECOLxy_interactionVertex_beampipeCenter = sqrt(RECOAntiSInteractionVertex.X()*RECOAntiSInteractionVertex.X() + RECOAntiSInteractionVertex.Y()*RECOAntiSInteractionVertex.Y() );
+	//indeed, if you are running on MC then the above calculation, which is with respect to (0,0,0) is correct for RECOLxy_interactionVertex_beampipeCenter, but if you run on data then you should actually calculate wrt the center of the beampipe, which is offsset wrt (0,0,0)
+	if(m_runningOnData) RECOLxy_interactionVertex_beampipeCenter = sqrt( pow(RECOAntiSInteractionVertex.X()-AnalyzerAllSteps::center_beampipe_x , 2) + pow(RECOAntiSInteractionVertex.Y()-AnalyzerAllSteps::center_beampipe_y, 2) ) ;
+	
+	double RECOLxy_interactionVertex_beampipeCenter_error = 1/RECOLxy_interactionVertex_beampipeCenter*sqrt( pow(RECOAntiSInteractionVertex.X(),2)*pow(RECO_S->vertexCovariance(0,0),2 ) + pow(RECOAntiSInteractionVertex.Y(),2)*pow(RECO_S->vertexCovariance(1,1),2 ) );
 	double RECOLxy_interactionVertex = AnalyzerAllSteps::lxy(beamspot,RECOAntiSInteractionVertex);
 
 	//if running on MC and the RECO_S charge is negative and the RECO_S has an interaction vertex which is far enough in lxy, check if this is a real AntiS by looking at the difference in lxyz between the RECO and the GEN antiS. Save this deltaLInteractionVertexAntiSmin in the tree, like this later I can easily select in the tree on signal antiS and background antiS
         double deltaLInteractionVertexAntiSmin = 999.;
 
-	
 	if(!m_runningOnData && RECO_S->charge() == -1  && RECOLxy_interactionVertex >= AnalyzerAllSteps::MinLxyCut){
 		if(h_genParticles.isValid()){
 			for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT and only for the ones with the correct pdgId check if this RECO antiS is matching a GEN particle and is thus not a fake antiS
@@ -218,7 +221,8 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		       }
 		}
 	}
-
+	//the weighting factor for events will depend on their pathlength through the beampipe
+	double event_weighting_factor = AnalyzerAllSteps::EventWeightingFactor(RECO_S->theta()); 
 
 	nTotalRECOS++;
 	//calculate some kinematic variables for the RECO AntiS
@@ -366,7 +370,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	//if the RECO S particle fails one of the below cuts than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice for computational reasons
 	//if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut)return;
-	if(RECOLxy_interactionVertex_000 < AnalyzerAllSteps::MinLxyCut  )return;
+	if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut  )return;
 
 
 	nSavedRECOS++;
@@ -377,13 +381,14 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	_S_deltaLInteractionVertexAntiSmin.push_back(deltaLInteractionVertexAntiSmin);
 
 	_S_lxy_interaction_vertex.push_back(RECOLxy_interactionVertex);
-	_S_lxy_interaction_vertex_000.push_back(RECOLxy_interactionVertex_000);
+	_S_lxy_interaction_vertex_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
 	_S_error_lxy_interaction_vertex.push_back(RECOErrorLxy_interactionVertex);
-	_S_error_lxy_interaction_vertex_000.push_back(RECOLxy_interactionVertex_000_error);
+	_S_error_lxy_interaction_vertex_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter_error);
 	_Ks_lxy_decay_vertex.push_back(RECOLxy_Ks);
 	_Lambda_lxy_decay_vertex.push_back(RECOLxy_Lambda);
 	_S_mass.push_back(RECO_Smass);
 	_S_chi2_ndof.push_back(RECO_S->vertexNormalizedChi2());
+	_S_event_weighting_factor.push_back(event_weighting_factor);
 
 	_S_daughters_deltaphi.push_back(RECODeltaPhiDaughters);
 	_S_daughters_deltaeta.push_back(RECODeltaEtaDaughters);
@@ -546,13 +551,14 @@ void FlatTreeProducerBDT::Init()
 	_S_deltaLInteractionVertexAntiSmin.clear();
 
     	_S_lxy_interaction_vertex.clear();
-    	_S_lxy_interaction_vertex_000.clear();
+    	_S_lxy_interaction_vertex_beampipeCenter.clear();
         _S_error_lxy_interaction_vertex.clear();
-        _S_error_lxy_interaction_vertex_000.clear();
+        _S_error_lxy_interaction_vertex_beampipeCenter.clear();
 	_Ks_lxy_decay_vertex.clear();
 	_Lambda_lxy_decay_vertex.clear();
         _S_mass.clear();
         _S_chi2_ndof.clear();
+        _S_event_weighting_factor.clear();
 
 	_S_daughters_deltaphi.clear();
 	_S_daughters_deltaeta.clear();

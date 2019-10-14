@@ -2,8 +2,8 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-runningOnData = False 
-lookAtAntiS =   True 
+runningOnData = False  #important, because this will choose rather to calculate lxy of the antiS interaction vertex wrt  (0,0) (for MC) or wrt the location of the center of the beampipe (for data)
+#lookAtAntiS =   True 
 
 options = VarParsing ('analysis')
 options.parseArguments()
@@ -47,7 +47,7 @@ process.source = cms.Source("PoolSource",
 
 process.load("SexaQAnalysis.AnalyzerAllSteps.FlatTreeProducerBDT_cfi")
 process.FlatTreeProducerBDT.runningOnData = runningOnData
-process.FlatTreeProducerBDT.lookAtAntiS = lookAtAntiS
+#process.FlatTreeProducerBDT.lookAtAntiS = lookAtAntiS
 process.flattreeproducer = cms.Path(process.FlatTreeProducerBDT)
 
 process.p = cms.Schedule(

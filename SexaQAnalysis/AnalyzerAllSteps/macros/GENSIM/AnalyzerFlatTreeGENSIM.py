@@ -18,32 +18,40 @@ maxNEntries = 1e5
 
 plots_output_dir = "plots_GENSIM/"
 
-#fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTree_trial17.root', 'read')
-fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTree_GENSIM_trial17_1p8GeV_191006_132318.root','read')
+fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/FlatTreeGENSIM_SIMSexaq_trial17_1p8GeV_13102019_v1_191013_143412.root','read')
 tree = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevel') 
 treeAllAntiS = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevelAllAntiS') 
 
-fOut = TFile('macro_test_FlatTree_GENSIM_trial17_1p8GeV_191006_132318.root','RECREATE')
+fOut = TFile('macro_FlatTreeGENSIM_SIMSexaq_trial17_1p8GeV_13102019_v1_191013_143412.root','RECREATE')
 
-eta_distribution_antiS_dir = fOut.mkdir("eta_distribution_antiS")
-eta_distribution_antiS_dir.cd()
+all_antiS_dir = fOut.mkdir("all_antiS")
+all_antiS_dir.cd()
 
+h_eta_all_AntiS_non_weighted = TH1F('h_eta_all_AntiS_non_weighted','; #eta #bar{S}; #Entries',160,-8,8)
 h_eta_all_AntiS = TH1F('h_eta_all_AntiS','; #eta #bar{S}; #Entries',160,-8,8)
-h_eta_all_AntiS_cut_eta_smaller4 = TH1F('h_eta_all_AntiS_cut_eta_smaller4','; #eta #bar{S}; #Entries',160,-8,8)
+tprof_eta_weighting_factor = TProfile('tprof_eta_weighting_factor','; #eta #bar{S}; Event weighting factor',160,-8,8)
+tprof_vz_antiS_reconstructable = TProfile('tprof_vz_antiS_reconstructable','; v_{z} #bar{S} interaction vertex  (cm); Reconstructability/10cm',34,-170,170)
+tprof_eta_antiS_reconstructable = TProfile('tprof_eta_antiS_reconstructable','; #eta #bar{S} interaction vertex  (cm); Reconstructability/10cm',34,-170,170)
 
 
 #first do this small loop which runs over the tree containing all the antiS (i.e. also the ones which do not go the correct granddaughters)
 for i in range(0,treeAllAntiS.GetEntries()):
 	treeAllAntiS.GetEntry(i)
-	h_eta_all_AntiS.Fill(treeAllAntiS._S_eta_all[0])
-	if(abs(treeAllAntiS._S_eta_all[0])<4):
-		h_eta_all_AntiS_cut_eta_smaller4.Fill(treeAllAntiS._S_eta_all[0])
-c_eta_all_AntiS = TCanvas("c_eta_all_AntiS","");
-h_eta_all_AntiS.DrawNormalized()
+	print treeAllAntiS._S_eta_all[0], ", ", treeAllAntiS._S_event_weighting_factor_all[0]
+	h_eta_all_AntiS_non_weighted.Fill(treeAllAntiS._S_eta_all[0],1)
+	h_eta_all_AntiS.Fill(treeAllAntiS._S_eta_all[0],treeAllAntiS._S_event_weighting_factor_all[0])
+	tprof_eta_weighting_factor.Fill(treeAllAntiS._S_eta_all[0],treeAllAntiS._S_event_weighting_factor_all[0])
+	#the AntiS does not necessarily have two daughters, so I cannot get the vz through that, so have to calculate the vz from eta assuming the beampipe is initly thin and at a radius of 
+
+	vz_interaction_antiS = 2.21/np.tan( 2*np.arctan( np.exp(treeAllAntiS._S_eta_all[0]) ) )
+	tprof_vz_antiS_reconstructable.Fill(vz_interaction_antiS,treeAllAntiS._S_reconstructable_all[0])#the AntiS does not necessarily have two daughters, so I cannot get the vz through that, so have to calculate the vz from eta
+	tprof_eta_antiS_reconstructable.Fill(treeAllAntiS._S_eta_all[0],treeAllAntiS._S_reconstructable_all[0])
+
+h_eta_all_AntiS_non_weighted.Write()
 h_eta_all_AntiS.Write()
-c_eta_all_AntiS_cut_eta_smaller4 = TCanvas("c_eta_all_AntiS_cut_eta_smaller4","");
-h_eta_all_AntiS_cut_eta_smaller4.DrawNormalized()
-h_eta_all_AntiS_cut_eta_smaller4.Write()
+tprof_eta_weighting_factor.Write()
+tprof_vz_antiS_reconstructable.Write()
+tprof_eta_antiS_reconstructable.Write()
 
 #now make some plots which validate the looping mechanism for the antiS
 
@@ -57,19 +65,17 @@ eta_unit = 0.2
 for i in range(0,400):
 	lower_eta = i*eta_unit
 	higher_eta = (i+1)*eta_unit
-	h_lxy_eta = TH1F('h_lxy_eta'+str(lower_eta)+'_to_'+str(higher_eta),'h_lxy_eta; l_{0} #bar{S} interaction vertex (cm); #Entries',4*140,0,140)
+	h_lxy_eta = TH1F('h_lxy_eta'+str(lower_eta)+'_to_'+str(higher_eta),'h_lxy_eta; l_{0} #bar{S} interaction vertex (cm); #Entries/0.1mm',300,0,3)
 	l_h_lxy_eta.append(h_lxy_eta)
 	h_vz_eta = TH1F('h_vz_eta'+str(lower_eta)+'_to_'+str(higher_eta),'h_vz_eta; vz #bar{S} interaction vertex (cm); #Entries',600,-300,300)
 	l_h_vz_eta.append(h_vz_eta)
-	h_lxy_n_loops = TH1F('h_lxy_n_loops'+str(i),'; l_{0} #bar{S} interaction vertex (cm); #Events/cm',140,0,140)
+	h_lxy_n_loops = TH1F('h_lxy_n_loops'+str(i),'; l_{0} #bar{S} interaction vertex (cm); #Events/0.1mm',10,2.16,2.26)
 	h_eta_n_loops = TH1F('h_eta_n_loops'+str(i),'; #eta #bar{S} interaction vertex (cm); #Entries',90,-4.5,4.5)
 	h_vz_n_loops = TH1F('h_vz_n_loops'+str(i),'; vz #bar{S} interaction vertex (cm); #Entries',600,-300,300)
 	l_h_lxy_n_loops.append(h_lxy_n_loops)
 	l_h_eta_n_loops.append(h_eta_n_loops)
 	l_h_vz_n_loops.append(h_vz_n_loops)
 
-
-	
 #fill plots with for different eta ranges the lxy and vz of the interaction vertex
 #fill plots for the first 100 loops, 2nd 100 loops , 3rd 100 loops, ... the lxy interaction vertex for eta within the barrel. Each plot should look alike. 
 nEntries = tree.GetEntries()
@@ -158,10 +164,10 @@ h_n_interactions_vs_n_loops_barrel = TH1F("h_n_interactions_vs_n_loops_barrel","
 h_n_interactions_vs_n_loops_endcap = TH1F("h_n_interactions_vs_n_loops_endcap","; #Loops; #bar{S} interacting after #Loops",400,0,1600)
 h_n_interactions_vs_n_loops_endcap_more_forward_than_endcap = TH1F("h_n_interactions_vs_n_loops_endcap_more_forward_than_endcap","; #Loops; #bar{S} interacting after #Loops",400,0,1600)
 #2D plots of the interaction vertex location
-h2_interaction_vertex_vx_vy = TH2F("h2_interaction_vertex_vx_vy","; v_{x} #bar{S} interaction vertex (cm); v_{y} #bar{S} interaction vertex (cm);Events/mm^{2}",2500,-125,125,2500,-125,125)
-h2_interaction_vertex_vx_vy_zoom = TH2F("h2_interaction_vertex_vx_vy_zoom","; v_{x} #bar{S} interaction vertex (cm); v_{y} #bar{S} interaction vertex (cm);Events/4.10^{-4}mm^{2}",2500,-25,25,2500,-25,25)
-h2_interaction_vertex_vz_lxy = TH2F("h2_interaction_vertex_vz_lxy","; v_{z} #bar{S} interaction vertex (cm); l_{0} #bar{S} interaction vertex (cm);Events/mm^{2}",2500,-125,125,1250,0,125)
-h2_interaction_vertex_vz_lxy_zoom = TH2F("h2_interaction_vertex_vz_lxy_zoom","; v_{z} #bar{S} interaction vertex (cm); l_{0} #bar{S} interaction vertex (cm);Events/mm^{2}",2500,-125,125,200,0,20)
+h2_interaction_vertex_vx_vy = TH2F("h2_interaction_vertex_vx_vy","; v_{x} #bar{S} interaction vertex (cm); v_{y} #bar{S} interaction vertex (cm);Events/(0.1mm x 0.1mm)",2000,-10,10,2000,-10,10)
+h2_interaction_vertex_vx_vy_zoom = TH2F("h2_interaction_vertex_vx_vy_zoom","; v_{x} #bar{S} interaction vertex (cm); v_{y} #bar{S} interaction vertex (cm);Events/(0.1mm x 0.1mm)",600,-3,3,600,-3,3)
+h2_interaction_vertex_vz_lxy = TH2F("h2_interaction_vertex_vz_lxy","; v_{z} #bar{S} interaction vertex (cm); l_{0} #bar{S} interaction vertex (cm);Events/(10cm x 0.1mm)",34,-170,170,1000,0,10)
+h2_interaction_vertex_vz_lxy_zoom = TH2F("h2_interaction_vertex_vz_lxy_zoom","; v_{z} #bar{S} interaction vertex (cm); l_{0} #bar{S} interaction vertex (cm);Events/(10cm x 0.1mm)",34,-170,170,10,2.16,2.26)
 
 for i in range(0,nEntries):
 	if i > maxNEntries:
@@ -169,10 +175,10 @@ for i in range(0,nEntries):
 	tree.GetEntry(i)
 	for j in range(0,len(tree._S_lxy_interaction_vertex)):
 		h2_n_loops_vs_eta.Fill(tree._S_eta[j],tree._S_n_loops[j])
-		h2_interaction_vertex_vx_vy.Fill(tree._S_vx_interaction_vertex[j],tree._S_vy_interaction_vertex[j])
-		h2_interaction_vertex_vx_vy_zoom.Fill(tree._S_vx_interaction_vertex[j],tree._S_vy_interaction_vertex[j])
-		h2_interaction_vertex_vz_lxy.Fill(tree._S_vz_interaction_vertex[j],tree._S_lxy_interaction_vertex[j])
-		h2_interaction_vertex_vz_lxy_zoom.Fill(tree._S_vz_interaction_vertex[j],tree._S_lxy_interaction_vertex[j])
+		h2_interaction_vertex_vx_vy.Fill(tree._S_vx_interaction_vertex[j],tree._S_vy_interaction_vertex[j],tree._S_event_weighting_factor[0])
+		h2_interaction_vertex_vx_vy_zoom.Fill(tree._S_vx_interaction_vertex[j],tree._S_vy_interaction_vertex[j],tree._S_event_weighting_factor[0])
+		h2_interaction_vertex_vz_lxy.Fill(tree._S_vz_interaction_vertex[j],tree._S_lxy_interaction_vertex[j],tree._S_event_weighting_factor[0])
+		h2_interaction_vertex_vz_lxy_zoom.Fill(tree._S_vz_interaction_vertex[j],tree._S_lxy_interaction_vertex[j],tree._S_event_weighting_factor[0])
 		h_n_interactions_vs_n_loops.Fill(tree._S_n_loops[j])
 		if(abs(tree._S_eta[j])<1.1):
 			h_n_interactions_vs_n_loops_barrel.Fill(tree._S_n_loops[j])
@@ -228,10 +234,11 @@ antiS_properties_dir = fOut.mkdir("antiS_properties")
 
 #properties of the antiS, so these are the ones which interact and go the correct granddaughters:
 antiS_properties_dir.cd()
+h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; Events/mm',160,-8,8)
 h_antiS_lxy_creation_vertex = TH1F('h_antiS_lxy_creation_vertex','; #bar{S} creation vertex l_{0} (cm) ; Events/mm',20,-1,1)
 h_antiS_vz_creation_vertex = TH1F('h_antiS_vz_creation_vertex','; #bar{S} creation vertex v_{z} (cm); Events/cm',60,-30,30)
-h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} interaction vertex l_{0} (cm) ; Events/5mm',240,0,120)
-h_antiS_vz = TH1F('h_antiS_vz','; #bar{S} interaction vertex v_{z} (cm); Events/cm',240,-120,120)
+h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} interaction vertex l_{0} (cm) ; Events/0.1mm',10,2.16,2.26)
+h_antiS_vz = TH1F('h_antiS_vz','; #bar{S} interaction vertex v_{z} (cm); Events/cm',340,-170,170)
 h_neutron_momentum = TH1F('h_neutron_momentum','; p neutron (GeV); Events/0.01GeV',85,0,0.85)
 h2_antiS_inv_mass_p = TH2F("h2_antiS_inv_mass_p","; mass #bar{S} (GeV); p #bar{S} (GeV);#Entries",100,-10,10,60,0,60)
 h2_antiS_inv_mass_p_Ks_plus_Lambda = TH2F("h2_antiS_inv_mass_p_Ks_plus_Lambda","; m_{#bar{S},obs} (GeV); |#vec{p}_{K_{s}} + #vec{p}_{#bar{#Lambda}}| (GeV);Events/GeV^{2}",110,-5,6,60,0,40)
@@ -244,22 +251,22 @@ h_antiS_sumDaughters_deltaR = TH1F('h_antiS_sumDaughters_deltaR','; #DeltaR(#vec
 momenta_daughters_and_grandaughters_dir = fOut.mkdir("momenta_daughters_and_grandaughters")
 momenta_daughters_and_grandaughters_dir.cd()
 h_pt_Ks = TH1F("h_pt_Ks",";p_{t} (GeV); #Entries",60,0,6)
-h_p_Ks = TH1F("h_p_Ks",";p (GeV); #Entries",6000,0,6)
+h_p_Ks = TH1F("h_p_Ks",";p (GeV); #Entries",60,0,6)
 h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{t} (GeV); Events/0.1GeV",60,0,6)
 h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_p_Ks_daug0 = TH1F("h_p_Ks_daug0",";p (GeV); Events/0.001GeV",6000,0,6)
-h_p_Ks_daug1 = TH1F("h_p_Ks_daug1",";p (GeV); Events/0.001GeV",6000,0,6)
+h_p_Ks_daug0 = TH1F("h_p_Ks_daug0",";p (GeV); Events/0.1GeV",60,0,6)
+h_p_Ks_daug1 = TH1F("h_p_Ks_daug1",";p (GeV); Events/0.1GeV",60,0,6)
 h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",30,0,30)
 h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",30,0,30)
 h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_eta_pt_Ks_daug0 = TH2F("h2_eta_pt_Ks_daug0",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pt_Ks_daug1 = TH2F("h2_eta_pt_Ks_daug1",";#eta;p_{t} (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pz_Ks_daug0 = TH2F("h2_eta_pz_Ks_daug0",";#eta;|p_{z}| (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_pz_Ks_daug1 = TH2F("h2_eta_pz_Ks_daug1",";#eta;|p_{z}| (GeV);  Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_p_Ks_daug0 = TH2F("h2_eta_p_Ks_daug0",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
-h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta;p (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h2_eta_pt_Ks_daug0 = TH2F("h2_eta_pt_Ks_daug0",";#eta K_{s} daughter;p_{t} K_{s} daughter (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pt_Ks_daug1 = TH2F("h2_eta_pt_Ks_daug1",";#eta K_{s} daughter;p_{t} K_{s} daughter (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pz_Ks_daug0 = TH2F("h2_eta_pz_Ks_daug0",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_pz_Ks_daug1 = TH2F("h2_eta_pz_Ks_daug1",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV);  Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_p_Ks_daug0 = TH2F("h2_eta_p_Ks_daug0",";#eta K_{s} daughter;p K_{s} daughter (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta K_{s} daughter;p K_{s} daughter (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
 
 
 h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",60,0,6)
@@ -273,12 +280,19 @@ h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Ev
 h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",30,0,30)
 h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
 h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_eta_pt_AntiLambda_AntiProton = TH2F("h2_eta_pt_AntiLambda_AntiProton",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pt_AntiLambda_Pion = TH2F("h2_eta_pt_AntiLambda_Pion",";#eta;p_{t} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,30,0,3)
-h2_eta_pz_AntiLambda_AntiProton = TH2F("h2_eta_pz_AntiLambda_AntiProton",";|#eta;p_{z}| (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_pz_AntiLambda_Pion = TH2F("h2_eta_pz_AntiLambda_Pion",";#eta;|p_{z}| (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0,10)
-h2_eta_p_AntiLambda_AntiProton = TH2F("h2_eta_p_AntiLambda_AntiProton",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
-h2_eta_p_AntiLambda_Pion = TH2F("h2_eta_p_AntiLambda_Pion",";#eta;p (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0.3,10.3)
+h2_eta_pt_AntiLambda_AntiProton = TH2F("h2_eta_pt_AntiLambda_AntiProton",";#eta #bar{#Lambda}-#bar{p};p_{t} #bar{#Lambda}-#bar{p} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
+h2_eta_pt_AntiLambda_Pion = TH2F("h2_eta_pt_AntiLambda_Pion",";#eta #bar{#Lambda}-#pi^{+};p_{t} #bar{#Lambda}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,30,0,3)
+h2_eta_pz_AntiLambda_AntiProton = TH2F("h2_eta_pz_AntiLambda_AntiProton",";#eta #bar{#Lambda}-#bar{p};p_{z}| #bar{#Lambda}-#bar{p} (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
+h2_eta_pz_AntiLambda_Pion = TH2F("h2_eta_pz_AntiLambda_Pion",";#eta #bar{#Lambda}-#pi^{+};|p_{z}| #bar{#Lambda}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0,10)
+h2_eta_p_AntiLambda_AntiProton = TH2F("h2_eta_p_AntiLambda_AntiProton",";#eta #bar{#Lambda}-#bar{p};p #bar{#Lambda}-#bar{p} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h2_eta_p_AntiLambda_Pion = TH2F("h2_eta_p_AntiLambda_Pion",";#eta #bar{#Lambda}-#pi^{+};p #bar{#Lambda}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,100,0,10)
+
+#the 3D angle(displacement, momentum) of the Ks, Lambda and 4 granddaugthers. This learns what is the the fraction that is actually pointing backwards
+h_Ks_openings_angle_displacement_momentum = TH1F("h_Ks_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{beamspot,creation vertex}) (rad);Events/0.1rad ",20,-1,1)
+h_Lambda_openings_angle_displacement_momentum = TH1F("h_Lambda_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{beamspot,creation vertex}) (rad);Events/0.1rad ",20,-1,1)
+h_GEN_Ks_daughters_openings_angle_displacement_momentum = TH1F("h_GEN_Ks_daughters_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{beamspot,creation vertex}) (rad);Events/0.1rad ",20,-1,1)
+h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum = TH1F("h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{beamspot,creation vertex}) (rad);Events/0.1rad ",20,-1,1)
+h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum = TH1F("h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{beamspot,creation vertex}) (rad);Events/0.1rad ",20,-1,1)
 
 #PCAs of the granddughters of the antiS
 PCA_granddaughters_dir = fOut.mkdir("PCA_granddaughters")
@@ -286,13 +300,13 @@ PCA_granddaughters_dir.cd()
 
 h_dxy_Ks_daug0 = TH1F("h_dxy_Ks_daug0",";d_{0} (cm); Events/mm",200,-10,10)
 h_dxy_Ks_daug1 = TH1F("h_dxy_Ks_daug1",";d_{0} (cm); Events/mm",200,-10,10)
-h_dz_Ks_daug0 = TH1F("h_dz_Ks_daug0",";d_{z} (cm); Events/cm",200,-100,100)
-h_dz_Ks_daug1 = TH1F("h_dz_Ks_daug1",";d_{z} (cm); Events/cm",200,-100,100)
+h_dz_Ks_daug0 = TH1F("h_dz_Ks_daug0",";d_{z} (cm); Events/5cm",40,-100,100)
+h_dz_Ks_daug1 = TH1F("h_dz_Ks_daug1",";d_{z} (cm); Events/5cm",40,-100,100)
 
 h_dxy_AntiLambda_AntiProton = TH1F("h_dxy_AntiLambda_AntiProton",";d_{0} (cm); Events/mm",200,-10,10)
 h_dxy_AntiLambda_Pion = TH1F("h_dxy_AntiLambda_Pion",";d_{0} (cm); Events/mm",200,-10,10)
-h_dz_AntiLambda_AntiProton = TH1F("h_dz_AntiLambda_AntiProton",";d_{z} (cm); Events/cm",200,-100,100)
-h_dz_AntiLambda_Pion = TH1F("h_dz_AntiLambda_Pion",";d_{z} (cm); Events/cm",200,-100,100)
+h_dz_AntiLambda_AntiProton = TH1F("h_dz_AntiLambda_AntiProton",";d_{z} (cm); Events/5cm",40,-100,100)
+h_dz_AntiLambda_Pion = TH1F("h_dz_AntiLambda_Pion",";d_{z} (cm); Events/5cm",40,-100,100)
 
 
 #info on the decay vertices of the V0s
@@ -344,140 +358,148 @@ for i in range(0,nEntries):
 	tree.GetEntry(i)
 
 
-	h_antiS_lxy_creation_vertex.Fill( np.sqrt( np.power(tree._S_vx[0],2) + np.power(tree._S_vy[0],2) ) )	
-	h_antiS_vz_creation_vertex.Fill(tree._S_vz[0])	
-	h_antiS_lxy.Fill(tree._S_lxy_interaction_vertex[0])	
-	h_antiS_vz.Fill(tree._S_vz_interaction_vertex[0])	
-	h_neutron_momentum.Fill(abs(tree._n_p[0]))
-	h_antiS_sumDaughters_openingsangle.Fill(tree._S_sumDaughters_openingsangle[0])	
-	h_antiS_sumDaughters_deltaPhi.Fill(tree._S_sumDaughters_deltaPhi[0])	
-	h_antiS_sumDaughters_deltaEta.Fill(tree._S_sumDaughters_deltaEta[0])	
-	h_antiS_sumDaughters_deltaR.Fill(tree._S_sumDaughters_deltaR[0])	
-	h2_antiS_inv_mass_p.Fill(tree._S_mass[0], np.sqrt( tree._S_pz[0]*tree._S_pz[0] + tree._S_pt[0]*tree._S_pt[0] ) )
-	h2_antiS_inv_mass_p_Ks_plus_Lambda.Fill(tree._S_mass[0], np.sqrt( pow(tree._Ks_pz[0] + tree._Lambda_pz[0] , 2) + pow(tree._Ks_pt[0] + tree._Lambda_pt[0] , 2) ) )
+	h_antiS_eta.Fill( tree._S_eta[0] )	
+	h_antiS_lxy_creation_vertex.Fill( np.sqrt( np.power(tree._S_vx[0],2) + np.power(tree._S_vy[0],2) ),tree._S_event_weighting_factor[0] )	
+	h_antiS_vz_creation_vertex.Fill(tree._S_vz[0],tree._S_event_weighting_factor[0])	
+	h_antiS_lxy.Fill(tree._S_lxy_interaction_vertex[0],tree._S_event_weighting_factor[0])
+	h_antiS_vz.Fill(tree._S_vz_interaction_vertex[0],tree._S_event_weighting_factor[0])
+	h_neutron_momentum.Fill(abs(tree._n_p[0]),tree._S_event_weighting_factor[0])
+	h_antiS_sumDaughters_openingsangle.Fill(tree._S_sumDaughters_openingsangle[0],tree._S_event_weighting_factor[0])	
+	h_antiS_sumDaughters_deltaPhi.Fill(tree._S_sumDaughters_deltaPhi[0],tree._S_event_weighting_factor[0])	
+	h_antiS_sumDaughters_deltaEta.Fill(tree._S_sumDaughters_deltaEta[0],tree._S_event_weighting_factor[0])	
+	h_antiS_sumDaughters_deltaR.Fill(tree._S_sumDaughters_deltaR[0],tree._S_event_weighting_factor[0])	
+	h2_antiS_inv_mass_p.Fill(tree._S_mass[0], np.sqrt( tree._S_pz[0]*tree._S_pz[0] + tree._S_pt[0]*tree._S_pt[0] ) ,tree._S_event_weighting_factor[0])
+	h2_antiS_inv_mass_p_Ks_plus_Lambda.Fill(tree._S_mass[0], np.sqrt( pow(tree._Ks_pz[0] + tree._Lambda_pz[0] , 2) + pow(tree._Ks_pt[0] + tree._Lambda_pt[0] , 2) ) ,tree._S_event_weighting_factor[0])
 	
-	h_pt_Ks.Fill(tree._Ks_pt[0])
-	h_p_Ks.Fill( np.sqrt( tree._Ks_pt[0]*tree._Ks_pt[0] + tree._Ks_pz[0]*tree._Ks_pz[0] ) )
-	h_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0])
-	h_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0])
-	h_p_Ks_daug0.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter0_pt[0],2) + np.power(tree._GEN_Ks_daughter0_pz[0],2) ) )
-	h_p_Ks_daug1.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter1_pt[0],2) + np.power(tree._GEN_Ks_daughter1_pz[0],2) ) )
-	h_pz_Ks.Fill(abs(tree._Ks_pz[0]))
-	h_pz_Ks_daug0.Fill(abs(tree._GEN_Ks_daughter0_pz[0]))
-	h_pz_Ks_daug1.Fill(abs(tree._GEN_Ks_daughter1_pz[0]))
-	h2_pt_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0], abs(tree._GEN_Ks_daughter0_pz[0]))
-	h2_pt_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0], abs(tree._GEN_Ks_daughter1_pz[0]))
-	h2_eta_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],tree._GEN_Ks_daughter0_pt[0])
-	h2_eta_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],tree._GEN_Ks_daughter1_pt[0])
-	h2_eta_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],abs(tree._GEN_Ks_daughter0_pz[0]))
-	h2_eta_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],abs(tree._GEN_Ks_daughter1_pz[0]))
-	h2_eta_p_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter0_pt[0],2)+np.power(tree._GEN_Ks_daughter0_pz[0],2)))
-	h2_eta_p_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter1_pt[0],2)+np.power(tree._GEN_Ks_daughter1_pz[0],2)))
+	h_pt_Ks.Fill(tree._Ks_pt[0],tree._S_event_weighting_factor[0])
+	h_p_Ks.Fill( np.sqrt( tree._Ks_pt[0]*tree._Ks_pt[0] + tree._Ks_pz[0]*tree._Ks_pz[0] ) ,tree._S_event_weighting_factor[0])
+	h_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0],tree._S_event_weighting_factor[0])
+	h_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0],tree._S_event_weighting_factor[0])
+	h_p_Ks_daug0.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter0_pt[0],2) + np.power(tree._GEN_Ks_daughter0_pz[0],2) ) ,tree._S_event_weighting_factor[0])
+	h_p_Ks_daug1.Fill(np.sqrt( np.power(tree._GEN_Ks_daughter1_pt[0],2) + np.power(tree._GEN_Ks_daughter1_pz[0],2) ) ,tree._S_event_weighting_factor[0])
+	h_pz_Ks.Fill(abs(tree._Ks_pz[0]),tree._S_event_weighting_factor[0])
+	h_pz_Ks_daug0.Fill(abs(tree._GEN_Ks_daughter0_pz[0]),tree._S_event_weighting_factor[0])
+	h_pz_Ks_daug1.Fill(abs(tree._GEN_Ks_daughter1_pz[0]),tree._S_event_weighting_factor[0])
+	h2_pt_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_pt[0], abs(tree._GEN_Ks_daughter0_pz[0]),tree._S_event_weighting_factor[0])
+	h2_pt_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_pt[0], abs(tree._GEN_Ks_daughter1_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_pt_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],tree._GEN_Ks_daughter0_pt[0],tree._S_event_weighting_factor[0])
+	h2_eta_pt_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],tree._GEN_Ks_daughter1_pt[0],tree._S_event_weighting_factor[0])
+	h2_eta_pz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],abs(tree._GEN_Ks_daughter0_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_pz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],abs(tree._GEN_Ks_daughter1_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_p_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter0_pt[0],2)+np.power(tree._GEN_Ks_daughter0_pz[0],2)),tree._S_event_weighting_factor[0])
+	h2_eta_p_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter1_pt[0],2)+np.power(tree._GEN_Ks_daughter1_pz[0],2)),tree._S_event_weighting_factor[0])
 
-	h_dxy_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dxy[0])
-	h_dxy_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dxy[0])
-	h_dz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dz[0])
-	h_dz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dz[0])
+	h_dxy_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dxy[0],tree._S_event_weighting_factor[0])
+	h_dxy_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dxy[0],tree._S_event_weighting_factor[0])
+	h_dz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dz[0],tree._S_event_weighting_factor[0])
+	h_dz_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dz[0],tree._S_event_weighting_factor[0])
 
 
-	h_pt_AntiLambda.Fill(tree._Lambda_pt[0])
-	h_p_AntiLambda.Fill( np.sqrt( tree._Lambda_pt[0]*tree._Lambda_pt[0] + tree._Lambda_pz[0]*tree._Lambda_pz[0] ) )
-	h_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0])
-	h_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0])
-	h_p_AntiLambda_AntiProton.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2) + np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2) ) )
-	h_p_AntiLambda_Pion.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_Pion_pt[0],2) +  np.power(tree._GEN_AntiLambda_Pion_pz[0],2) ) )
-	h_pz_AntiLambda.Fill(abs(tree._Lambda_pz[0]))
-	h_pz_AntiLambda_AntiProton.Fill(abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
-	h_pz_AntiLambda_Pion.Fill(abs(tree._GEN_AntiLambda_Pion_pz[0]))
-	h2_pt_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
-	h2_pt_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0],abs(tree._GEN_AntiLambda_Pion_pz[0]))
-	h2_eta_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],tree._GEN_AntiLambda_AntiProton_pt[0])
-	h2_eta_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],tree._GEN_AntiLambda_Pion_pt[0])
-	h2_eta_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]))
-	h2_eta_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],abs(tree._GEN_AntiLambda_Pion_pz[0]))
-	h2_eta_p_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2)+np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2)))
-	h2_eta_p_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_Pion_pz[0],2)+np.power(tree._GEN_AntiLambda_Pion_pt[0],2)))
+	h_pt_AntiLambda.Fill(tree._Lambda_pt[0],tree._S_event_weighting_factor[0])
+	h_p_AntiLambda.Fill( np.sqrt( tree._Lambda_pt[0]*tree._Lambda_pt[0] + tree._Lambda_pz[0]*tree._Lambda_pz[0] ) ,tree._S_event_weighting_factor[0])
+	h_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0],tree._S_event_weighting_factor[0])
+	h_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0],tree._S_event_weighting_factor[0])
+	h_p_AntiLambda_AntiProton.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2) + np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2) ) ,tree._S_event_weighting_factor[0])
+	h_p_AntiLambda_Pion.Fill( np.sqrt( np.power(tree._GEN_AntiLambda_Pion_pt[0],2) +  np.power(tree._GEN_AntiLambda_Pion_pz[0],2) ) ,tree._S_event_weighting_factor[0])
+	h_pz_AntiLambda.Fill(abs(tree._Lambda_pz[0]),tree._S_event_weighting_factor[0])
+	h_pz_AntiLambda_AntiProton.Fill(abs(tree._GEN_AntiLambda_AntiProton_pz[0]),tree._S_event_weighting_factor[0])
+	h_pz_AntiLambda_Pion.Fill(abs(tree._GEN_AntiLambda_Pion_pz[0]),tree._S_event_weighting_factor[0])
+	h2_pt_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_pt[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]),tree._S_event_weighting_factor[0])
+	h2_pt_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_pt[0],abs(tree._GEN_AntiLambda_Pion_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_pt_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],tree._GEN_AntiLambda_AntiProton_pt[0],tree._S_event_weighting_factor[0])
+	h2_eta_pt_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],tree._GEN_AntiLambda_Pion_pt[0],tree._S_event_weighting_factor[0])
+	h2_eta_pz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],abs(tree._GEN_AntiLambda_AntiProton_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_pz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],abs(tree._GEN_AntiLambda_Pion_pz[0]),tree._S_event_weighting_factor[0])
+	h2_eta_p_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_AntiProton_pz[0],2)+np.power(tree._GEN_AntiLambda_AntiProton_pt[0],2)),tree._S_event_weighting_factor[0])
+	h2_eta_p_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_eta[0],np.sqrt(np.power(tree._GEN_AntiLambda_Pion_pz[0],2)+np.power(tree._GEN_AntiLambda_Pion_pt[0],2)),tree._S_event_weighting_factor[0])
 
-	h_dxy_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_dxy[0])
-	h_dxy_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dxy[0])
-	h_dz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_dz[0])
-	h_dz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dz[0])
+
+	h_Ks_openings_angle_displacement_momentum.Fill(tree._Ks_openings_angle_displacement_momentum[0])
+	h_Lambda_openings_angle_displacement_momentum.Fill(tree._Lambda_openings_angle_displacement_momentum[0])
+	h_GEN_Ks_daughters_openings_angle_displacement_momentum.Fill(tree._GEN_Ks_daughter0_openings_angle_displacement_momentum[0])
+	h_GEN_Ks_daughters_openings_angle_displacement_momentum.Fill(tree._GEN_Ks_daughter1_openings_angle_displacement_momentum[0])
+	h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum.Fill(tree._GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum[0])
+	h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum.Fill(tree._GEN_AntiLambda_Pion_openings_angle_displacement_momentum[0])
+
+	h_dxy_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_dxy[0],tree._S_event_weighting_factor[0])
+	h_dxy_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dxy[0],tree._S_event_weighting_factor[0])
+	h_dz_AntiLambda_AntiProton.Fill(tree._GEN_AntiLambda_AntiProton_dz[0],tree._S_event_weighting_factor[0])
+	h_dz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dz[0],tree._S_event_weighting_factor[0])
 	
 	#need only one of the granddaughter of each V0, as their creation vertex is the same
-	h_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_lxy[0])
-	h_vz_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0])
-	h_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_lxy[0])
-	h_vz_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0])
+	h_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_lxy[0],tree._S_event_weighting_factor[0])
+	h_vz_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],tree._S_event_weighting_factor[0])
+	h_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_lxy[0],tree._S_event_weighting_factor[0])
+	h_vz_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._S_event_weighting_factor[0])
 
-	h2_vx_vy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0])
-	h2_vz_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0])
-	h2_vx_vy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0])
-	h2_vz_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0])
+	h2_vx_vy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],tree._S_event_weighting_factor[0])
+	h2_vz_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._S_event_weighting_factor[0])
+	h2_vx_vy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],tree._S_event_weighting_factor[0])
+	h2_vz_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],tree._S_event_weighting_factor[0])
 
 	#fill the tprofiles
 	#the Ks daughters are both pions, so can put them in same tprofiles
 	#low pt
 	if(tree._GEN_Ks_daughter0_pt[0]>0.1 and tree._GEN_Ks_daughter0_pt[0]<0.9):
-		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 	if(tree._GEN_Ks_daughter1_pt[0]>0.1 and tree._GEN_Ks_daughter1_pt[0]<0.9):
-		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter1_vx[0],tree._GEN_Ks_daughter1_vy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter1_vz[0],tree._GEN_Ks_daughter1_lxy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter1_vx[0],tree._GEN_Ks_daughter1_vy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt.Fill(tree._GEN_Ks_daughter1_vz[0],tree._GEN_Ks_daughter1_lxy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 
 	if(tree._GEN_AntiLambda_AntiProton_pt[0]>0.1 and tree._GEN_AntiLambda_AntiProton_pt[0]<0.9):
-		prof2_vx_vy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 	if(tree._GEN_AntiLambda_Pion_pt[0]>0.1 and tree._GEN_AntiLambda_Pion_pt[0]<0.9):
-		prof2_vx_vy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_Pion_vx[0],tree._GEN_AntiLambda_Pion_vy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_Pion_vz[0],tree._GEN_AntiLambda_Pion_lxy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_Pion_vx[0],tree._GEN_AntiLambda_Pion_vy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_lowPt.Fill(tree._GEN_AntiLambda_Pion_vz[0],tree._GEN_AntiLambda_Pion_lxy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 
 	#high pt
 	if(tree._GEN_Ks_daughter0_pt[0]>0.9):
-		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 	if(tree._GEN_Ks_daughter1_pt[0]>0.9):
-		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter1_vx[0],tree._GEN_Ks_daughter1_vy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter1_vz[0],tree._GEN_Ks_daughter1_lxy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter1_vx[0],tree._GEN_Ks_daughter1_vy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt.Fill(tree._GEN_Ks_daughter1_vz[0],tree._GEN_Ks_daughter1_lxy[0],tree._GEN_Ks_daughter1_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 	
 	if(tree._GEN_AntiLambda_AntiProton_pt[0]>0.9):
-		prof2_vx_vy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_AntiLambda_AntiProton_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],tree._GEN_AntiLambda_AntiProton_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 	if(tree._GEN_AntiLambda_Pion_pt[0]>0.9):
-		prof2_vx_vy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_Pion_vx[0],tree._GEN_AntiLambda_Pion_vy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0])
-		prof2_vz_lxy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_Pion_vz[0],tree._GEN_AntiLambda_Pion_lxy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0])
+		prof2_vx_vy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_Pion_vx[0],tree._GEN_AntiLambda_Pion_vy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
+		prof2_vz_lxy_creation_vertex_AntiLambda_Pion_numberOfTrackerLayers_highPt.Fill(tree._GEN_AntiLambda_Pion_vz[0],tree._GEN_AntiLambda_Pion_lxy[0],tree._GEN_AntiLambda_Pion_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])
 
 
 	#low pt Ks
 	if(tree._GEN_Ks_daughter0_pt[0]>0.35 and tree._GEN_Ks_daughter0_pt[0]<0.5):
 		if(abs(tree._GEN_Ks_daughter0_pz[0]) < 1):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		elif(abs(tree._GEN_Ks_daughter0_pz[0]) > 1 and abs(tree._GEN_Ks_daughter0_pz[0]) < 3):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		else:
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_lowPt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 	elif(tree._GEN_Ks_daughter0_pt[0]>0.5 and tree._GEN_Ks_daughter0_pt[0]<1.):
 		if(abs(tree._GEN_Ks_daughter0_pz[0]) < 1):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		elif(abs(tree._GEN_Ks_daughter0_pz[0]) > 1 and abs(tree._GEN_Ks_daughter0_pz[0]) < 3):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		else:
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_middlePt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 	else:
 		if(abs(tree._GEN_Ks_daughter0_pz[0]) < 1):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_lowPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		elif(abs(tree._GEN_Ks_daughter0_pz[0]) > 1 and abs(tree._GEN_Ks_daughter0_pz[0]) < 3):
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_middlePz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 		else:
-			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0])	
+			prof2_vz_lxy_creation_vertex_Ks_daughters_numberOfTrackerLayers_highPt_highPz.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],tree._GEN_Ks_daughter0_numberOfTrackerLayers[0],tree._S_event_weighting_factor[0])	
 
 	
+antiS_properties_dir.cd()
 
-
-momenta_daughters_and_grandaughters_dir.cd()
+h_antiS_eta.Write()
 
 h_antiS_lxy_creation_vertex.Write()
 h_antiS_vz_creation_vertex.Write()
-
 
 c_antiS_lxy = TCanvas("c_antiS_lxy","");
 h_antiS_lxy.DrawNormalized()
@@ -499,11 +521,14 @@ for h in l_TH1F:
 	h.Draw("CL")
 	h.SetStats(0)
 	CMS_lumi.CMS_lumi(c, 0, 11)
-	if i_l_TH1F == 1:
-		c.SetLogy()
+	#if i_l_TH1F == 1:
+	#	c.SetLogy()
 	c.SaveAs(plots_output_dir+h.GetName()+".pdf")
 	c.Write()
 	i_l_TH1F+=1
+
+fermiMomentum_dir = fOut.mkdir("fermiMomentum")
+fermiMomentum_dir.cd()
 
 h2_antiS_inv_mass_p.Write()
 h2_antiS_inv_mass_p_Ks_plus_Lambda.Write()
@@ -572,18 +597,24 @@ CMS_lumi.CMS_lumi(c_h2_antiS_inv_mass_p_Ks_plus_Lambda, 0, 11)
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.SaveAs(plots_output_dir+h2_antiS_inv_mass_p_Ks_plus_Lambda.GetName()+".pdf")
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.Write()
 
+momenta_daughters_and_grandaughters_dir.cd()
 
 ll_TH1F = [
 [h_pt_Ks_daug0,h_pt_Ks],
 [h_pz_Ks_daug0,h_pz_Ks],
 [h_pz_AntiLambda_Pion,h_pz_AntiLambda_AntiProton,h_pz_AntiLambda],
-[h_pt_AntiLambda_Pion,h_pt_AntiLambda_AntiProton,h_pt_AntiLambda]
+[h_pt_AntiLambda_Pion,h_pt_AntiLambda_AntiProton,h_pt_AntiLambda],
+[h_GEN_Ks_daughters_openings_angle_displacement_momentum,h_Ks_openings_angle_displacement_momentum],
+[h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum,h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum,h_Lambda_openings_angle_displacement_momentum]
 ]
+
 
 ll_legend_text =  [
 ["K_{S}^{0} daughters","K_{S}^{0}"],
 ["K_{S}^{0} daughters","K_{S}^{0}"],
 ["#bar{#Lambda}-#pi^{+}","#bar{#Lambda}-#bar{p}","#bar{#Lambda}"],
+["#bar{#Lambda}-#pi^{+}","#bar{#Lambda}-#bar{p}","#bar{#Lambda}"],
+["K_{S}^{0} daughters","K_{S}^{0}"],
 ["#bar{#Lambda}-#pi^{+}","#bar{#Lambda}-#bar{p}","#bar{#Lambda}"]
 ]
 for l in ll_TH1F:

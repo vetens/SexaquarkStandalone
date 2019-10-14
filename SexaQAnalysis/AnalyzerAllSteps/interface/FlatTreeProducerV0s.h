@@ -42,6 +42,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     void InitZ();
     void InitPV();
     void InitBeamspot();
+    void InitGeneral();
 
     edm::Service<TFileService> m_fs;
 
@@ -80,6 +81,8 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     TTree* _tree_PV;
     TTree* _tree_beamspot;
     TTree* _tree_GEN_Ks; 
+    TTree* _tree_general; 
+
 
     //definition of variables which should go to tree
     //GEN Ks
@@ -101,9 +104,8 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     std::vector<float> _Z_mass,_Z_dz_PV_muon1,_Z_dz_PV_muon2,_Z_ptMuMu;
     std::vector<float> _PV_n,_PV0_lxy,_PV0_vz;
     std::vector<float> _beampot_lxy,_beampot_vz;
-
+    std::vector<int> _general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ,_general_eventTrackMultiplicity,_general_eventTrackMultiplicity_highPurity;
    
-
 
 
 

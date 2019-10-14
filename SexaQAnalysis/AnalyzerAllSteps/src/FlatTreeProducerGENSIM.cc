@@ -28,11 +28,14 @@ void FlatTreeProducerGENSIM::beginJob() {
 
 	_treeAllAntiS = fs->make <TTree>("FlatTreeGENLevelAllAntiS","treeAllAntiS");
 	_treeAllAntiS->Branch("_S_eta_all",&_S_eta_all);
+	_treeAllAntiS->Branch("_S_event_weighting_factor_all",&_S_event_weighting_factor_all);
+	_treeAllAntiS->Branch("_S_reconstructable_all",&_S_reconstructable_all);
 
         _tree = fs->make <TTree>("FlatTreeGENLevel","tree");
         // Declare tree's branches
 	_tree->Branch("_S_n_loops",&_S_n_loops);
 	_tree->Branch("_S_charge",&_S_charge);
+	_tree->Branch("_S_event_weighting_factor",&_S_event_weighting_factor);
 	_tree->Branch("_S_lxy_interaction_vertex",&_S_lxy_interaction_vertex);
 	_tree->Branch("_S_lxyz_interaction_vertex",&_S_lxyz_interaction_vertex);
 	_tree->Branch("_S_error_lxy_interaction_vertex",&_S_error_lxy_interaction_vertex);
@@ -73,6 +76,9 @@ void FlatTreeProducerGENSIM::beginJob() {
 
 	_tree->Branch("_deltaR_sumDaughterMomenta_antiSMomentum",&_deltaR_sumDaughterMomenta_antiSMomentum);
 
+	_tree->Branch("_Ks_openings_angle_displacement_momentum",&_Ks_openings_angle_displacement_momentum);
+	_tree->Branch("_Lambda_openings_angle_displacement_momentum",&_Lambda_openings_angle_displacement_momentum);
+
 	_tree->Branch("_S_pt",&_S_pt);
 	_tree->Branch("_Ks_pt",&_Ks_pt);
 	_tree->Branch("_Lambda_pt",&_Lambda_pt);
@@ -101,6 +107,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_Ks_daughter0_lxy",&_GEN_Ks_daughter0_lxy);
 	_tree->Branch("_GEN_Ks_daughter0_dxy",&_GEN_Ks_daughter0_dxy);
 	_tree->Branch("_GEN_Ks_daughter0_dz",&_GEN_Ks_daughter0_dz);
+	_tree->Branch("_GEN_Ks_daughter0_openings_angle_displacement_momentum",&_GEN_Ks_daughter0_openings_angle_displacement_momentum);
 
 	_tree->Branch("_GEN_Ks_daughter1_px",&_GEN_Ks_daughter1_px);
 	_tree->Branch("_GEN_Ks_daughter1_py",&_GEN_Ks_daughter1_py);
@@ -114,6 +121,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_Ks_daughter1_lxy",&_GEN_Ks_daughter1_lxy);
 	_tree->Branch("_GEN_Ks_daughter1_dxy",&_GEN_Ks_daughter1_dxy);
 	_tree->Branch("_GEN_Ks_daughter1_dz",&_GEN_Ks_daughter1_dz);
+	_tree->Branch("_GEN_Ks_daughter1_openings_angle_displacement_momentum",&_GEN_Ks_daughter1_openings_angle_displacement_momentum);
 
 	_tree->Branch("_GEN_AntiLambda_AntiProton_px",&_GEN_AntiLambda_AntiProton_px);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_py",&_GEN_AntiLambda_AntiProton_py);
@@ -127,6 +135,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_AntiLambda_AntiProton_lxy",&_GEN_AntiLambda_AntiProton_lxy);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_dxy",&_GEN_AntiLambda_AntiProton_dxy);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_dz",&_GEN_AntiLambda_AntiProton_dz);
+	_tree->Branch("_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum",&_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum);
 
 	_tree->Branch("_GEN_AntiLambda_Pion_px",&_GEN_AntiLambda_Pion_px);
 	_tree->Branch("_GEN_AntiLambda_Pion_py",&_GEN_AntiLambda_Pion_py);
@@ -140,6 +149,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_AntiLambda_Pion_lxy",&_GEN_AntiLambda_Pion_lxy);
 	_tree->Branch("_GEN_AntiLambda_Pion_dxy",&_GEN_AntiLambda_Pion_dxy);
 	_tree->Branch("_GEN_AntiLambda_Pion_dz",&_GEN_AntiLambda_Pion_dz);
+	_tree->Branch("_GEN_AntiLambda_Pion_openings_angle_displacement_momentum",&_GEN_AntiLambda_Pion_openings_angle_displacement_momentum);
 
   	_tree->Branch("_GEN_Ks_daughter0_numberOfTrackerLayers",&_GEN_Ks_daughter0_numberOfTrackerLayers);
         _tree->Branch("_GEN_Ks_daughter1_numberOfTrackerLayers",&_GEN_Ks_daughter1_numberOfTrackerLayers);
@@ -211,13 +221,14 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 			v_antiS_momenta_and_itt[duplicateIt][1]++;
 	}
 	else{//this is a new antiS
+		nTotalUniqueGenS++;
+		nTotalUniqueGenS_weighted = nTotalUniqueGenS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
 		vector<float> dummyVec; 
 		dummyVec.push_back(genParticle->eta());
 		dummyVec.push_back(1.);
 		v_antiS_momenta_and_itt.push_back(dummyVec);
-		_S_eta_all.push_back(genParticle->eta());
-		_treeAllAntiS->Fill();
-		_S_eta_all.clear();
+
+
 	}
   }
 
@@ -229,46 +240,62 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   //first find the GEN particles which are proper antiS
   if(!m_runningOnData && m_lookAtAntiS){
 	  if(h_genParticles.isValid()){
+	      double etaPrevious = 999;
+	      double eventWeighingPrevious = 999;
+	      bool reconstructablePrevious = false;
 	      for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT
 
 			const reco::Candidate * genParticle = &h_genParticles->at(i);
 			if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
 
+			bool AntiSReconstructable = false;
+
 			//check if this is a reconstructable antiS, so should have 2 daughters of correct type, each daughter should have 2 daughters with the correct type
 			//the below implicitely neglects the duplitcate antiS due to looping, because only 1 of the duplicates will interact and give daughters
-			if(genParticle->numberOfDaughters()==0 && abs(genParticle->eta()) < 4.3) nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3++;
-			//couning the number of antiS with only 1 daughter as below will also count the duplicates
-			//if(genParticle->numberOfDaughters()==1 && abs(genParticle->eta()) < 4) nTotalGiving1DaughtersGENSWithEtaSmallerThan4++;
 			if(genParticle->numberOfDaughters()==2){
 
 				nTotalGiving2DaughtersGENS++;
-				if(abs(genParticle->eta()) < 4.3 ) nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3++;
+				nTotalGiving2DaughtersGENS_weighted = nTotalGiving2DaughtersGENS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
 
 				int daughterParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle);//returns 3 if daughters from antiS are Ks and AntiLambda
  
 				if(genParticle->daughter(0)->numberOfDaughters()==2 && genParticle->daughter(1)->numberOfDaughters()==2 && daughterParticlesTypes == 3){
 
 					nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS++;
+					nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS_weighted = nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
 					int graddaughters0ParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle->daughter(0));
 					int graddaughters1ParticlesTypes = AnalyzerAllSteps::getDaughterParticlesTypes(genParticle->daughter(1));
 					if((graddaughters0ParticlesTypes == 1 && graddaughters1ParticlesTypes == 2) || (graddaughters1ParticlesTypes == 1 && graddaughters0ParticlesTypes == 2)){
 						std::cout << "AntiS with all CORRECT: correct types and numbers of daughters and granddaughters and eta " << genParticle->eta() << std::endl;
 						nTotalCorrectGENS++;
-						if(genParticle->eta()>0) nTotalGENSPosEta++;
-						if(genParticle->eta()<0) nTotalGENSNegEta++;
+						nTotalCorrectGENS_weighted = nTotalCorrectGENS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
+						if(genParticle->eta()>0) {nTotalGENSPosEta++; nTotalGENSPosEta_weighted = nTotalGENSPosEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());}
+						if(genParticle->eta()<0) {nTotalGENSNegEta++; nTotalGENSNegEta_weighted = nTotalGENSNegEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());}
 						FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP);
 						
+						
 					}
-					//else std::cout << "AntiS with correct daughters and correct number of granddaughters, but not correct type of granddaughters" << std::endl;
 
 				}
 
-				//else std::cout << "AntiS with correct number of daughters, but not with correct type of daughters or number of granddaughters, type of daughters: " << genParticle->daughter(0)->pdgId() << "," << genParticle->daughter(1)->pdgId() << " #granddaughters daug 0: " << genParticle->daughter(0)->numberOfDaughters() << " #granddaughters daug 1: " << genParticle->daughter(1)->numberOfDaughters() << std::endl;
 				
 			}
+			//fill a small tree with some variables for all antiS, not only the ones going to all correct granddaughters, but only save this when you go to a new anitS, because otherwise you are filling this for all the duplicates also, and dont save for the fist antiS, this is done by requireing etaPrevious != 999
+			if(genParticle->eta() != etaPrevious && etaPrevious != 999){
+				_S_eta_all.push_back(etaPrevious);
+				_S_event_weighting_factor_all.push_back(eventWeighingPrevious);
+				_S_reconstructable_all.push_back(reconstructablePrevious);
+				_treeAllAntiS->Fill();
+				_S_eta_all.clear();
+				_S_event_weighting_factor_all.clear();
+				_S_reconstructable_all.clear();
 
-			//else std::cout << "Not the correct number of daughters, #daughters: " << genParticle->numberOfDaughters() << " pdgId daughter " << pdgIdAntiSDaughter << std::endl;
-
+				std::cout << "--------------------------------> genParticle->eta(): " << genParticle->eta() << " AntiSReconstructable:  " << reconstructablePrevious << std::endl;
+			}
+		        etaPrevious = genParticle->eta();
+		        eventWeighingPrevious = AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
+		        reconstructablePrevious = AntiSReconstructable;
+		
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
 	  }//if(h_genParticles.isValid())
 	else{
@@ -277,10 +304,6 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
   }
 
-  nTotalUniqueGenS = nTotalUniqueGenS + v_antiS_momenta_and_itt.size();
-  for(unsigned int s = 0; s <  v_antiS_momenta_and_itt.size(); s++ ){
-	if(abs(v_antiS_momenta_and_itt[s][0]) < 4.3) nTotalUniqueGenSWithEtaSmallerThan4p3++;
-  }
 
  } //end of analyzer
 
@@ -309,7 +332,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GENDeltaRDaughters = pow(GENDeltaPhiDaughters*GENDeltaPhiDaughters+GENDeltaEtaDaughters*GENDeltaEtaDaughters,0.5);
 
 	//count the number of AntiS going to fully correct granddaughters and which interact in the beampipe 
-	if(GENLxy_interactionVertex < 3) nTotalCorrectGENSInteractingInBeampipe++;
+	if(GENLxy_interactionVertex < 2.26){ nTotalCorrectGENSInteractingInBeampipe++; nTotalCorrectGENSInteractingInBeampipe_weighted = nTotalCorrectGENSInteractingInBeampipe_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());} 
 
 	reco::LeafCandidate::LorentzVector n_(0,0,0,0.939565);
 	double GEN_Smass = ((genParticle->daughter(0)->daughter(0)->p4()+genParticle->daughter(0)->daughter(1)->p4()+genParticle->daughter(1)->daughter(0)->p4()+genParticle->daughter(1)->daughter(1)->p4())-n_).mass();
@@ -349,6 +372,13 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double deltaEta_sumDaughterMomenta_antiSMomentum = vGENAntiSSumDaug0and1Momentum.Eta() - GENAntiSMomentumVertex.Eta();
 	double deltaR_sumDaughterMomenta_antiSMomentum = pow(deltaPhi_sumDaughterMomenta_antiSMomentum*deltaPhi_sumDaughterMomenta_antiSMomentum + deltaEta_sumDaughterMomenta_antiSMomentum*deltaEta_sumDaughterMomenta_antiSMomentum ,0.5); 
 
+	//openingsangle between the displacement and the momentum of the Ks and Lambda: are they pointing back to the beamspot?
+	reco::Candidate::Vector GENAntiSInteractionVertex_beamspot(genParticle->daughter(0)->vx()-beamspot.X(),genParticle->daughter(0)->vy()-beamspot.Y(),genParticle->daughter(0)->vz()-beamspot.Z());
+	reco::Candidate::Vector GENAntiSDaug0Momentum_vector(genParticle->daughter(0)->px(),genParticle->daughter(0)->py(),genParticle->daughter(0)->pz());
+	reco::Candidate::Vector GENAntiSDaug1Momentum_vector(genParticle->daughter(1)->px(),genParticle->daughter(1)->py(),genParticle->daughter(1)->pz());
+	double Ks_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GENAntiSInteractionVertex_beamspot,GENAntiSDaug0Momentum_vector);
+	double Lambda_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GENAntiSInteractionVertex_beamspot,GENAntiSDaug1Momentum_vector);
+
 	//now look at the granddaughters:
 	//For the Ks:
 	double GEN_Ks_daughter0_px = genParticle->daughter(0)->daughter(0)->px();
@@ -365,6 +395,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_Ks_daughter0_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_Ks_daughter0_creation_vertex);
 	double GEN_Ks_daughter0_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_Ks_daughter0_creation_vertex,GEN_Ks_daughter0_momentum,beamspot);
 	double GEN_Ks_daughter0_dz = AnalyzerAllSteps::dz_line_point(GEN_Ks_daughter0_creation_vertex,GEN_Ks_daughter0_momentum,beamspot);
+	reco::Candidate::Vector GEN_Ks_daughter0_creation_vertex_beamspot_vector(genParticle->daughter(0)->daughter(0)->vx()-beamspot.X(),genParticle->daughter(0)->daughter(0)->vy()-beamspot.Y(),genParticle->daughter(0)->daughter(0)->vz()-beamspot.Z());
+	reco::Candidate::Vector GEN_Ks_daughter0_momentum_vertex_vector(genParticle->daughter(0)->daughter(0)->px(),genParticle->daughter(0)->daughter(0)->py(),genParticle->daughter(0)->daughter(0)->pz());
+	double GEN_Ks_daughter0_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GEN_Ks_daughter0_creation_vertex_beamspot_vector,GEN_Ks_daughter0_momentum_vertex_vector);
 
 	double GEN_Ks_daughter1_px = genParticle->daughter(0)->daughter(1)->px();
 	double GEN_Ks_daughter1_py = genParticle->daughter(0)->daughter(1)->py();
@@ -380,6 +413,9 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_Ks_daughter1_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_Ks_daughter1_creation_vertex);
 	double GEN_Ks_daughter1_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_Ks_daughter1_creation_vertex,GEN_Ks_daughter1_momentum,beamspot);
         double GEN_Ks_daughter1_dz = AnalyzerAllSteps::dz_line_point(GEN_Ks_daughter1_creation_vertex,GEN_Ks_daughter1_momentum,beamspot);
+	reco::Candidate::Vector GEN_Ks_daughter1_creation_vertex_beamspot_vector(genParticle->daughter(0)->daughter(1)->vx()-beamspot.X(),genParticle->daughter(0)->daughter(1)->vy()-beamspot.Y(),genParticle->daughter(0)->daughter(1)->vz()-beamspot.Z());
+	reco::Candidate::Vector GEN_Ks_daughter1_momentum_vertex_vector(genParticle->daughter(0)->daughter(1)->px(),genParticle->daughter(0)->daughter(1)->py(),genParticle->daughter(0)->daughter(1)->pz());
+	double GEN_Ks_daughter1_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GEN_Ks_daughter1_creation_vertex_beamspot_vector,GEN_Ks_daughter1_momentum_vertex_vector);
 
 	//For the AntiLambda: first find the antiproton by finding the one with the highest momentum
 	const reco::Candidate  * AntiLambdaAntiProton = genParticle->daughter(1)->daughter(1);	
@@ -402,7 +438,10 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_AntiLambda_AntiProton_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_AntiLambda_AntiProton_creation_vertex);
 	double GEN_AntiLambda_AntiProton_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_AntiLambda_AntiProton_creation_vertex,GEN_AntiLambda_AntiProton_momentum,beamspot);
 	double GEN_AntiLambda_AntiProton_dz = AnalyzerAllSteps::dz_line_point(GEN_AntiLambda_AntiProton_creation_vertex,GEN_AntiLambda_AntiProton_momentum,beamspot);
-
+	reco::Candidate::Vector GEN_AntiLambda_AntiProton_creation_vertex_beamspot_vector(AntiLambdaAntiProton->vx()-beamspot.X(),AntiLambdaAntiProton->vy()-beamspot.Y(),AntiLambdaAntiProton->vz()-beamspot.Z());
+	reco::Candidate::Vector GEN_AntiLambda_AntiProton_momentum_vector(AntiLambdaAntiProton->px(),AntiLambdaAntiProton->py(),AntiLambdaAntiProton->pz());
+	double GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(  GEN_AntiLambda_AntiProton_creation_vertex_beamspot_vector,GEN_AntiLambda_AntiProton_momentum_vector);
+	
 
 	double GEN_AntiLambda_Pion_px = AntiLambdaPion->px();
 	double GEN_AntiLambda_Pion_py = AntiLambdaPion->py();
@@ -418,6 +457,11 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_AntiLambda_Pion_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_AntiLambda_Pion_creation_vertex);
         double GEN_AntiLambda_Pion_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_AntiLambda_Pion_creation_vertex,GEN_AntiLambda_Pion_momentum,beamspot);
         double GEN_AntiLambda_Pion_dz = AnalyzerAllSteps::dz_line_point(GEN_AntiLambda_Pion_creation_vertex,GEN_AntiLambda_Pion_momentum,beamspot);
+	reco::Candidate::Vector GEN_AntiLambda_Pion_creation_vertex_beamspot_vector(AntiLambdaPion->vx()-beamspot.X(),AntiLambdaPion->vy()-beamspot.Y(),AntiLambdaPion->vz()-beamspot.Z());
+	reco::Candidate::Vector GEN_AntiLambda_Pion_momentum_vector(AntiLambdaPion->px(),AntiLambdaPion->py(),AntiLambdaPion->pz());
+        double GEN_AntiLambda_Pion_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(  GEN_AntiLambda_Pion_creation_vertex_beamspot_vector,GEN_AntiLambda_Pion_momentum_vector);  
+	
+
 	//loop over the trackingparticles and find the one with the same px, py, pz as the granddaughters of this AntiS. For these trackingparticles it would be interesting to get the numberOfTrackerLayers() and numberOfTrackerHits() to have an idea how many layers the granddaughters cross
 	int tp_Ks_daughter0_found = -1;
 	int tp_Ks_daughter1_found = -1;
@@ -470,6 +514,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 
 	_S_n_loops.push_back(v_antiS_momenta_and_itt[itDuplicateAntiS][1]);
 	_S_charge.push_back(genParticle->charge());
+	_S_event_weighting_factor.push_back(AnalyzerAllSteps::EventWeightingFactor(genParticle->theta()));
 
 	_S_lxy_interaction_vertex.push_back(GENLxy_interactionVertex);
 	_S_lxyz_interaction_vertex.push_back(GENLxyz_interactionVertex);
@@ -507,6 +552,10 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 
 	_deltaR_sumDaughterMomenta_antiSMomentum.push_back(deltaR_sumDaughterMomenta_antiSMomentum);
 
+	_Ks_openings_angle_displacement_momentum.push_back(Ks_openings_angle_displacement_momentum);
+	_Lambda_openings_angle_displacement_momentum.push_back(Lambda_openings_angle_displacement_momentum);
+	
+
 	_S_pt.push_back(genParticle->pt());
 	_Ks_pt.push_back(genParticle->daughter(0)->pt());
 	_Lambda_pt.push_back(genParticle->daughter(1)->pt());
@@ -535,6 +584,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_Ks_daughter0_lxy.push_back(GEN_Ks_daughter0_lxy);
 	_GEN_Ks_daughter0_dxy.push_back(GEN_Ks_daughter0_dxy);
 	_GEN_Ks_daughter0_dz.push_back(GEN_Ks_daughter0_dz);
+	_GEN_Ks_daughter0_openings_angle_displacement_momentum.push_back(GEN_Ks_daughter0_openings_angle_displacement_momentum);
 
 	_GEN_Ks_daughter1_px.push_back(GEN_Ks_daughter1_px); 
 	_GEN_Ks_daughter1_py.push_back(GEN_Ks_daughter1_py); 
@@ -548,6 +598,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_Ks_daughter1_lxy.push_back(GEN_Ks_daughter1_lxy);
 	_GEN_Ks_daughter1_dxy.push_back(GEN_Ks_daughter1_dxy);
 	_GEN_Ks_daughter1_dz.push_back(GEN_Ks_daughter1_dz);
+	_GEN_Ks_daughter1_openings_angle_displacement_momentum.push_back(GEN_Ks_daughter1_openings_angle_displacement_momentum);
 
 	_GEN_AntiLambda_AntiProton_px.push_back(GEN_AntiLambda_AntiProton_px);
 	_GEN_AntiLambda_AntiProton_py.push_back(GEN_AntiLambda_AntiProton_py);
@@ -561,6 +612,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_AntiLambda_AntiProton_lxy.push_back(GEN_AntiLambda_AntiProton_lxy);
 	_GEN_AntiLambda_AntiProton_dxy.push_back(GEN_AntiLambda_AntiProton_dxy);
 	_GEN_AntiLambda_AntiProton_dz.push_back(GEN_AntiLambda_AntiProton_dz);
+	_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum.push_back(GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum);
 
 	_GEN_AntiLambda_Pion_px.push_back(GEN_AntiLambda_Pion_px);
 	_GEN_AntiLambda_Pion_py.push_back(GEN_AntiLambda_Pion_py);
@@ -574,6 +626,7 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_AntiLambda_Pion_lxy.push_back(GEN_AntiLambda_Pion_lxy);
 	_GEN_AntiLambda_Pion_dxy.push_back(GEN_AntiLambda_Pion_dxy);
 	_GEN_AntiLambda_Pion_dz.push_back(GEN_AntiLambda_Pion_dz);
+	_GEN_AntiLambda_Pion_openings_angle_displacement_momentum.push_back(GEN_AntiLambda_Pion_openings_angle_displacement_momentum);
 
 	_GEN_Ks_daughter0_numberOfTrackerLayers.push_back(Ks_daughter0_numberOfTrackerLayers);
 	_GEN_Ks_daughter1_numberOfTrackerLayers.push_back(Ks_daughter1_numberOfTrackerLayers);
@@ -637,22 +690,43 @@ FlatTreeProducerGENSIM::~FlatTreeProducerGENSIM()
 
 	std::cout << "The total number GEN " << particle << " that were found is (this includes duplicates): " << nTotalGENS << std::endl; 
 	std::cout << "The total number of unique " << particle << ": " << nTotalUniqueGenS  << std::endl; 
-	std::cout << "The total number of unique " << particle << " with |eta| < 4.3: " << nTotalUniqueGenSWithEtaSmallerThan4p3  << std::endl; 
-	std::cout << "The total number GEN " << particle << "  giving 2 daughters: " << nTotalGiving2DaughtersGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 2 daughters (should be the same as above, cause only antiS with |eta|<4 can interact and thus have 2 daughters): " << nTotalGiving2DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 0 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
-	std::cout << "The total number GEN " << particle << "  with |eta| < 4.3 giving 1 daughters (this is not expected because normally you loop the antiS until it interacts, but maybe the daughters were not saved by GEANT): " << nTotalUniqueGenSWithEtaSmallerThan4p3 - nTotalGiving2DaughtersGENS - nTotalGiving0DaughtersGENSWithEtaSmallerThan4p3 << std::endl; 
+	std::cout << "The total number GEN " << particle << " giving 2 correct daughters: " << nTotalGiving2DaughtersGENS << std::endl; 
 	std::cout << "The total number GEN " << particle << " giving 2 correct daughters and 4 granddaughters: " << nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl; 
 	std::cout << "The total number GEN " << particle << " decaying to ALL correct granddaughters is: " << nTotalCorrectGENS << std::endl;
 	std::cout << "so the branching ratio you extract for all charged decay is the division of the 2 previous lines: " << (double)nTotalCorrectGENS/(double)nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS << std::endl;
-	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles and interacting in the beampipe is: " << nTotalCorrectGENSInteractingInBeampipe << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << "The overall efficiency factor which includes any of the daughters or granddaughters falling out of acceptance (eta > 5.5) and the BR to all charged products is: " << (double)nTotalCorrectGENS/(double)nTotalUniqueGenS << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles and interacting in the beampipe (lxy < 2.26cm) is: " << nTotalCorrectGENSInteractingInBeampipe << std::endl;
 	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with pos eta is: " << nTotalGENSPosEta << std::endl;
         std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
 
-	std::cout << "So the efficiency factor you extract for the fact that you discard |eta| > 4.3 anti-S is (you could already have extracted this at GEN level): " <<  (double)nTotalUniqueGenSWithEtaSmallerThan4p3/(double)nTotalUniqueGenS << std::endl;
-	std::cout << "fraction of AntiS with |eta| < 4.3 which go to correct granddaughters: " << (double)nTotalCorrectGENS/(double)nTotalUniqueGenSWithEtaSmallerThan4p3 << std::endl;
-	std::cout << "The second efficiency factor is the number of these AntiS with |eta| < 4.3 which actually go to correct granddaughters AND interact in the beampipe: "<< (double)nTotalCorrectGENSInteractingInBeampipe/(double)nTotalUniqueGenSWithEtaSmallerThan4p3 << std::endl;
-	
+
+	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
+	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
+	std::cout << "---------------------------BUT THESE SHOULD BE REWEIGHTED BASED ON HOW MUCH MATERAIAL THE ANTIS PASSES----------------------------------------" << std::endl;	
+	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
+	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
+
+	std::cout << "The total number of unique " << particle << ": " << nTotalUniqueGenS_weighted  << std::endl; 
+	std::cout << "The total number GEN " << particle << " giving 2 correct daughters: " << nTotalGiving2DaughtersGENS_weighted << std::endl; 
+	std::cout << "The total number GEN " << particle << " giving 2 correct daughters and 4 granddaughters: " << nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS_weighted << std::endl; 
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct granddaughters is: " << nTotalCorrectGENS_weighted << std::endl;
+	std::cout << "so the branching ratio you extract for all charged decay is the division of the 2 previous lines: " << (double)nTotalCorrectGENS_weighted/(double)nTotalGivingCorrectDaughtersAnd4GrandDaughtersGENS_weighted << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << "The overall efficiency factor which includes any of the daughters or granddaughters falling out of acceptance (eta > 5.5) and the BR to all charged products is: " << (double)nTotalCorrectGENS_weighted/(double)nTotalUniqueGenS_weighted << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles and interacting in the beampipe (lxy < 2.26cm) is: " << nTotalCorrectGENSInteractingInBeampipe_weighted << std::endl;
+	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with pos eta is: " << nTotalGENSPosEta_weighted << std::endl;
+        std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with neg eta is: " << nTotalGENSNegEta_weighted << std::endl; 
 
 }
 
@@ -664,6 +738,7 @@ FlatTreeProducerGENSIM::Init()
 
     	_S_n_loops.clear();
     	_S_charge.clear();
+    	_S_event_weighting_factor.clear();
 
     	_S_lxy_interaction_vertex.clear();
     	_S_lxyz_interaction_vertex.clear();
@@ -706,6 +781,9 @@ FlatTreeProducerGENSIM::Init()
 
 	_deltaR_sumDaughterMomenta_antiSMomentum.clear();
 
+	_Ks_openings_angle_displacement_momentum.clear();
+	_Lambda_openings_angle_displacement_momentum.clear();
+
 	_S_pt.clear();
 	_Ks_pt.clear();
 	_Lambda_pt.clear();
@@ -735,6 +813,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_Ks_daughter0_lxy.clear();
 	_GEN_Ks_daughter0_dxy.clear();
 	_GEN_Ks_daughter0_dz.clear();
+	_GEN_Ks_daughter0_openings_angle_displacement_momentum.clear();
 
 	_GEN_Ks_daughter1_px.clear();
 	_GEN_Ks_daughter1_py.clear();
@@ -748,6 +827,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_Ks_daughter1_lxy.clear();
 	_GEN_Ks_daughter1_dxy.clear();
 	_GEN_Ks_daughter1_dz.clear();
+	_GEN_Ks_daughter1_openings_angle_displacement_momentum.clear();
 
 	_GEN_AntiLambda_AntiProton_px.clear();
 	_GEN_AntiLambda_AntiProton_py.clear();
@@ -761,6 +841,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_AntiLambda_AntiProton_lxy.clear();
 	_GEN_AntiLambda_AntiProton_dxy.clear();
 	_GEN_AntiLambda_AntiProton_dz.clear();
+	_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum.clear();
 
 	_GEN_AntiLambda_Pion_px.clear();
 	_GEN_AntiLambda_Pion_py.clear();
@@ -774,6 +855,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_AntiLambda_Pion_lxy.clear();
 	_GEN_AntiLambda_Pion_dxy.clear();
 	_GEN_AntiLambda_Pion_dz.clear();
+	_GEN_AntiLambda_Pion_openings_angle_displacement_momentum.clear();
 
         _GEN_Ks_daughter0_numberOfTrackerLayers.clear();
         _GEN_Ks_daughter1_numberOfTrackerLayers.clear();

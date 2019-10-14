@@ -192,6 +192,13 @@ void FlatTreeProducerV0s::beginJob() {
         _tree_beamspot->Branch("_beampot_lxy",&_beampot_lxy);
         _tree_beamspot->Branch("_beampot_vz",&_beampot_vz);
 
+	//some generalities:
+	_tree_general = fs->make <TTree>("FlatTreeGeneral","treeGeneral");
+	_tree_general->Branch("_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ",&_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ);
+	_tree_general->Branch("_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",&_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ);
+	_tree_general->Branch("_general_eventTrackMultiplicity",&_general_eventTrackMultiplicity);
+	_tree_general->Branch("_general_eventTrackMultiplicity_highPurity",&_general_eventTrackMultiplicity_highPurity);
+	
 }
 
 void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup) {
@@ -261,8 +268,8 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	}
   }
 
-  bool Fired_HLT_Mu17_Mu8_DZ_v = false;
-  bool Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;
+  bool Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ = false;
+  bool Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ = false;
   //std::cout << "-----------------------------------------------" << std::endl;
   if ( HLTResHandle.isValid() && !HLTResHandle.failedToGet() ) {
 
@@ -270,13 +277,14 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	int ntrigs = (int)trigNames->size();
 	for (int i = 0; i < ntrigs; i++) {
 
+	      //std::cout << trigNames->triggerName(i) << std::endl;
 	      //if(HLTResHandle->accept(i) == 1)std::cout << trigNames->triggerName(i) << " : " << HLTResHandle->accept(i) << std::endl;
 
-	      if(trigNames->triggerName(i).find("HLT_Mu17_Mu8_DZ_v") != std::string::npos){
-			 Fired_HLT_Mu17_Mu8_DZ_v = HLTResHandle->accept(i);			
+	      if(trigNames->triggerName(i).find("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ") != std::string::npos){
+			 Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ = HLTResHandle->accept(i);			
 	      }
-	      if(trigNames->triggerName(i).find("HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v") != std::string::npos){
-			 Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = HLTResHandle->accept(i);			
+	      if(trigNames->triggerName(i).find("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ") != std::string::npos){
+			 Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ = HLTResHandle->accept(i);			
 	      }
 	}
 
@@ -386,9 +394,6 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 	std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
 
-  	std::cout << "Fired_HLT_Mu17_Mu8_DZ_v: " << Fired_HLT_Mu17_Mu8_DZ_v << std::endl;
-  	std::cout << "Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v: " << Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v << std::endl;
-	std::cout << "OR of the previous 2: " << (Fired_HLT_Mu17_Mu8_DZ_v || Fired_HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v) << std::endl;
 //	std::cout << "ptMuon1 = " << ptMuon1 << std::endl;
 //	std::cout << "ptMuon2 = " << ptMuon2 << std::endl;
 //	std::cout << "etaMuon1 = " << etaMuon1 << std::endl;
@@ -414,6 +419,24 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	_beampot_lxy.push_back( sqrt( pow( h_bs->x0() , 2) + pow( h_bs->y0() , 2) ));
 	_beampot_vz.push_back(h_bs->z0());
 	_tree_beamspot->Fill();       
+
+
+	//loop over the track collection and count the number of high purity tracks to have an idea 
+	int nHighPurityTracks = 0;
+	if(h_generalTracks.isValid()){
+		for(unsigned int i = 0; i < h_generalTracks->size(); ++i){
+			const reco::Track *ptr = &h_generalTracks->at(i);
+			if( AnalyzerAllSteps::trackQualityAsInt(ptr) == 2) nHighPurityTracks++;
+		}
+	}
+
+	InitGeneral();
+	_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ);
+	_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ);
+	_general_eventTrackMultiplicity.push_back(h_generalTracks->size());
+	_general_eventTrackMultiplicity_highPurity.push_back(nHighPurityTracks);
+	_tree_general->Fill();
+	
 
 	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
 
@@ -700,12 +723,14 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 	}
 
 	//just a consitency check: if deltaR is small then also the 3D distance between the GEN decay vertex and the RECO decay vertex should be small
-	if( RECOV0->mass() > 0.48 && RECOV0->mass() < 0.52 &&  abs(RECOV0->eta()) < 2 && dxy_beamspot < 0.1 && dxy_beamspot > 0. && abs(dz_PV0) < 0.2 ){
-		std::cout << "number of daughters: "<< h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() << std::endl;
-		if(deltaRBestMatchingGENParticle < 0.01 && h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() > 0){
-			double distance = sqrt(  pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx() - RECOV0->vx() ,2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy() - RECOV0->vy(),2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz() - RECOV0->vz(),2) );
-			double GEN_lxyz = sqrt( pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz(),2) );
-			std::cout << "Found a GEN Ks matching a RECO Ks in deltaR, the 3D distance between GEN and RECO decay vertex is: "<< distance << " the GEN lxyz is: " << GEN_lxyz << std::endl;
+	if(h_genParticles.isValid()){
+		if( RECOV0->mass() > 0.48 && RECOV0->mass() < 0.52 &&  abs(RECOV0->eta()) < 2 && dxy_beamspot < 0.1 && dxy_beamspot > 0. && abs(dz_PV0) < 0.2 ){
+			std::cout << "number of daughters: "<< h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() << std::endl;
+			if(deltaRBestMatchingGENParticle < 0.01 && h_genParticles->at(bestMatchingGENParticle).numberOfDaughters() > 0){
+				double distance = sqrt(  pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx() - RECOV0->vx() ,2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy() - RECOV0->vy(),2) + pow( h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz() - RECOV0->vz(),2) );
+				double GEN_lxyz = sqrt( pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vx(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vy(),2) + pow(h_genParticles->at(bestMatchingGENParticle).daughter(0)->vz(),2) );
+				std::cout << "Found a GEN Ks matching a RECO Ks in deltaR, the 3D distance between GEN and RECO decay vertex is: "<< distance << " the GEN lxyz is: " << GEN_lxyz << std::endl;
+			}
 		}
 	}	
 
@@ -938,6 +963,14 @@ void FlatTreeProducerV0s::InitPV()
 void FlatTreeProducerV0s::InitBeamspot(){
 	_beampot_lxy.clear();
 	_beampot_vz.clear();
+}
+
+void FlatTreeProducerV0s::InitGeneral(){
+	_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ.clear();
+	_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ.clear();
+
+	_general_eventTrackMultiplicity.clear();
+	_general_eventTrackMultiplicity_highPurity.clear();
 }
 
 DEFINE_FWK_MODULE(FlatTreeProducerV0s);
