@@ -1,7 +1,21 @@
-from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT,TProfile,TF1
+from ROOT import *
 import numpy as np
 import copy
 from array import array
+
+import sys
+sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
+import  CMS_lumi, tdrstyle
+
+gROOT.SetBatch(kTRUE)
+gStyle.SetLegendTextSize(0.08)
+
+CMS_lumi.writeExtraText = 1
+CMS_lumi.extraText = ""
+tdrstyle.setTDRStyle()
+
+colours = [1,2,4,35,38,41]
+
 
 fIns = [
 #the standard V0s:
@@ -9,8 +23,8 @@ fIns = [
 #'/storage_mnt/storage/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_standardV0s/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root',
 
 #the adapted V0s:
-'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DoubleMuon_adaptedV0s_extendedFlatTree6/combined_FlatTreeV0_DoubleMuonData_Run_G_H.root',
-'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_adaptedV0s_extendedFlatTree6/combined/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'
+'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DoubleMuon_adaptedV0s_extendedFlatTree8/combined_FlatTreeV0_DoubleMuonData_Run_G_H.root',
+'/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerV0s/qsub/Results/FlatTrees_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_adaptedV0s_extendedFlatTree8/combined/combined_FlatTreeV0_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'
 ]
 
 maxEvents = 2e5
@@ -88,17 +102,33 @@ for fIn in fIns:
 	iFile = iFile+1	
 
 iFile = 0
-h_RECO_Ks_vz_PV_min_Data= TH1F('h_RECO_Ks_vz_PV_min_Data'," ;PV vz min (cm); #entries",20000,-100,100)
-h_RECO_Ks_vz_PV_min_MC= TH1F('h_RECO_Ks_vz_PV_min_MC'," ;PV vz min (cm); #entries",20000,-100,100)
+h_RECO_Ks_vz_PV_min_Data= TH1F('h_RECO_Ks_vz_PV_min_Data'," ;PV vz min (cm); #entries",4000,-20,20)
+h_RECO_Ks_vz_PV_min_MC= TH1F('h_RECO_Ks_vz_PV_min_MC'," ;PV vz min (cm); #entries",4000,-20,20)
+h_RECO_track_multiplicity_Data = TH1F('h_RECO_track_multiplicity_Data',';track multiplicity;#entries',250,0,2000)
+h_RECO_track_multiplicity_MC = TH1F('h_RECO_track_multiplicity_MC',';track multiplicity;#entries',250,0,2000)
 h_RECO_Ks_vz_PV_min_Data.SetDirectory(0)
 h_RECO_Ks_vz_PV_min_MC.SetDirectory(0)
+h_RECO_track_multiplicity_Data.SetDirectory(0)
+h_RECO_track_multiplicity_MC.SetDirectory(0)
 for fIn in fIns:
 	fIn = TFile(fIn,'read')
 	treeKs = fIn.Get('FlatTreeProducerV0s/FlatTreeKs')
+	treeGeneral = fIn.Get('FlatTreeProducerV0s/FlatTreeGeneral')
 	for i in range(0,min_entries):
 		if(i > maxEvents):
                         continue
+
 		treeKs.GetEntry(i)
+		treeGeneral.GetEntry(i)
+
+		if(treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ[0] == 0 and treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ[0] == 0):
+			continue
+
+		if(iFile == 0):
+			h_RECO_track_multiplicity_Data.Fill(treeGeneral._general_eventTrackMultiplicity[0])		
+		else:
+			h_RECO_track_multiplicity_MC.Fill(treeGeneral._general_eventTrackMultiplicity[0])	
+
 		for j in range(0, len(treeKs._Ks_mass)):
 			#require only Ks which point to a 'best PV'
                         if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_min_PV[j]) < 0.2) :
@@ -112,7 +142,8 @@ for fIn in fIns:
 #h_RECO_PV0_vz_Data.Scale(1./h_RECO_PV0_vz_Data.Integral(), "width")
 #h_RECO_PV0_vz_MC.Scale(1./h_RECO_PV0_vz_MC.Integral(), "width")
 
-fOut = TFile('Results/output_DataToMC_RunG_H_with_dxy_dz_min_PV_reweighing_on_Ks_vz_Dz_min_PV.root','RECREATE')
+plots_output_dir = 'Results_v8_tr_bit/'
+fOut = TFile(plots_output_dir+'output_DataToMC_RunG_H_with_dxy_dz_min_PV_reweighing_on_Ks_vz_Dz_min_PV.root','RECREATE')
 h_dummy =  TH1F('h_dummy'," x; y",20,0,10)
 histos_Data = [h_dummy]*9
 histos_MC = [h_dummy]*9
@@ -187,19 +218,19 @@ for fIn in fIns:
 	treeZ = fIn.Get('FlatTreeProducerV0s/FlatTreeZ')
 	treePV = fIn.Get('FlatTreeProducerV0s/FlatTreePV')
 	treeBeamspot = fIn.Get('FlatTreeProducerV0s/FlatTreeBeamspot')
-	#treeGeneral = fIn.Get('FlatTreeProducerV0s/FlatTreeGeneral')
+	treeGeneral = fIn.Get('FlatTreeProducerV0s/FlatTreeGeneral')
 
 	nEntriesKs = treeKs.GetEntries()
 	nEntriesZ = treeZ.GetEntries()
 	nEntriesPV = treePV.GetEntries()
 	nEntriesBeamspot = treeBeamspot.GetEntries()
-	#nEntriesGeneral = treeGeneral.GetEntries()
+	nEntriesGeneral = treeGeneral.GetEntries()
 
 	print 'Number of entries in the treeKs: ', nEntriesKs
 	print 'Number of entries in the treeZ: ', nEntriesZ
 	print 'Number of entries in the treePV: ', nEntriesPV
 	print 'Number of entries in the treeBeamspot: ', nEntriesBeamspot
-	#print 'Number of entries in the treeGeneral: ', nEntriesGeneral
+	print 'Number of entries in the treeGeneral: ', nEntriesGeneral
 
 	bins1 = np.arange(-150,-60,10)
 	bins2 = np.arange(-60,60,1)
@@ -300,8 +331,8 @@ for fIn in fIns:
 	h_RECO_beamspot_vz_MC_NOTreweighted_to_data = TH1F('h_RECO_beamspot_vz_MC_NOTreweighted_to_data',"; beamspot v_{z} (cm); #entries",200,-100,100)
 
 	#check the reweighing of the beamspot
-	h_RECO_Ks_vz_PV_min_MC_reweighted_to_data = TH1F('h_RECO_Ks_vz_PV_min_MC_reweighted_to_data'," ; v_{z} min PV (cm); #entries",200,-100,100)
-	h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data = TH1F('h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data',"; v_{z} min PV (cm); #entries",200,-100,100)
+	h_RECO_Ks_vz_PV_min_MC_reweighted_to_data = TH1F('h_RECO_Ks_vz_PV_min_MC_reweighted_to_data'," ; v_{z} min PV (cm); #entries",40,-20,20)
+	h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data = TH1F('h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data',"; v_{z} min PV (cm); #entries",40,-20,20)
 
 	#some extra plots to check lifetimes of Ks 
 	h_lxyz_Ks_1 = TH1F('h_lxyz_Ks_eta_1'," ;Ks ct (cm); #entries",lxyz_Ks_bins,0,lxyz_Ks_max)
@@ -361,7 +392,7 @@ for fIn in fIns:
 		treeKs.GetEntry(i)
 		treePV.GetEntry(i)
 		treeBeamspot.GetEntry(i)
-		#treeGeneral.GetEntry(i)
+		treeGeneral.GetEntry(i)
 		
 		nKshortThisEvent = 0
 	
@@ -371,8 +402,8 @@ for fIn in fIns:
 #		       continue
 
 		#trigger requirement
-		#if(treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ[0] == 0 and treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ[0] == 0):
-		#	continue
+		if(treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ[0] == 0 and treeGeneral._general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ[0] == 0):
+			continue
 
 		
 		#now loop over all the Ks in this event:
@@ -489,8 +520,8 @@ for fIn in fIns:
 
 				eta_bin = int(abs(treeKs._Ks_eta[j]*10)) - 1
 				#eta_bin = 0
-				histos_lifetime[ eta_bin ].Fill(t_Ks*c)
-				print 'lifetime: ', t_Ks*c
+				histos_lifetime[ eta_bin ].Fill(t_Ks*c*100)
+				#print 'lifetime(cm): ', t_Ks*c*100
 				#!!!!!!!!!!!!!The IDEA was to then divide the above lifetime plots by the efficiency versus lxyz from MC, but this is not possible with this MC sample as I do not have the decay position of Ks as Ks are decayed by Geant and Geant decay info is not stored. 
 				if(iFile == 1):
 					#have to use the reweighing factor only in the nominator of these histograms otherwise will reweigh twice, because they are used for efficiency calculation in the end
@@ -549,11 +580,11 @@ h_RECO_beamspot_vz_MC.Scale(1./h_RECO_beamspot_vz_MC.Integral(), "width")
 h_RECO_beamspot_vz_MC.Write()
 
 
-h_RECO_Ks_vz_PV_min_Data.Rebin(10)
+h_RECO_Ks_vz_PV_min_Data.Rebin(100)
 h_RECO_Ks_vz_PV_min_Data.Scale(1./h_RECO_Ks_vz_PV_min_Data.Integral(), "width")
 h_RECO_Ks_vz_PV_min_Data.Write()
 
-h_RECO_Ks_vz_PV_min_MC.Rebin(10)
+h_RECO_Ks_vz_PV_min_MC.Rebin(100)
 h_RECO_Ks_vz_PV_min_MC.Scale(1./h_RECO_Ks_vz_PV_min_MC.Integral(), "width")
 h_RECO_Ks_vz_PV_min_MC.Write()
 
@@ -561,6 +592,44 @@ h_RECO_Ks_vz_PV_min_MC_reweighted_to_data.Scale(1./h_RECO_Ks_vz_PV_min_MC_reweig
 h_RECO_Ks_vz_PV_min_MC_reweighted_to_data.Write()
 h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Scale(1./h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Integral(),"width")
 h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Write()
+
+h_RECO_track_multiplicity_Data.Scale(1./h_RECO_track_multiplicity_Data.Integral(), "width")
+h_RECO_track_multiplicity_Data.Write()
+
+h_RECO_track_multiplicity_MC.Scale(1./h_RECO_track_multiplicity_MC.Integral(), "width")
+h_RECO_track_multiplicity_MC.Write()
+
+#save the validation plots for the reweighting procedure to file
+validation_reweighing_dir = fOut.mkdir("validation_reweighing")
+validation_reweighing_dir.cd()
+
+l_TH1F = [h_RECO_Ks_vz_PV_min_Data,h_RECO_Ks_vz_PV_min_MC,h_RECO_Ks_vz_PV_min_MC_reweighted_to_data]
+
+l_legend_text = ["Data","MC","MC reweighted to data"]
+
+#for h in l_TH1F:
+#	h.SetDirectory(0)
+
+i_l_TH1F = 0
+legend = TLegend(0.6,0.85,0.99,0.99)
+c_validation_reweighing = TCanvas("c_validation_reweighing","");
+for h in l_TH1F:
+	if(i_l_TH1F==0):
+		h.Draw("")
+	else:	
+		h.Draw("same")
+	h.SetLineColor(colours[i_l_TH1F])
+	h.SetMarkerStyle(22+i_l_TH1F)
+	h.SetMarkerColor(colours[i_l_TH1F])
+	h.SetStats(0)
+	legend.AddEntry(h,l_legend_text[i_l_TH1F],"lep")
+	i_l_TH1F+=1
+
+legend.Draw()
+CMS_lumi.CMS_lumi(c_validation_reweighing, 0, 11)
+c_validation_reweighing.SaveAs(plots_output_dir+c_validation_reweighing.GetName()+".pdf")
+c_validation_reweighing.Write()
+
 
 #h_RECO_beamspot_vz_MC_reweighted_to_data.Scale(1./h_RECO_beamspot_vz_MC_reweighted_to_data.Integral(), "width")
 #h_RECO_beamspot_vz_MC_reweighted_to_data.Write()
