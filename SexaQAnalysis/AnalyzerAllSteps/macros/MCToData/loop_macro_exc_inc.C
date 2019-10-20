@@ -272,7 +272,7 @@ void loop_macro_exc_inc(){
       mc->Sumw2();
 	
       //scale the MC with a given factor
-      mc->Scale(1.20298597518);
+      //mc->Scale(1.20298597518);
       //for lambda
       //mc->Scale(1.7);
 
@@ -295,7 +295,7 @@ void loop_macro_exc_inc(){
       gPad->SetGridx(); 
       gPad->SetGridy(); 
       mc->Draw("hhist");
-      legend->AddEntry(mc,"1.2*MC","l");
+      legend->AddEntry(mc,"MC","l");
       //for lambda
       //legend->AddEntry(mc,"1.72*MC","l");
       data->SetMarkerStyle(23);

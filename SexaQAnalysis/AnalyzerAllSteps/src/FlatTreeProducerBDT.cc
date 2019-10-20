@@ -33,9 +33,21 @@ FlatTreeProducerBDT::FlatTreeProducerBDT(edm::ParameterSet const& pset):
 
 void FlatTreeProducerBDT::beginJob() {
 
-    
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+
+	//PV information
+        _tree_PV = fs->make <TTree>("FlatTreePV","tree_PV");
+	_tree_PV->Branch("_nPV",&_nPV);
+	_tree_PV->Branch("_nGoodPV",&_nGoodPV);
+	_tree_PV->Branch("_PVx",&_PVx);
+	_tree_PV->Branch("_PVy",&_PVy);
+	_tree_PV->Branch("_PVz",&_PVz);
+	_tree_PV->Branch("_goodPVx",&_goodPVx);
+	_tree_PV->Branch("_goodPVy",&_goodPVy);
+	_tree_PV->Branch("_goodPVz",&_goodPVz);
+    
+        // Initialize when class is created
         _tree = fs->make <TTree>("FlatTree","tree");
 
         // Declare tree's branches
@@ -165,7 +177,29 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L;
   iEvent.getByToken(m_V0LToken, h_V0L);
 
-
+  //PV
+  int nPVs = 0;
+  int ngoodPVs = 0;
+  Init_PV();
+  if(h_offlinePV.isValid()){
+	for(unsigned int i = 0; i < h_offlinePV->size(); i++ ){
+		if(h_offlinePV->at(i).isValid()){
+			nPVs++;
+			_PVx.push_back(h_offlinePV->at(i).x());
+			_PVy.push_back(h_offlinePV->at(i).y());
+			_PVz.push_back(h_offlinePV->at(i).z());
+		}
+		if(h_offlinePV->at(i).isValid() && h_offlinePV->at(i).tracksSize() >= 4){
+			ngoodPVs++;
+			_goodPVx.push_back(h_offlinePV->at(i).x());
+			_goodPVy.push_back(h_offlinePV->at(i).y());
+			_goodPVz.push_back(h_offlinePV->at(i).z());
+		}
+	}
+  }
+  _nPV.push_back(nPVs);
+  _nGoodPV.push_back(ngoodPVs);
+  _tree_PV->Fill();
 
   //beamspot
   TVector3 beamspot(999999,999999,999999);
@@ -536,6 +570,18 @@ FlatTreeProducerBDT::~FlatTreeProducerBDT()
 			std::cout << "The total number RECO S that were saved is: " << nSavedRECOS << std::endl; 
 	}
 	std::cout << "saved/found = " << (double)nSavedRECOS/(double)nTotalRECOS << std::endl;
+}
+
+void FlatTreeProducerBDT::Init_PV()
+{
+	_nPV.clear();
+        _nGoodPV.clear();
+        _PVx.clear();
+        _PVy.clear();
+        _PVz.clear();
+        _goodPVx.clear();
+        _goodPVy.clear();
+        _goodPVz.clear();
 }
 
 void FlatTreeProducerBDT::Init_Counter()

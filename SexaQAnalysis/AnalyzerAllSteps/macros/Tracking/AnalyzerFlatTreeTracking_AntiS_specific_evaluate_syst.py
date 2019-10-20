@@ -21,7 +21,7 @@ verbose = True
 
 plots_output_dir = "plots_syst_evaluation/"
 
-inFiles = [TFile("/pnfs/iihe/cms/store/user/lowette/crmc_Sexaq/Skimmed/CRAB_SimSexaq_trial17/crab_Step1_Step2_Skimming_FlatTree_trial17_18092019_v1/190918_051631/combined_FlatTree_Tracking_Skimmed_trial17.root",'read')]
+inFiles = [TFile("/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/test_FlatTreeSkimming_Step1_Step2_Skimming_FlatTree_trial17_1p8GeV_17102019_v1_191017_220444_numberOfTrackerHits.root",'read')]
 
 fOut = TFile(plots_output_dir+'macro_syst_evaluation_antiS_RECO_eff2.root','RECREATE')
 
@@ -38,7 +38,7 @@ FidReg_maxPz = 22.
 FidReg_minvz = -105
 FidReg_maxvz = 105
 
-FidReg_maxlxy = 49.5
+FidReg_maxlxy = 45.5
 
 FidReg_mindxy = 0.
 FidReg_maxdxy = 8.5

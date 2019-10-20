@@ -125,7 +125,15 @@ METCollectionTag_(pset.getParameter<edm::InputTag>("METCollection"))
    produces<std::vector<int>>("nlambdas");
    produces<std::vector<int>>("nkshorts");
    produces<std::vector<int>>("nkshortsAndNlambdas");
-   produces<std::vector<int>>("nPVs");
+   produces<std::vector<int>>("nPV");
+   produces<std::vector<int>>("nGoodPV");
+   produces<std::vector<float>>("PVx");
+   produces<std::vector<float>>("PVy");
+   produces<std::vector<float>>("PVz");
+   produces<std::vector<float>>("goodPVx");
+   produces<std::vector<float>>("goodPVy");
+   produces<std::vector<float>>("goodPVz");
+
    produces<std::vector<int>>("njets");
    produces<std::vector<reco::Particle::LorentzVector>>("TwoTopJets");
    produces<std::vector<int>>("nmuons");
@@ -210,9 +218,45 @@ InitialProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(!h_PVs.isValid()) {
       std::cout << "Missing collection during InitialProducer : " << offlinePrimaryVerticesCollectionTag_ << " ... skip entry !" << std::endl;
   }
-  auto nPVs = std::make_unique<std::vector<int>>();
-  nPVs->push_back((int)h_PVs->size());
-  iEvent.put(std::move(nPVs), "nPVs");
+
+  auto _nPV = std::make_unique<std::vector<int>>();
+  auto _nGoodPV = std::make_unique<std::vector<int>>();
+  auto _PVx= std::make_unique<std::vector<float>>();
+  auto _PVy= std::make_unique<std::vector<float>>();
+  auto _PVz= std::make_unique<std::vector<float>>();
+  auto _goodPVx= std::make_unique<std::vector<float>>();
+  auto _goodPVy= std::make_unique<std::vector<float>>();
+  auto _goodPVz= std::make_unique<std::vector<float>>();
+
+  int nPVs = 0;
+  int ngoodPVs = 0;
+  if(h_PVs.isValid()){
+	for(unsigned int i = 0; i < h_PVs->size(); i++ ){
+		if(h_PVs->at(i).isValid()){
+			nPVs++;
+			_PVx->push_back(h_PVs->at(i).x());
+			_PVy->push_back(h_PVs->at(i).y());
+			_PVz->push_back(h_PVs->at(i).z());
+		}
+		if(h_PVs->at(i).isValid() && h_PVs->at(i).tracksSize() >= 4){
+			ngoodPVs++;
+			_goodPVx->push_back(h_PVs->at(i).x());
+			_goodPVy->push_back(h_PVs->at(i).y());
+			_goodPVz->push_back(h_PVs->at(i).z());
+		}
+	}
+  }
+
+  _nPV->push_back(nPVs);
+  _nGoodPV->push_back(ngoodPVs);
+  iEvent.put(std::move(_nPV), "nPV");
+  iEvent.put(std::move(_nGoodPV), "nGoodPV");
+  iEvent.put(std::move(_PVx), "PVx");
+  iEvent.put(std::move(_PVy), "PVy");
+  iEvent.put(std::move(_PVz), "PVz");
+  iEvent.put(std::move(_goodPVx), "goodPVx");
+  iEvent.put(std::move(_goodPVy), "goodPVy");
+  iEvent.put(std::move(_goodPVz), "goodPVz");
 
   //njets part and HT part
   edm::Handle<std::vector<reco::PFJet> > h_jets;

@@ -29,6 +29,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+    void Init_PV();
     void Init();
     void Init_Counter();
 
@@ -53,9 +54,13 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0KsToken;
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0LToken;
    
+    TTree* _tree_PV;   
     TTree* _tree;   
     TTree* _tree_counter;
 
+    //definition of variables which should go to _tree_PV
+    std::vector<int> _nPV,_nGoodPV;
+    std::vector<float> _PVx,_PVy,_PVz,_goodPVx,_goodPVy,_goodPVz;
     //definition of variables which should go to tree
     std::vector<float> _S_charge;
     std::vector<float> _S_deltaLInteractionVertexAntiSmin;

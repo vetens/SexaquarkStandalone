@@ -12,7 +12,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     virtual ~FlatTreeProducerGENSIM();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-    void FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP);
+    bool FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP);
 
   private:
     int nTotalGENS=0;
@@ -23,6 +23,8 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     int nTotalCorrectGENSInteractingInBeampipe=0;
     int nTotalGENSPosEta=0;
     int nTotalGENSNegEta=0;
+    int nTotalRecoconstructableGENS_negEta=0;
+    int nTotalRecoconstructableGENS_posEta=0;
     bool m_lookAtAntiS;
     bool m_runningOnData; 
 
@@ -62,7 +64,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     TTree* _tree;   
 
     //definition of variables which should go to _treeAllAntiS
-    std::vector<float> _S_eta_all,_S_event_weighting_factor_all;
+    std::vector<float> _S_eta_all,_S_event_weighting_factor_all,_S_vz_creation_vertex_all,_S_pt_all,_S_pz_all;
     std::vector<int> _S_reconstructable_all;
 
     //definition of variables which should go to _tree
