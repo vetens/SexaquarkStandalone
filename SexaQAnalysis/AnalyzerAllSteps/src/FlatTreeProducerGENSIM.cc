@@ -28,8 +28,11 @@ void FlatTreeProducerGENSIM::beginJob() {
 
 	_treeAllAntiS = fs->make <TTree>("FlatTreeGENLevelAllAntiS","treeAllAntiS");
 	_treeAllAntiS->Branch("_S_eta_all",&_S_eta_all);
-	_treeAllAntiS->Branch("_S_event_weighting_factor_all",&_S_event_weighting_factor_all);
 	_treeAllAntiS->Branch("_S_reconstructable_all",&_S_reconstructable_all);
+	_treeAllAntiS->Branch("_S_event_weighting_factor_all",&_S_event_weighting_factor_all);
+	_treeAllAntiS->Branch("_S_vz_creation_vertex_all",&_S_vz_creation_vertex_all);
+	_treeAllAntiS->Branch("_S_pt_all",&_S_pt_all);
+	_treeAllAntiS->Branch("_S_pz_all",&_S_pz_all);
 
         _tree = fs->make <TTree>("FlatTreeGENLevel","tree");
         // Declare tree's branches
@@ -188,7 +191,8 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   TVector3 beamspotVariance(0,0,0);
   if(h_bs.isValid()){  
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
-	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
+	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));
+	std::cout << "beamspot location: "<< sqrt(h_bs->x0()*h_bs->x0()+h_bs->y0()*h_bs->y0()) << " , " << h_bs->z0() << std::endl;
   }
   else{
 	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!beamspot collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
@@ -240,13 +244,38 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   //first find the GEN particles which are proper antiS
   if(!m_runningOnData && m_lookAtAntiS){
 	  if(h_genParticles.isValid()){
-	      double etaPrevious = 999;
-	      double eventWeighingPrevious = 999;
-	      bool reconstructablePrevious = false;
+	      //double etaPrevious = 999;
+	      //double eventWeighingPrevious = 999;
+	      //bool reconstructablePrevious = false;
+	      //vector of vectors containing for each of the unique antiS a vector and this vector has as first element the eta of the antiS and as second entry if it is reconstructable
+	      std::vector<std::vector<double>> v_antiS_eta_reconstructable; 
 	      for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT
 
 			const reco::Candidate * genParticle = &h_genParticles->at(i);
 			if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
+
+			//check if you already have an entry for this antiS in v_antiS_eta_reconstructable
+			bool newAntiS = true;
+			int antiS_it = -1;
+			for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){//check for all the entries in v_antiS_eta_reconstructable if there is an eta match, if there is an eta match this antiS has already been encountered
+				if(v_antiS_eta_reconstructable[j][0] == genParticle->eta() ){ newAntiS = false;antiS_it = j;}
+			}
+			//if there was no eta match newAntiS is still true and I should make an new entry in the vector for this guy
+			if(newAntiS){
+
+				std::vector<double> newAntiSEntry; 
+				newAntiSEntry.push_back(genParticle->eta()); 
+				newAntiSEntry.push_back(0);//take it as not reconstructable at first 
+				newAntiSEntry.push_back(AnalyzerAllSteps::EventWeightingFactor(genParticle->theta()));
+				newAntiSEntry.push_back(genParticle->vz());//save where it got produced.
+				newAntiSEntry.push_back(genParticle->pt());
+				newAntiSEntry.push_back(genParticle->pz());
+
+				v_antiS_eta_reconstructable.push_back(newAntiSEntry);
+				antiS_it = v_antiS_eta_reconstructable.size()-1;
+			}
+			
+			
 
 			bool AntiSReconstructable = false;
 
@@ -271,8 +300,8 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 						nTotalCorrectGENS_weighted = nTotalCorrectGENS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
 						if(genParticle->eta()>0) {nTotalGENSPosEta++; nTotalGENSPosEta_weighted = nTotalGENSPosEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());}
 						if(genParticle->eta()<0) {nTotalGENSNegEta++; nTotalGENSNegEta_weighted = nTotalGENSNegEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());}
-						FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP);
-						
+						AntiSReconstructable = FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP);
+
 						
 					}
 
@@ -280,23 +309,38 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
 				
 			}
-			//fill a small tree with some variables for all antiS, not only the ones going to all correct granddaughters, but only save this when you go to a new anitS, because otherwise you are filling this for all the duplicates also, and dont save for the fist antiS, this is done by requireing etaPrevious != 999
-			if(genParticle->eta() != etaPrevious && etaPrevious != 999){
-				_S_eta_all.push_back(etaPrevious);
-				_S_event_weighting_factor_all.push_back(eventWeighingPrevious);
-				_S_reconstructable_all.push_back(reconstructablePrevious);
-				_treeAllAntiS->Fill();
-				_S_eta_all.clear();
-				_S_event_weighting_factor_all.clear();
-				_S_reconstructable_all.clear();
 
-				std::cout << "--------------------------------> genParticle->eta(): " << genParticle->eta() << " AntiSReconstructable:  " << reconstructablePrevious << std::endl;
-			}
-		        etaPrevious = genParticle->eta();
-		        eventWeighingPrevious = AnalyzerAllSteps::EventWeightingFactor(genParticle->theta());
-		        reconstructablePrevious = AntiSReconstructable;
+			//now save for this antiS in v_antiS_eta_reconstructable the or of the reconstructability flag which was already in this vector and the the current AntiSReconstructable, like that you will check for any of the duplicates if it was reconstructable
+			v_antiS_eta_reconstructable[antiS_it][1] = (int)v_antiS_eta_reconstructable[antiS_it][1] | AntiSReconstructable;
 		
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
+
+	    for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){
+		std::cout << "v_antiS_eta_reconstructable: " << v_antiS_eta_reconstructable[j][1] << ", " << v_antiS_eta_reconstructable[j][0] << std::endl;
+
+		_S_eta_all.push_back(v_antiS_eta_reconstructable[j][0]);
+		_S_reconstructable_all.push_back(v_antiS_eta_reconstructable[j][1]);
+		_S_event_weighting_factor_all.push_back(v_antiS_eta_reconstructable[j][2]);
+		_S_vz_creation_vertex_all.push_back(v_antiS_eta_reconstructable[j][3]);
+		_S_pt_all.push_back(v_antiS_eta_reconstructable[j][4]);
+		_S_pz_all.push_back(v_antiS_eta_reconstructable[j][5]);
+
+		_treeAllAntiS->Fill();
+
+		_S_eta_all.clear();
+		_S_reconstructable_all.clear();
+		_S_event_weighting_factor_all.clear();
+		_S_vz_creation_vertex_all.clear();
+		_S_pt_all.clear();
+		_S_pz_all.clear();
+
+		if(v_antiS_eta_reconstructable[j][1]){
+			if(v_antiS_eta_reconstructable[j][0]>0)nTotalRecoconstructableGENS_posEta++;
+			if(v_antiS_eta_reconstructable[j][0]<0)nTotalRecoconstructableGENS_negEta++;
+		}
+
+	    }
+
 	  }//if(h_genParticles.isValid())
 	else{
 		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!genparticle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
@@ -309,7 +353,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
 
 
-void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP){
+bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP){
   
 
 	//Find how many duplicates there are for this AntiS
@@ -640,6 +684,15 @@ void FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 
   	_tree->Fill();
 
+	int cutNumberOfTrackerHits = 7;
+	if(	Ks_daughter0_numberOfTrackerHits >= cutNumberOfTrackerHits && 
+		Ks_daughter1_numberOfTrackerHits >= cutNumberOfTrackerHits && 
+		AntiLambda_AntiProton_numberOfTrackerHits >= cutNumberOfTrackerHits && 
+		AntiLambda_Pion_numberOfTrackerHits >= cutNumberOfTrackerHits){
+		return true;
+	}
+	else return false;
+
 }
 
 
@@ -705,6 +758,8 @@ FlatTreeProducerGENSIM::~FlatTreeProducerGENSIM()
 	std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with pos eta is: " << nTotalGENSPosEta << std::endl;
         std::cout << "The total number GEN " << particle << " decaying to ALL correct particles, that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
 
+	std::cout << "nTotalRecoconstructableGENS_posEta " << nTotalRecoconstructableGENS_posEta << std::endl;
+	std::cout << "nTotalRecoconstructableGENS_negEta " << nTotalRecoconstructableGENS_negEta << std::endl;
 
 	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
 	std::cout << "----------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;	
