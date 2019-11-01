@@ -134,12 +134,12 @@ for fIn in fIns:
                         if(treeKs._Ks_mass[j] > 0.48 and treeKs._Ks_mass[j] < 0.52 and  abs(treeKs._Ks_eta[j]) < 2 and treeKs._Ks_dxy_beamspot[j] < 0.1 and treeKs._Ks_dxy_beamspot[j] > 0. and abs(treeKs._Ks_dz_min_PV[j]) < 0.2) :
 				if(iFile == 0):
 					h_RECO_Ks_vz_PV_min_Data.Fill(treeKs._Ks_vz_dz_min_PV[j])
-					h_RECO_track_multiplicity_Data.Fill(treeGeneral._general_eventTrackMultiplicity[0])#some events with 2 or more good Ks will contribute twice or more to this histo, but that is ok. Such events are twice as important
-					h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Fill(treeKs._Ks_vz_dz_min_PV[j],treeGeneral._general_eventTrackMultiplicity[0])	
+		#			h_RECO_track_multiplicity_Data.Fill(treeGeneral._general_eventTrackMultiplicity[0])#some events with 2 or more good Ks will contribute twice or more to this histo, but that is ok. Such events are twice as important
+					#h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Fill(treeKs._Ks_vz_dz_min_PV[j],treeGeneral._general_eventTrackMultiplicity[0])	
 				else:	
 					h_RECO_Ks_vz_PV_min_MC.Fill(treeKs._Ks_vz_dz_min_PV[j])
-					h_RECO_track_multiplicity_MC.Fill(treeGeneral._general_eventTrackMultiplicity[0])
-					h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Fill(treeKs._Ks_vz_dz_min_PV[j],treeGeneral._general_eventTrackMultiplicity[0])
+		#			h_RECO_track_multiplicity_MC.Fill(treeGeneral._general_eventTrackMultiplicity[0])
+		#			h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Fill(treeKs._Ks_vz_dz_min_PV[j],treeGeneral._general_eventTrackMultiplicity[0])
 	iFile = iFile+1	
 
 #normalize the histogram of PV in data to later use it for reweighting 
@@ -211,6 +211,9 @@ f_poisson = TF1("f_poisson","[0]*(TMath::Exp(-x/[1]))", 0, lxyz_Ks_max)
 h2_RECO_Ks_vz_lxy_data = TH2F("h2_RECO_Ks_vz_lxy_data",";v_{z} K_{S} decay (cm);l_{0} K_{S} decay (cm);#entries",50,-100,100,20,0,100)
 h2_RECO_Ks_vz_lxy_mc   = TH2F("h2_RECO_Ks_vz_lxy_mc",";v_{z} K_{S} decay (cm);l_{0} K_{S} decay (cm);#entries",50,-100,100,20,0,100)
 
+h_Ks_mass_data = TH1F("h_Ks_mass_data",";mass K_{s} (GeV);Entries/1MeV",50,0.47,0.52)
+h_Ks_mass_mc = TH1F("h_Ks_mass_mc",";mass K_{s} (GeV);Entries/1MeV",50,0.475,0.525)
+
 iFile = 0
 for fIn in fIns:
 
@@ -264,11 +267,14 @@ for fIn in fIns:
 	h_RECO_Ks_pt_tracks2 = TH1F('h_RECO_Ks_pt_tracks2',"; Ks daughter 2 p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pt_tracks1_and_2 = TH1F('h_RECO_Ks_pt_tracks1_and_2',"; K_{s} daughter 1 and 2 track p_{t} (GeV);#entries",len(bins)-1,array('d',bins))
 
-	bins1 = np.arange(0,15,1)
-	bins2 = np.arange(15,21,1.5)
-	bins3 = np.arange(21,25,2)
-	bins4 = np.arange(25,40,5)
-	args = (bins1,bins2,bins3,bins4)
+	bins1 = np.arange(-40,-25,5)
+	bins2 = np.arange(-25,-21,2)
+	bins3 = np.arange(-21,-15,1.5)
+	bins4 = np.arange(-15,15,1)
+	bins5 = np.arange(15,21,1.5)
+	bins6 = np.arange(21,25,2)
+	bins7 = np.arange(25,40,5)
+	args = (bins1,bins2,bins3,bins4,bins5,bins6,bins7)
 	bins = np.concatenate(args)
 	h_RECO_Ks_pz= TH1F('h_RECO_Ks_pz',"; Ks p_{z} (GeV);#entries",len(bins)-1,array('d',bins))
 	h_RECO_Ks_pz_tracks1 = TH1F('h_RECO_Ks_pz_tracks1',"; Ks daughter 1 p_{z} (GeV);#entries",len(bins)-1,array('d',bins))
@@ -424,25 +430,29 @@ for fIn in fIns:
 
 				#if( abs(treeKs._Ks_eta[j]) > 1): continue
 
-				nKshortThisEvent+=1
 
 				#1st reweigihing factor
-				x_axis_h_RECO_Ks_vz_PV_min_Data = h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.GetXaxis()
-				y_axis_h_RECO_Ks_vz_PV_min_Data = h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.GetYaxis()
+				x_axis_h_RECO_Ks_vz_PV_min_Data = h_RECO_Ks_vz_PV_min_Data.GetXaxis()
+				#y_axis_h_RECO_Ks_vz_PV_min_Data = h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.GetYaxis()
 				binx_prob_h_RECO_PV0_vz_Data = x_axis_h_RECO_Ks_vz_PV_min_Data.FindBin(treeKs._Ks_vz_dz_min_PV[j])  #treeKs._Ks_vz_dz_min_PV[j]
-				biny_prob_h_RECO_PV0_vz_Data = y_axis_h_RECO_Ks_vz_PV_min_Data.FindBin(treeGeneral._general_eventTrackMultiplicity[0])  #treeKs._Ks_vz_dz_min_PV[j]
-				prob_h_RECO_PV0_vz_Data = h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.GetBinContent(binx_prob_h_RECO_PV0_vz_Data,biny_prob_h_RECO_PV0_vz_Data) #the actual probability
+				#biny_prob_h_RECO_PV0_vz_Data = y_axis_h_RECO_Ks_vz_PV_min_Data.FindBin(treeGeneral._general_eventTrackMultiplicity[0])  #treeKs._Ks_vz_dz_min_PV[j]
+				prob_h_RECO_PV0_vz_Data = h_RECO_Ks_vz_PV_min_Data.GetBinContent(binx_prob_h_RECO_PV0_vz_Data) #the actual probability
 
-				x_axis_h_RECO_Ks_vz_PV_min_MC = h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.GetXaxis()
-				y_axis_h_RECO_Ks_vz_PV_min_MC = h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.GetYaxis()
+				x_axis_h_RECO_Ks_vz_PV_min_MC = h_RECO_Ks_vz_PV_min_MC.GetXaxis()
+				#y_axis_h_RECO_Ks_vz_PV_min_MC = h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.GetYaxis()
 				binx_prob_h_RECO_PV0_vz_MC= x_axis_h_RECO_Ks_vz_PV_min_MC.FindBin(treeKs._Ks_vz_dz_min_PV[j]) #treeKs._Ks_vz_dz_min_PV[j]
-				biny_prob_h_RECO_PV0_vz_MC= y_axis_h_RECO_Ks_vz_PV_min_MC.FindBin(treeGeneral._general_eventTrackMultiplicity[0]) #treeKs._Ks_vz_dz_min_PV[j]
-				prob_h_RECO_PV0_vz_MC= h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.GetBinContent(binx_prob_h_RECO_PV0_vz_MC,biny_prob_h_RECO_PV0_vz_MC) #the actual probability
+				#biny_prob_h_RECO_PV0_vz_MC= y_axis_h_RECO_Ks_vz_PV_min_MC.FindBin(treeGeneral._general_eventTrackMultiplicity[0]) #treeKs._Ks_vz_dz_min_PV[j]
+				prob_h_RECO_PV0_vz_MC= h_RECO_Ks_vz_PV_min_MC.GetBinContent(binx_prob_h_RECO_PV0_vz_MC) #the actual probability
 
 				PV_Z_reweighting_factor = 1
-				if(prob_h_RECO_PV0_vz_MC > 0 and iFile == 1): #only reweigh for MC
-					PV_Z_reweighting_factor = prob_h_RECO_PV0_vz_Data/prob_h_RECO_PV0_vz_MC
+				#if(prob_h_RECO_PV0_vz_MC > 0 and iFile == 1): #only reweigh for MC
+				#	PV_Z_reweighting_factor = prob_h_RECO_PV0_vz_Data/prob_h_RECO_PV0_vz_MC
 
+				if(iFile == 1):
+					if(prob_h_RECO_PV0_vz_MC > 0): PV_Z_reweighting_factor = prob_h_RECO_PV0_vz_Data/prob_h_RECO_PV0_vz_MC
+					else: PV_Z_reweighting_factor = 0
+
+				nKshortThisEvent+=PV_Z_reweighting_factor
 
 				#2nd reweighing factor
 				x_axis_h_RECO_beamspot_vz_Data = h_RECO_beamspot_vz_Data.GetXaxis()
@@ -513,8 +523,10 @@ for fIn in fIns:
 				#the 2D plot of lxy verus vz	
 				if(iFile == 0):
 					h2_RECO_Ks_vz_lxy_data.Fill(treeKs._Ks_vz[j],treeKs._Ks_Lxy[j], PV_Z_reweighting_factor)
+					h_Ks_mass_data.Fill(treeKs._Ks_mass[j],PV_Z_reweighting_factor)
 				if(iFile == 1):
 					h2_RECO_Ks_vz_lxy_mc.Fill(treeKs._Ks_vz[j],treeKs._Ks_Lxy[j], PV_Z_reweighting_factor)
+					h_Ks_mass_mc.Fill(treeKs._Ks_mass[j],PV_Z_reweighting_factor)
 
 				#calculate the lifetimes: first calculate lxyz, also in m, in the LAB frame (Lxyz_prime and Lxyz_prime_m) calculate gamma and beta and v, then lifetime in the LAB frame is given by t_prime_Ks and through time dilation you can get it in the COM frame (t_Ks).
 				Lxyz_prime = np.sqrt( treeKs._Ks_Lxy[j]*treeKs._Ks_Lxy[j] + (treeKs._Ks_vz[j]-treePV._PV0_vz[0])*(treeKs._Ks_vz[j]-treePV._PV0_vz[0]) )
@@ -601,16 +613,16 @@ h_RECO_Ks_vz_PV_min_MC_reweighted_to_data.Write()
 h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Scale(1./h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Integral(),"width")
 h_RECO_Ks_vz_PV_min_MC_NOTreweighted_to_data.Write()
 
-h_RECO_track_multiplicity_Data.Scale(1./h_RECO_track_multiplicity_Data.Integral(), "width")
+#h_RECO_track_multiplicity_Data.Scale(1./h_RECO_track_multiplicity_Data.Integral(), "width")
 h_RECO_track_multiplicity_Data.Write()
 
-h_RECO_track_multiplicity_MC.Scale(1./h_RECO_track_multiplicity_MC.Integral(), "width")
+#h_RECO_track_multiplicity_MC.Scale(1./h_RECO_track_multiplicity_MC.Integral(), "width")
 h_RECO_track_multiplicity_MC.Write()
 
-h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Scale(1./h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Integral(),"width")
+#h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Scale(1./h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Integral(),"width")
 h2_RECO_Ks_vz_PV_min_track_multiplicity_Data.Write()
 
-h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Scale(1./h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Integral(),"width")
+#h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Scale(1./h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Integral(),"width")
 h2_RECO_Ks_vz_PV_min_track_multiplicity_MC.Write()
 
 #save the validation plots for the reweighting procedure to file
@@ -738,6 +750,29 @@ h2_RECO_Ks_vz_xy_ratio = h2_RECO_Ks_vz_lxy_data.Clone()
 h2_RECO_Ks_vz_xy_ratio.SetName("h2_RECO_Ks_vz_xy_ratio") 
 h2_RECO_Ks_vz_xy_ratio.Divide(h2_RECO_Ks_vz_lxy_mc)
 h2_RECO_Ks_vz_xy_ratio.Write()
+
+#masses of the used Ks in data and MC
+
+c_name = "c_Ks_masses"
+c = TCanvas(c_name,"")
+legend = TLegend(0.8,0.85,0.99,0.99)
+l_h_masses = [h_Ks_mass_data,h_Ks_mass_mc]
+l_legend = ["data","MC"] 
+for j in range(0,len(l_h_masses)):
+	h = l_h_masses[j]
+	if j == 0:
+		h.Draw("PCE1")
+	else:
+		h.Draw("same")
+	h.SetLineColor(colours[j])
+	h.SetMarkerStyle(22+j)
+	h.SetMarkerColor(colours[j])
+	h.SetStats(0)
+	legend.AddEntry(h,l_legend[j],"lep")
+legend.Draw()
+CMS_lumi.CMS_lumi(c, 0, 11)
+c.SaveAs(plots_output_dir+c_name+".pdf")
+c.Write()
 
 print "number of Kshort going into the histos for Data: ", sum(nKshortPerEventData)
 print "number of Kshort going into the histos for MC: ", sum(nKshortPerEventMC)

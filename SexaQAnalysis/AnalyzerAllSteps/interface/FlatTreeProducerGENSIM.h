@@ -12,7 +12,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     virtual ~FlatTreeProducerGENSIM();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-    bool FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP);
+    bool FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP, unsigned int nGoodPV);
 
   private:
     int nTotalGENS=0;
@@ -35,6 +35,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     double  nTotalCorrectGENSInteractingInBeampipe_weighted = 0.;
     double  nTotalGENSPosEta_weighted = 0.;
     double  nTotalGENSNegEta_weighted = 0.;
+    double  nTotalCorrectGENS_Reconstructable_weighted = 0.;
 
     virtual void beginJob();
     virtual void analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup);
@@ -50,11 +51,13 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     edm::Service<TFileService> m_fs;
  
     edm::InputTag m_bsTag;
+    edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
     edm::InputTag m_genParticlesTag_SIM_GEANT;
     edm::InputTag m_TPTag;
 
     edm::EDGetTokenT<reco::BeamSpot> m_bsToken;
+    edm::EDGetTokenT<vector<reco::Vertex>> m_offlinePVToken;
     edm::EDGetTokenT<vector<reco::GenParticle>> m_genParticlesToken_GEN; 
     edm::EDGetTokenT<vector<reco::GenParticle>> m_genParticlesToken_SIM_GEANT; 
     edm::EDGetTokenT<vector<TrackingParticle> > m_TPToken;   
@@ -64,14 +67,15 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     TTree* _tree;   
 
     //definition of variables which should go to _treeAllAntiS
-    std::vector<float> _S_eta_all,_S_event_weighting_factor_all,_S_vz_creation_vertex_all,_S_pt_all,_S_pz_all;
-    std::vector<int> _S_reconstructable_all;
+    std::vector<float> _S_eta_all,_S_event_weighting_factor_all,_S_event_weighting_factor_PU_all,_S_vz_creation_vertex_all,_S_pt_all,_S_pz_all;
+    std::vector<int> _S_reconstructable_all, _S_nGoodPV_all;
 
     //definition of variables which should go to _tree
     std::vector<float> _S_n_loops;
     std::vector<float> _S_charge;
-    std::vector<float> _S_event_weighting_factor;
-    std::vector<float> _S_lxy_interaction_vertex, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_Mt,_S_chi2_ndof;
+    std::vector<float> _S_nGoodPV;
+    std::vector<float> _S_event_weighting_factor,_S_event_weighting_factor_PU;
+    std::vector<float> _S_lxy_interaction_vertex, _S_lxy_interaction_vertex_beamspot, _S_lxy_interaction_vertex_beampipeCenterData, _S_lxyz_interaction_vertex,  _S_error_lxy_interaction_vertex,_S_mass,_S_Mt,_S_chi2_ndof;
     std::vector<float> _n_M, _n_p;
     std::vector<float> _S_daughters_deltaphi,_S_daughters_deltaeta,_S_daughters_openingsangle,_S_Ks_openingsangle,_S_Lambda_openingsangle,_S_sumDaughters_openingsangle,_S_sumDaughters_deltaPhi,_S_sumDaughters_deltaEta,_S_sumDaughters_deltaR,_S_daughters_DeltaR,_S_eta,_Ks_eta,_Lambda_eta;
     std::vector<float> _S_dxy,_Ks_dxy,_Lambda_dxy;

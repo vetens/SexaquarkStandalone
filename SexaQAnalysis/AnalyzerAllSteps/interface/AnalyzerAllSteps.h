@@ -48,6 +48,7 @@ using namespace std;
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
+
 //matching on hits specific:
 #include "SimDataFormats/Associations/interface/VertexToTrackingVertexAssociator.h"
 #include "SimDataFormats/Associations/interface/TrackToTrackingParticleAssociator.h"
@@ -56,10 +57,10 @@ using namespace std;
 class AnalyzerAllSteps : public edm::EDAnalyzer
  {
   public:
-    static constexpr double deltaRCutV0RECOKs = 0.01;
-    static constexpr double deltaRCutV0RECOLambda = 0.01;
-    static constexpr double deltaRCutRECOAntiS = 0.1;
-    static constexpr double deltaLCutInteractionVertexAntiSmin = 0.5;
+    static constexpr double deltaRCutV0RECOKs = 0.04;
+    static constexpr double deltaRCutV0RECOLambda = 0.04;
+    static constexpr double deltaRCutRECOAntiS = 0.5;
+    static constexpr double deltaLCutInteractionVertexAntiSmin = 1.;
 
     //definition of the background cuts
     static constexpr double MinLxyCut = 1.9;
@@ -118,9 +119,13 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     int static trackQualityAsInt(const reco::Track *track);
     std::vector<double> static isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp);
     double static EventWeightingFactor(double etaAntiS);
+    double static PUReweighingFactor(map<double,double>,double MC_PV_vz);
 
+    //definitions of the maps for the PU reweighing. These maps are obtained with /user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/PUReweighing each map is for a certain PU, starting at PU0. Each map has as key the absolute z location and as value the 2D (PU and z location of the valid PVs) reweighing parameter. At the end it includes a vector with all the maps, so when you need the reweighing parameter you need to go to a certain location in the vector, given by the PU, and then find the best mathing z value and get that key's value --> see src/AnalyzerAllSteps.cc for the actual values
+      static  map<double,double> mapPU0,mapPU1,mapPU2,mapPU3,mapPU4,mapPU5,mapPU6,mapPU7,mapPU8,mapPU9,mapPU10,mapPU11,mapPU12,mapPU13,mapPU14,mapPU15,mapPU16,mapPU17,mapPU18,mapPU19,mapPU20,mapPU21,mapPU22,mapPU23,mapPU24,mapPU25,mapPU26,mapPU27,mapPU28,mapPU29,mapPU30,mapPU31,mapPU32,mapPU33,mapPU34,mapPU35,mapPU36,mapPU37,mapPU38,mapPU39,mapPU40,mapPU41,mapPU42,mapPU43,mapPU44,mapPU45,mapPU46,mapPU47,mapPU48,mapPU49,mapPU50,mapPU51,mapPU52,mapPU53,mapPU54,mapPU55,mapPU56,mapPU57,mapPU58,mapPU59,mapPU60; 
+      static vector<map<double, double>> v_mapPU; 
 
-     };
+	     };
 
 #endif
 

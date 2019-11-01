@@ -1,13 +1,11 @@
 import os 
 
-l_inputFiles = ["inputFiles_FlatTreeProducerBDT_SingleMuon_Run2016G.txt"]
-l_outputFiles = ["FlatTreeBDT_SingleMuon_Run2016G.root"]
 
 inputListDir = "/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerBDT/inputFilesLists"
 
 i = 0
 for inputList in os.listdir(inputListDir):
-	file = open("shell/"+str(i)+".sh","w") 
+	file = open("shell/FlatTreeBDTData"+str(i)+".sh","w") 
 #	file.write("#!/bin/bash"+"\n")
 #	file.write("cd /afs/cern.ch/user/j/jdeclerc/CMSSW_9_4_7/src/"+"\n")
 #	file.write("cmsenv"+"\n")

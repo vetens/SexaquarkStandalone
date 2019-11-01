@@ -79,7 +79,15 @@ void FlatTreeProducerTracking::beginJob() {
 
 	// Initialize when class is created                                                              |  m_TPTag(pset.getParameter<edm::InputTag>("TrackingParticles")),
         edm::Service<TFileService> fs ; 
-	
+
+	//PV info
+	_tree_PV = fs->make <TTree>("FlatTreePV","treePV");
+	_tree_PV->Branch("_goodPVxPOG",&_goodPVxPOG);
+	_tree_PV->Branch("_goodPVyPOG",&_goodPVyPOG);
+	_tree_PV->Branch("_goodPVzPOG",&_goodPVzPOG);
+	_tree_PV->Branch("_goodPV_weightPU",&_goodPV_weightPU);
+
+	//tree for all the tracks, normally I don't use this as it way too heavy (there are a looooot of tracks)	
 	_tree_tracks = fs->make <TTree>("FlatTreeTracks","treeTracks");
 	
 	_tree_tracks->Branch("_tp_pt",&_tp_pt);
@@ -134,6 +142,8 @@ void FlatTreeProducerTracking::beginJob() {
 	_tree_tpsAntiS->Branch("_tpsAntiS_dxy_beamspot",&_tpsAntiS_dxy_beamspot);
 	_tree_tpsAntiS->Branch("_tpsAntiS_dz_beamspot",&_tpsAntiS_dz_beamspot);
 	_tree_tpsAntiS->Branch("_tpsAntiS_dz_AntiSCreationVertex",&_tpsAntiS_dz_AntiSCreationVertex);
+	_tree_tpsAntiS->Branch("_tpsAntiS_dxyTrack_beamspot",&_tpsAntiS_dxyTrack_beamspot);
+	_tree_tpsAntiS->Branch("_tpsAntiS_dzTrack_beamspot",&_tpsAntiS_dzTrack_beamspot);
 
 	_tree_tpsAntiS->Branch("_tpsAntiS_numberOfTrackerHits",&_tpsAntiS_numberOfTrackerHits);
 	_tree_tpsAntiS->Branch("_tpsAntiS_charge",&_tpsAntiS_charge);
@@ -155,11 +165,14 @@ void FlatTreeProducerTracking::beginJob() {
 	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_vz_beamspot",&_tpsAntiS_bestRECO_vz_beamspot);
 	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_dxy_beamspot",&_tpsAntiS_bestRECO_dxy_beamspot);
 	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_dz_beamspot",&_tpsAntiS_bestRECO_dz_beamspot);
+	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_dxyTrack_beamspot",&_tpsAntiS_bestRECO_dxyTrack_beamspot);
+	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_dzTrack_beamspot",&_tpsAntiS_bestRECO_dzTrack_beamspot);
 	_tree_tpsAntiS->Branch("_tpsAntiS_bestRECO_charge",&_tpsAntiS_bestRECO_charge);
 	_tree_tpsAntiS->Branch("_tpsAntiS_returnCodeV0Fitter",&_tpsAntiS_returnCodeV0Fitter);
 
 
 	_tree_tpsAntiS->Branch("_tpsAntiS_event_weighting_factor",&_tpsAntiS_event_weighting_factor);
+	_tree_tpsAntiS->Branch("_tpsAntiS_event_weighting_factorPU",&_tpsAntiS_event_weighting_factorPU);
 
 }
 
@@ -216,14 +229,44 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 //  iEvent.getByToken(m_PileupInfoToken, h_PileupInfo);
 //  int nPU = h_PileupInfo->size(); 
 
+  //vector<map<double, double>> v_mapPU{AnalyzerAllSteps::mapPU0, AnalyzerAllSteps::mapPU1,AnalyzerAllSteps::mapPU2,AnalyzerAllSteps::mapPU3,AnalyzerAllSteps::mapPU4,AnalyzerAllSteps::mapPU5,AnalyzerAllSteps::mapPU6,AnalyzerAllSteps::mapPU7,AnalyzerAllSteps::mapPU8};
 
+  InitPV();
+  unsigned int nGoodPV = 0;
+  if(h_offlinePV.isValid()){
+
+	//first count the number of good vertices
+	for(unsigned int i = 0; i < h_offlinePV->size(); i++){
+		double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
+                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2)nGoodPV++;
+	}
+
+	//now that you know the good number of vertices store the location of the vertex and the reweighing factor
+	for(unsigned int i = 0; i < h_offlinePV->size(); i++){
+		double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
+                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){
+			_goodPVxPOG.push_back(h_offlinePV->at(i).x());
+                        _goodPVyPOG.push_back(h_offlinePV->at(i).y());
+                        _goodPVzPOG.push_back(h_offlinePV->at(i).z());
+			double weightPU = 0.;
+			if(nGoodPV < AnalyzerAllSteps::v_mapPU.size()) weightPU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV], h_offlinePV->at(i).z());
+        		_goodPV_weightPU.push_back(weightPU);
+		}
+	}	
+
+  }
+  _tree_PV->Fill();
 
   //beamspot
   TVector3 beamspot(0,0,0);
   TVector3 beamspotVariance(0,0,0);
+  reco::BeamSpot::Point beamspotPoint;
   if(h_bs.isValid()){  
 	beamspot.SetXYZ(h_bs->x0(),h_bs->y0(),h_bs->z0());
-	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
+	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));		
+	reco::BeamSpot::Point beamspotPoint(h_bs->position());
+	std::cout << "beamspot location: " << h_bs->x0() << ", " << h_bs->y0() << ", "<< h_bs->z0() << std::endl;
+	std::cout << "beamspot errors: " << h_bs->x0Error() << ", "<< h_bs->y0Error() << ", "<< h_bs->z0Error() << std::endl;
   }
   else{
 	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!beamspot collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
@@ -300,7 +343,7 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 		nUniqueAntiSInThisEvent++;
 		
 
-		int returnCodeFillTreesAntiSAndDaughters = FillTreesAntiSAndDaughters(tp, beamspot, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl, theBeamSpot, theMagneticField);
+		int returnCodeFillTreesAntiSAndDaughters = FillTreesAntiSAndDaughters(tp, beamspot, beamspotPoint, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl, theBeamSpot, theMagneticField,nGoodPV);
  		if(returnCodeFillTreesAntiSAndDaughters == 0 || returnCodeFillTreesAntiSAndDaughters == 1) nUniqueAntiSWithCorrectGranddaughtersThisEvent++;
  		if(returnCodeFillTreesAntiSAndDaughters == 1) nUniqueAntiSWithCorrectGranddaughtersRECONSTRUCTEDThisEvent++;
 
@@ -398,7 +441,7 @@ void FlatTreeProducerTracking::FillTreesTracks(const TrackingParticle& tp, TVect
 
 }
 
-int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField ){
+int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot, reco::BeamSpot::Point beamspotPoint,  TVector3 beamspotVariance, int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField, unsigned int nGoodPV ){
 
 	//loop through the trackingparticles to find the antiS daughters and granddaughters and save them so that you can compare later the dauhgters to the V0 collections using deltaR matching and the granddaughters to the track collection using track matching on hits
 
@@ -513,6 +556,11 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 			}
 		}
 	}
+
+	//also calculate the 3D distance betwen GEN and RECO decay vertex  as an extra check
+	double deltaRminKs_deltaL = 999.;
+	if(bestMatchingKs > -1) deltaRminKs_deltaL = sqrt( pow(tp_Ks_posPion.vx() - h_V0Ks->at(bestMatchingKs).vx(),2) + pow(tp_Ks_posPion.vy() - h_V0Ks->at(bestMatchingKs).vy(),2) + pow(tp_Ks_posPion.vz() - h_V0Ks->at(bestMatchingKs).vz(),2) );
+
 	if( deltaRminKs <  AnalyzerAllSteps::deltaRCutV0RECOKs) RECOKsFound = true;
 
 	double deltaRminAntiL = 999.;
@@ -527,6 +575,10 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 			}
 		}
 	}
+	//also calculate the 3D distance betwen GEN and RECO decay vertex  as an extra check
+	double deltaRminAntiL_deltaL = 999.;
+	if(bestMatchingAntiL > -1) deltaRminAntiL_deltaL = sqrt( pow(tp_AntiLambda_posPion.vx() - h_V0L->at(bestMatchingAntiL).vx(),2) + pow(tp_AntiLambda_posPion.vy() - h_V0L->at(bestMatchingAntiL).vy(),2) + pow(tp_AntiLambda_posPion.vz() - h_V0L->at(bestMatchingAntiL).vz(),2) );
+
 	if( deltaRminAntiL <  AnalyzerAllSteps::deltaRCutV0RECOLambda) RECOAntiLambdaFound = true;
 
 
@@ -656,11 +708,14 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	InitTrackingAntiS();	
 
 	//for each of the 7 particles in the game fill first a tree (FillFlatTreeTpsAntiS) which contains the kinematics of the tp, so this is on GEN level. Then fill a tree (FillFlatTreeTpsAntiSRECO) containing info on the best matching RECO object. For the first 3 particles these are VertexCompositeCandidate, for the other 4 these matching RECO objects are tracks. I can only fill this second part of the tree if indeed a RECO object was found. If a RECO object was not found I should still make a dummy entry in the vector to keep the order in the vector correct, as entry 0 is the the antiS, 1 is the Ks, 2 is the antiLambda, 3 is the pi plus of the ks, 4 the pi minus of the Ks, 5 the pos pion of the antiLambda, 6 the anti proton of the antiLambda. 
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp,RECOAntiSFound,0,deltaRminAntiS,999);
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp,RECOAntiSFound,0,deltaRminAntiS,999,deltaLInteractionVertexAntiSmin, theMagneticField);
+	std::cout << "nGoodPV: " <<  nGoodPV << std::endl;
 	_tpsAntiS_event_weighting_factor.push_back(AnalyzerAllSteps::EventWeightingFactor(tp.theta()));
+	if(nGoodPV < AnalyzerAllSteps::v_mapPU.size())_tpsAntiS_event_weighting_factorPU.push_back(AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],tp.vz()));
+	else _tpsAntiS_event_weighting_factorPU.push_back(0.);
 	if(bestMatchingAntiS>-1){//for the antiS just save a few extras:
 
-		FillFlatTreeTpsAntiSRECO(beamspot,RECOAntiSFound,0,h_sCands->at(bestMatchingAntiS));
+		FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOAntiSFound,0,h_sCands->at(bestMatchingAntiS));
 
 		//for the antiS just save a few extras:
 
@@ -675,40 +730,37 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 		_tpsAntiS_bestRECO_error_Lxy_beamspot.push_back(RECOErrorLxy_interactionVertex);
 		_tpsAntiS_bestRECO_error_Lxy_beampipeCenter.push_back(RECOErrorLxy_interactionVertex_beampipeCenter);
 
-		//the 3D distance between the GEN annihilation vertex and the RECO annihilation vertex
-		_tpsAntiS_deltaLInteractionVertexAntiSmin.push_back(deltaLInteractionVertexAntiSmin);
 	}
 	else{
 		 _tpsAntiS_bestRECO_massMinusNeutron.push_back(999.);
 		 _tpsAntiS_bestRECO_error_Lxy_beamspot.push_back(999.);
 		 _tpsAntiS_bestRECO_error_Lxy_beampipeCenter.push_back(999.);
-		 _tpsAntiS_deltaLInteractionVertexAntiSmin.push_back(999.);	
 		 FillFlatTreeTpsAntiSRECODummy();
 	}
 
 	//Ks
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks,RECOKsFound,1,deltaRminKs,returnCodeV0Fitter_Ks);
-	if(RECOKsFound)FillFlatTreeTpsAntiSRECO(beamspot,RECOKsFound,1,h_V0Ks->at(bestMatchingKs));
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks,RECOKsFound,1,deltaRminKs,returnCodeV0Fitter_Ks,deltaRminKs_deltaL,theMagneticField);
+	if(bestMatchingKs > -1)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOKsFound,1,h_V0Ks->at(bestMatchingKs));
 	else FillFlatTreeTpsAntiSRECODummy();
 	//AntiLambda
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda,RECOAntiLambdaFound,2,deltaRminAntiL,returnCodeV0Fitter_AntiLambda);
-	if(RECOAntiLambdaFound)FillFlatTreeTpsAntiSRECO(beamspot,RECOAntiLambdaFound,2,h_V0L->at(bestMatchingAntiL));
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda,RECOAntiLambdaFound,2,deltaRminAntiL,returnCodeV0Fitter_AntiLambda,deltaRminAntiL_deltaL,theMagneticField);
+	if(bestMatchingAntiL > -1)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOAntiLambdaFound,2,h_V0L->at(bestMatchingAntiL));
 	else FillFlatTreeTpsAntiSRECODummy();
 	//Ks_posPion
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks_posPion,RECOKsPosPionFound,3,-999,returnCodeV0Fitter_KsPosPion_track);
-	if(matchedTrackPointer_KsPosPion)FillFlatTreeTpsAntiSRECO(beamspot,RECOKsPosPionFound,3,matchedTrackPointer_KsPosPion);
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks_posPion,RECOKsPosPionFound,3,-999,returnCodeV0Fitter_KsPosPion_track,999.,theMagneticField);
+	if(matchedTrackPointer_KsPosPion)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOKsPosPionFound,3,matchedTrackPointer_KsPosPion);
 	else FillFlatTreeTpsAntiSRECODummy();
 	//Ks_negPion
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks_negPion,RECOKsNegPionFound,4,-999,returnCodeV0Fitter_KsNegPion_track);
-	if(matchedTrackPointer_KsNegPion)FillFlatTreeTpsAntiSRECO(beamspot,RECOKsNegPionFound,4,matchedTrackPointer_KsNegPion);
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_Ks_negPion,RECOKsNegPionFound,4,-999,returnCodeV0Fitter_KsNegPion_track,999.,theMagneticField);
+	if(matchedTrackPointer_KsNegPion)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOKsNegPionFound,4,matchedTrackPointer_KsNegPion);
 	else FillFlatTreeTpsAntiSRECODummy();
 	//AntiLambda_posPion
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda_posPion,RECOAntiLambda_posPionFound,5,-999,returnCodeV0Fitter_AntiLambdaPosPion_track);
-	if(matchedTrackPointer_AntiLambda_posPion)FillFlatTreeTpsAntiSRECO(beamspot,RECOAntiLambda_posPionFound,5,matchedTrackPointer_AntiLambda_posPion);
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda_posPion,RECOAntiLambda_posPionFound,5,-999,returnCodeV0Fitter_AntiLambdaPosPion_track,999.,theMagneticField);
+	if(matchedTrackPointer_AntiLambda_posPion)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOAntiLambda_posPionFound,5,matchedTrackPointer_AntiLambda_posPion);
 	else FillFlatTreeTpsAntiSRECODummy();
 	//AntiLambda_AntiProton
-	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda_AntiProton,RECOAntiLambda_AntiProtonFound,6,-999,returnCodeV0Fitter_AntiLambda_AntiProton);
-	if(matchedTrackPointer_AntiLambda_AntiProton)FillFlatTreeTpsAntiSRECO(beamspot,RECOAntiLambda_AntiProtonFound,6,matchedTrackPointer_AntiLambda_AntiProton);
+	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp_AntiLambda_AntiProton,RECOAntiLambda_AntiProtonFound,6,-999,returnCodeV0Fitter_AntiLambda_AntiProton,999.,theMagneticField);
+	if(matchedTrackPointer_AntiLambda_AntiProton)FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOAntiLambda_AntiProtonFound,6,matchedTrackPointer_AntiLambda_AntiProton);
 	else FillFlatTreeTpsAntiSRECODummy();
 
 	_tree_tpsAntiS->Fill();
@@ -719,7 +771,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
 
 
-void FlatTreeProducerTracking::FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 AntiSCreationVertex, TrackingParticle trackingParticle, bool RECOFound, int type, double besteDeltaR, int returnCodeV0Fitter){
+void FlatTreeProducerTracking::FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 AntiSCreationVertex, TrackingParticle trackingParticle, bool RECOFound, int type, double besteDeltaR, int returnCodeV0Fitter, double besteDeltaL, const MagneticField* theMagneticField){
 
 	TVector3 tpCreationVertex(trackingParticle.vx(),trackingParticle.vy(),trackingParticle.vz());
 	TVector3 ZeroZeroZero(0.,0.,0.);
@@ -730,10 +782,32 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 
 	double dz_beamspot = AnalyzerAllSteps::dz_line_point(tpCreationVertex,tpMomentum,beamspot);
 	double dz_AntiSCreationVertex = AnalyzerAllSteps::dz_line_point(tpCreationVertex,tpMomentum,AntiSCreationVertex);
 
+	//calculate the dxy and dz of the tp, but like you would for a real track, that is: extrapolating the track vertex and momentum to the point of closest approach to the beamspot (as in the example starting at https://github.com/cms-sw/cmssw/blob/9a33fb13bee1a546877a4b581fa63876043f38f0/SimTracker/TrackHistory/src/TrackClassifier.cc#L161)
+	//const SimTrack *assocTrack = &(trackingParticle.g4Track_begin());
+
+	FreeTrajectoryState ftsAtProduction(
+	      GlobalPoint(trackingParticle.vx(), trackingParticle.vy(), trackingParticle.vz()),
+	      GlobalVector(trackingParticle.px(), trackingParticle.py(), trackingParticle.pz()),
+	      TrackCharge(trackingParticle.charge()),
+	      theMagneticField);
+
+    	TSCPBuilderNoMaterial tscpBuilder;
+    	TrajectoryStateClosestToPoint tsAtClosestApproach = tscpBuilder(ftsAtProduction, GlobalPoint(beamspot.X(),beamspot.Y(),beamspot.Z()));
+
+    	GlobalVector v = tsAtClosestApproach.theState().position() - GlobalPoint(beamspot.X(),beamspot.Y(),beamspot.Z());
+    	GlobalVector p = tsAtClosestApproach.theState().momentum();
+
+    	// Simulated dxy
+    	double dxySim = -v.x() * sin(p.phi()) + v.y() * cos(p.phi());
+
+    	// Simulated dz
+    	double dzSim = v.z() - (v.x() * p.x() + v.y() * p.y()) * p.z() / p.perp2();	
+
 	//the type is just to use in the ROOT viewer to be able to select which particle I want to look at
 	_tpsAntiS_type.push_back(type);
 	_tpsAntiS_pdgId.push_back(trackingParticle.pdgId());
 	_tpsAntiS_bestDeltaRWithRECO.push_back(besteDeltaR);
+	_tpsAntiS_deltaLInteractionVertexAntiSmin.push_back(besteDeltaL);
 	_tpsAntiS_mass.push_back(trackingParticle.mass());
 
 	_tpsAntiS_pt.push_back(trackingParticle.pt());
@@ -748,6 +822,8 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 
 	_tpsAntiS_dxy_beamspot.push_back(dxy);
 	_tpsAntiS_dz_beamspot.push_back(dz_beamspot);
 	_tpsAntiS_dz_AntiSCreationVertex.push_back(dz_AntiSCreationVertex);
+	_tpsAntiS_dxyTrack_beamspot.push_back(dxySim);
+	_tpsAntiS_dzTrack_beamspot.push_back(dzSim);
 
 	_tpsAntiS_numberOfTrackerHits.push_back(trackingParticle.numberOfTrackerHits());
 	_tpsAntiS_charge.push_back(trackingParticle.charge());
@@ -758,7 +834,7 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 
 
 }
 
-void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool RECOFound,int type, reco::VertexCompositeCandidate bestRECOCompositeCandidate){
+void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, bool RECOFound,int type, reco::VertexCompositeCandidate bestRECOCompositeCandidate){
 
 
 	TVector3 bestRECOCompositeCandidateCreationVertex(bestRECOCompositeCandidate.vx(),bestRECOCompositeCandidate.vy(),bestRECOCompositeCandidate.vz());
@@ -785,11 +861,15 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool 
 	_tpsAntiS_bestRECO_dxy_beamspot.push_back(dxy);
 	_tpsAntiS_bestRECO_dz_beamspot.push_back(dz_beamspot);
 
+	//VertexCompositeCandidate does not have a dxy or dz
+	_tpsAntiS_bestRECO_dxyTrack_beamspot.push_back(999.);
+        _tpsAntiS_bestRECO_dzTrack_beamspot.push_back(999.);
+
 	_tpsAntiS_bestRECO_charge.push_back(bestRECOCompositeCandidate.charge());
 
 }
 
-void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool RECOFound,int type, const reco::Track *matchedTrackPointer){
+void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, bool RECOFound,int type, const reco::Track *matchedTrackPointer){
 	
 
 	TVector3 bestRECOCompositeCandidateCreationVertex(matchedTrackPointer->vx(),matchedTrackPointer->vy(),matchedTrackPointer->vz());
@@ -799,8 +879,10 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool 
 	TVector3 bestRECOCompositeCandidateMomentum(matchedTrackPointer->px(),matchedTrackPointer->py(),matchedTrackPointer->pz());
 	double dxy = AnalyzerAllSteps::dxy_signed_line_point(bestRECOCompositeCandidateCreationVertex,bestRECOCompositeCandidateMomentum,beamspot);
 	double dz_beamspot = AnalyzerAllSteps::dz_line_point(bestRECOCompositeCandidateCreationVertex,bestRECOCompositeCandidateMomentum,beamspot);
+	
+	double dxyTrackbeamspot = matchedTrackPointer->dxy(beamspotPoint);
+	double dzTrackbeamspot = matchedTrackPointer->dz(beamspotPoint);
 
-	//the type is just to use in the ROOT viewer to be able to select which particle I want to look at
 	_tpsAntiS_bestRECO_mass.push_back(999.); //tracks dont have a mass so save a dummy value, I need to save dummy values to keep the order in the vectors
 
 	_tpsAntiS_bestRECO_pt.push_back(matchedTrackPointer->pt());
@@ -816,6 +898,9 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool 
 	_tpsAntiS_bestRECO_dxy_beamspot.push_back(dxy);
 	_tpsAntiS_bestRECO_dz_beamspot.push_back(dz_beamspot);
 
+	_tpsAntiS_bestRECO_dxyTrack_beamspot.push_back(dxyTrackbeamspot);
+	_tpsAntiS_bestRECO_dzTrack_beamspot.push_back(dzTrackbeamspot);
+
 	_tpsAntiS_bestRECO_charge.push_back(matchedTrackPointer->charge());
 
 }
@@ -823,7 +908,6 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool 
 void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECODummy(){
 	
 
-	//the type is just to use in the ROOT viewer to be able to select which particle I want to look at
 	_tpsAntiS_bestRECO_mass.push_back(999.); //tracks dont have a mass so save a dummy value, I need to save dummy values to keep the order in the vectors
 
 	_tpsAntiS_bestRECO_pt.push_back(999.);
@@ -838,6 +922,9 @@ void FlatTreeProducerTracking::FillFlatTreeTpsAntiSRECODummy(){
 	_tpsAntiS_bestRECO_vz_beamspot.push_back(999.);
 	_tpsAntiS_bestRECO_dxy_beamspot.push_back(999.);
 	_tpsAntiS_bestRECO_dz_beamspot.push_back(999.);
+
+	_tpsAntiS_bestRECO_dxyTrack_beamspot.push_back(999.);
+        _tpsAntiS_bestRECO_dzTrack_beamspot.push_back(999.);
 
 	_tpsAntiS_bestRECO_charge.push_back(999);
 
@@ -2251,6 +2338,13 @@ void FlatTreeProducerTracking::RecoEvaluationAntiS(const reco::Candidate  * genP
 }
 */
 
+void FlatTreeProducerTracking::InitPV()
+{
+	_goodPVxPOG.clear();
+	_goodPVyPOG.clear();
+	_goodPVzPOG.clear();
+	_goodPV_weightPU.clear();
+}
 
 void FlatTreeProducerTracking::InitTracking()
 {
@@ -2311,6 +2405,8 @@ void FlatTreeProducerTracking::InitTrackingAntiS(){
 	_tpsAntiS_dxy_beamspot.clear();
 	_tpsAntiS_dz_beamspot.clear();
 	_tpsAntiS_dz_AntiSCreationVertex.clear();
+	_tpsAntiS_dxyTrack_beamspot.clear();
+	_tpsAntiS_dzTrack_beamspot.clear();
 
 	_tpsAntiS_numberOfTrackerHits.clear();
 	_tpsAntiS_charge.clear();
@@ -2334,10 +2430,14 @@ void FlatTreeProducerTracking::InitTrackingAntiS(){
 	_tpsAntiS_bestRECO_dxy_beamspot.clear();
 	_tpsAntiS_bestRECO_dz_beamspot.clear();
 
+	_tpsAntiS_bestRECO_dxyTrack_beamspot.clear();
+	_tpsAntiS_bestRECO_dzTrack_beamspot.clear();
+
 	_tpsAntiS_bestRECO_charge.clear();
 	_tpsAntiS_returnCodeV0Fitter.clear();
 
 	_tpsAntiS_event_weighting_factor.clear();
+	_tpsAntiS_event_weighting_factorPU.clear();
 
 }
 

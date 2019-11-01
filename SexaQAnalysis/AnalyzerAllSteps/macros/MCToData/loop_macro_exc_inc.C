@@ -272,7 +272,7 @@ void loop_macro_exc_inc(){
       mc->Sumw2();
 	
       //scale the MC with a given factor
-      //mc->Scale(1.20298597518);
+      //mc->Scale(1.20363184668);
       //for lambda
       //mc->Scale(1.7);
 

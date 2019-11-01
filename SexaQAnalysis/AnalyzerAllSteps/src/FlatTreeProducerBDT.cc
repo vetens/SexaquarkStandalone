@@ -40,12 +40,16 @@ void FlatTreeProducerBDT::beginJob() {
         _tree_PV = fs->make <TTree>("FlatTreePV","tree_PV");
 	_tree_PV->Branch("_nPV",&_nPV);
 	_tree_PV->Branch("_nGoodPV",&_nGoodPV);
+	_tree_PV->Branch("_nGoodPVPOG",&_nGoodPVPOG);
 	_tree_PV->Branch("_PVx",&_PVx);
 	_tree_PV->Branch("_PVy",&_PVy);
 	_tree_PV->Branch("_PVz",&_PVz);
 	_tree_PV->Branch("_goodPVx",&_goodPVx);
 	_tree_PV->Branch("_goodPVy",&_goodPVy);
 	_tree_PV->Branch("_goodPVz",&_goodPVz);
+	_tree_PV->Branch("_goodPVxPOG",&_goodPVxPOG);
+	_tree_PV->Branch("_goodPVyPOG",&_goodPVyPOG);
+	_tree_PV->Branch("_goodPVzPOG",&_goodPVzPOG);
     
         // Initialize when class is created
         _tree = fs->make <TTree>("FlatTree","tree");
@@ -55,6 +59,10 @@ void FlatTreeProducerBDT::beginJob() {
         //just for checking you are looking at the correct one: S or antiS
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_deltaLInteractionVertexAntiSmin",&_S_deltaLInteractionVertexAntiSmin);
+	_tree->Branch("_S_deltaRAntiSmin",&_S_deltaRAntiSmin);
+	_tree->Branch("_S_deltaRKsAntiSmin",&_S_deltaRKsAntiSmin);
+	_tree->Branch("_S_deltaRLambdaAntiSmin",&_S_deltaRLambdaAntiSmin);
+
 	_tree->Branch("_S_lxy_interaction_vertex",&_S_lxy_interaction_vertex);
 	_tree->Branch("_S_lxy_interaction_vertex_beampipeCenter",&_S_lxy_interaction_vertex_beampipeCenter);
 	_tree->Branch("_S_error_lxy_interaction_vertex",&_S_error_lxy_interaction_vertex);
@@ -64,6 +72,8 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree->Branch("_S_mass",&_S_mass);
 	_tree->Branch("_S_chi2_ndof",&_S_chi2_ndof);
 	_tree->Branch("_S_event_weighting_factor",&_S_event_weighting_factor);
+	_tree->Branch("_S_event_weighting_factorPU",&_S_event_weighting_factorPU);
+	_tree->Branch("_S_event_weighting_factorALL",&_S_event_weighting_factorALL);
 
 	_tree->Branch("_S_daughters_deltaphi",&_S_daughters_deltaphi);
 	_tree->Branch("_S_daughters_deltaeta",&_S_daughters_deltaeta);
@@ -180,6 +190,7 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   //PV
   int nPVs = 0;
   int ngoodPVs = 0;
+  unsigned int ngoodPVsPOG = 0;
   Init_PV();
   if(h_offlinePV.isValid()){
 	for(unsigned int i = 0; i < h_offlinePV->size(); i++ ){
@@ -195,10 +206,26 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 			_goodPVy.push_back(h_offlinePV->at(i).y());
 			_goodPVz.push_back(h_offlinePV->at(i).z());
 		}
+
+                double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
+                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){
+			ngoodPVsPOG++;
+                        _goodPVxPOG.push_back(h_offlinePV->at(i).x());
+                        _goodPVyPOG.push_back(h_offlinePV->at(i).y());
+                        _goodPVzPOG.push_back(h_offlinePV->at(i).z());
+		}
+
+
 	}
   }
+//  srand(time(NULL));
+  int randomIndexPV = rand()%(ngoodPVsPOG);
+  double randomPVz = _goodPVzPOG[randomIndexPV];
+  
+
   _nPV.push_back(nPVs);
   _nGoodPV.push_back(ngoodPVs);
+  _nGoodPVPOG.push_back(ngoodPVsPOG);
   _tree_PV->Fill();
 
   //beamspot
@@ -215,7 +242,7 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   if(h_sCands.isValid()){
       for(unsigned int i = 0; i < h_sCands->size(); ++i){//loop all S candidates
 	const reco::VertexCompositeCandidate * antiS = &h_sCands->at(i);
-	FillBranches(antiS, beamspot, beamspotVariance, h_offlinePV,m_runningOnData,  h_genParticles, h_V0Ks,  h_V0L);
+	FillBranches(antiS, beamspot, beamspotVariance, h_offlinePV,m_runningOnData,  h_genParticles, h_V0Ks,  h_V0L, ngoodPVsPOG, randomPVz);
       }
   }
 
@@ -228,7 +255,7 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 
 
-void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L){
+void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, unsigned int ngoodPVsPOG, double randomPVz){
 
 	TVector3 RECOAntiSInteractionVertex(RECO_S->vx(),RECO_S->vy(),RECO_S->vz());//this is the interaction vertex of the antiS and the neutron. Check in the skimming code if you want to check.
 	double RECOLxy_interactionVertex_beampipeCenter = sqrt(RECOAntiSInteractionVertex.X()*RECOAntiSInteractionVertex.X() + RECOAntiSInteractionVertex.Y()*RECOAntiSInteractionVertex.Y() );
@@ -240,7 +267,8 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	//if running on MC and the RECO_S charge is negative and the RECO_S has an interaction vertex which is far enough in lxy, check if this is a real AntiS by looking at the difference in lxyz between the RECO and the GEN antiS. Save this deltaLInteractionVertexAntiSmin in the tree, like this later I can easily select in the tree on signal antiS and background antiS
         double deltaLInteractionVertexAntiSmin = 999.;
-
+        double deltaRAntiSmin = 999.;
+	int bestMatchingAntiS = -1;
 	if(!m_runningOnData && RECO_S->charge() == -1  && RECOLxy_interactionVertex >= AnalyzerAllSteps::MinLxyCut){
 		if(h_genParticles.isValid()){
 			for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT and only for the ones with the correct pdgId check if this RECO antiS is matching a GEN particle and is thus not a fake antiS
@@ -250,13 +278,28 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 				double deltaLInteractionVertexAntiS = sqrt( pow(h_genParticles->at(i).daughter(0)->vx() - RECO_S->vx(),2) + pow(h_genParticles->at(i).daughter(0)->vy() - RECO_S->vy(),2) +  pow(h_genParticles->at(i).daughter(0)->vz() - RECO_S->vz(),2)  );
 				if(deltaLInteractionVertexAntiS < deltaLInteractionVertexAntiSmin){
 					deltaLInteractionVertexAntiSmin = deltaLInteractionVertexAntiS;
+					deltaRAntiSmin = AnalyzerAllSteps::deltaR(h_genParticles->at(i).phi(), h_genParticles->at(i).eta(),RECO_S->phi(),RECO_S->eta());
+					bestMatchingAntiS = i;
 				}
+
 
 		       }
 		}
 	}
 	//the weighting factor for events will depend on their pathlength through the beampipe
 	double event_weighting_factor = AnalyzerAllSteps::EventWeightingFactor(RECO_S->theta()); 
+	double event_weighting_factorPU = 1.; 
+	//you only need to calculate a reweighing parameter for the PU and z location if you are running on MC
+	std::cout << "just before event_weighting_factorPU: " << ngoodPVsPOG << ", " << AnalyzerAllSteps::v_mapPU.size() << " , " << bestMatchingAntiS << std::endl;
+        if(ngoodPVsPOG < AnalyzerAllSteps::v_mapPU.size() && bestMatchingAntiS > -1) {
+		std::cout << "event_weighting_factorPU for signal" << event_weighting_factorPU << std::endl;
+		event_weighting_factorPU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[ngoodPVsPOG],h_genParticles->at(bestMatchingAntiS).vz());
+	}
+	else if(ngoodPVsPOG < AnalyzerAllSteps::v_mapPU.size()){ //but if the MC does not contain any antiS you have to reweigh on the 'event', so pick a random PVz location to reweigh on
+		event_weighting_factorPU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[ngoodPVsPOG],randomPVz);
+		event_weighting_factorPU = event_weighting_factorPU * ngoodPVsPOG / 18.479;
+		std::cout << "event_weighting_factorPU for BKG" << event_weighting_factorPU << std::endl;
+	}
 
 	nTotalRECOS++;
 	//calculate some kinematic variables for the RECO AntiS
@@ -413,6 +456,9 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	_S_charge.push_back(RECO_S->charge());
 	_S_deltaLInteractionVertexAntiSmin.push_back(deltaLInteractionVertexAntiSmin);
+	_S_deltaRAntiSmin.push_back(deltaRAntiSmin);
+	_S_deltaRKsAntiSmin.push_back(deltaRMinKs);
+	_S_deltaRLambdaAntiSmin.push_back(deltaRMinLambda);
 
 	_S_lxy_interaction_vertex.push_back(RECOLxy_interactionVertex);
 	_S_lxy_interaction_vertex_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
@@ -423,6 +469,8 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	_S_mass.push_back(RECO_Smass);
 	_S_chi2_ndof.push_back(RECO_S->vertexNormalizedChi2());
 	_S_event_weighting_factor.push_back(event_weighting_factor);
+	_S_event_weighting_factorPU.push_back(event_weighting_factorPU);
+	_S_event_weighting_factorALL.push_back(event_weighting_factor*event_weighting_factorPU);
 
 	_S_daughters_deltaphi.push_back(RECODeltaPhiDaughters);
 	_S_daughters_deltaeta.push_back(RECODeltaEtaDaughters);
@@ -528,6 +576,7 @@ void FlatTreeProducerBDT::endJob()
 void
 FlatTreeProducerBDT::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
+  srand(time(NULL));
 }
 
 // ------------ method called when ending the processing of a run  ------------
@@ -576,12 +625,16 @@ void FlatTreeProducerBDT::Init_PV()
 {
 	_nPV.clear();
         _nGoodPV.clear();
+        _nGoodPVPOG.clear();
         _PVx.clear();
         _PVy.clear();
         _PVz.clear();
         _goodPVx.clear();
         _goodPVy.clear();
         _goodPVz.clear();
+        _goodPVxPOG.clear();
+        _goodPVyPOG.clear();
+        _goodPVzPOG.clear();
 }
 
 void FlatTreeProducerBDT::Init_Counter()
@@ -595,6 +648,9 @@ void FlatTreeProducerBDT::Init()
 
     	_S_charge.clear();
 	_S_deltaLInteractionVertexAntiSmin.clear();
+	_S_deltaRAntiSmin.clear();
+	_S_deltaRKsAntiSmin.clear();
+	_S_deltaRLambdaAntiSmin.clear();
 
     	_S_lxy_interaction_vertex.clear();
     	_S_lxy_interaction_vertex_beampipeCenter.clear();
@@ -605,6 +661,8 @@ void FlatTreeProducerBDT::Init()
         _S_mass.clear();
         _S_chi2_ndof.clear();
         _S_event_weighting_factor.clear();
+        _S_event_weighting_factorPU.clear();
+        _S_event_weighting_factorALL.clear();
 
 	_S_daughters_deltaphi.clear();
 	_S_daughters_deltaeta.clear();

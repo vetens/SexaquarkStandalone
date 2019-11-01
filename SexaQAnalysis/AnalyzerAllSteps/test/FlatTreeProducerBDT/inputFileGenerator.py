@@ -23,7 +23,7 @@ directories= [
 "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/DoubleMuonLowMass/DoubleMuonLowMass_Run2016G-07Aug17-v1_trialR/190923_082721/0000",
 "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/DoubleMuonLowMass/DoubleMuonLowMass_Run2016H-07Aug17-v1_trialR/190909_071419/0000",
 #HTMHT
-"/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/HTMHT/HTMHT_Run2016G-23Sep2016-v2_trialR/190910_071127/0000",
+"/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/HTMHT/HTMHT_Run2016G-07Aug17-v1_trialR/191007_155452/0000",
 "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/HTMHT/HTMHT_Run2016H-07Aug17-v1_trialR/190910_071209/0000",
 #JetHT
 "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/JetHT/JetHT_Run2016G-07Aug17-v1_trialR/190910_071252/0000",

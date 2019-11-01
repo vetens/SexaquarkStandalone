@@ -14,6 +14,8 @@
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 #include "CommonTools/CandUtils/interface/AddFourMomenta.h" 
 
+#include "TrackingTools/PatternTools/interface/TSCPBuilderNoMaterial.h"
+#include "TrackingTools/TrajectoryState/interface/FreeTrajectoryState.h"
 
 #include "AnalyzerAllSteps.h"
 using namespace edm;
@@ -37,10 +39,10 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
 
 
     void FillTreesTracks(const TrackingParticle& tp, TVector3 beamspot, int nPVs, const reco::Track *matchedTrackPointer, bool matchingTrackFound, std::vector<double> tpIsGrandDaughterAntiS);
-    int FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot, TVector3 beamspotVariance,int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField );
-    void FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 AntiSCreationVertex, TrackingParticle trackingParticle, bool RECOFound, int type, double besteDeltaR, int returnCodeV0Fitter);
-    void FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool RECOFound, int type, reco::VertexCompositeCandidate  bestRECOCompositeCandidate);
-    void FillFlatTreeTpsAntiSRECO(TVector3 beamspot, bool RECOFound, int type, const reco::Track *matchedTrackPointer);
+    int FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, TVector3 beamspotVariance,int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField , unsigned int nGoodPV);
+    void FillFlatTreeTpsAntiS(TVector3 beamspot, TVector3 AntiSCreationVertex, TrackingParticle trackingParticle, bool RECOFound, int type, double besteDeltaR, int returnCodeV0Fitter, double besteDeltaL, const MagneticField* theMagneticField);
+    void FillFlatTreeTpsAntiSRECO(TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, bool RECOFound, int type, reco::VertexCompositeCandidate  bestRECOCompositeCandidate);
+    void FillFlatTreeTpsAntiSRECO(TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, bool RECOFound, int type, const reco::Track *matchedTrackPointer);
     void FillFlatTreeTpsAntiSRECODummy();
     int V0Fitter_trackSelection(const reco::Track *matchedTrackPointer1, const reco::BeamSpot* theBeamSpot);
     int V0Fitter(const reco::Track *matchedTrackPointer1, const reco::Track *matchedTrackPointer2, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField, bool isGENKs, bool isGENLambda, bool isGENAntiLambda);
@@ -76,6 +78,7 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     //---- configurable parameters --------
     bool m_lookAtAntiS;
 
+    void InitPV();
     void InitTracking();
     void InitTrackingAntiS();
     
@@ -107,6 +110,9 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<TrackingParticle> > m_TPToken;
 //    edm::EDGetTokenT<vector<PileupSummaryInfo> > m_PileupInfoToken;
    
+    TTree* _tree_PV;   
+    std::vector<float> _goodPVxPOG,_goodPVyPOG,_goodPVzPOG,_goodPV_weightPU;
+
     TTree* _tree_tracks;   
     std::vector<float> _tp_pt,_tp_eta,_tp_phi,_tp_pz,_tp_Lxy_beamspot,_tp_vz_beamspot,_tp_dxy_beamspot,_tp_dz_beamspot,_tp_etaOfGrandMotherAntiS;
     std::vector<int> _tp_numberOfTrackerHits,_tp_charge,_tp_reconstructed,_tp_isAntiSTrack;
@@ -114,8 +120,8 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     std::vector<int> _matchedTrack_trackQuality,_matchedTrack_charge,_matchedTrack_isLooper;
 
     TTree* _tree_tpsAntiS;
-    std::vector<float> _tpsAntiS_bestDeltaRWithRECO,_tpsAntiS_deltaLInteractionVertexAntiSmin,_tpsAntiS_mass,_tpsAntiS_pt,_tpsAntiS_eta,_tpsAntiS_phi,_tpsAntiS_pz,_tpsAntiS_Lxy_beampipeCenter,_tpsAntiS_Lxy_beamspot,_tpsAntiS_vz,_tpsAntiS_vz_beamspot,_tpsAntiS_dxy_beamspot,_tpsAntiS_dz_beamspot,_tpsAntiS_dz_AntiSCreationVertex,_tpsAntiS_numberOfTrackerHits,_tpsAntiS_charge,_tpsAntiS_reconstructed,_tpsAntiS_event_weighting_factor;
-    std::vector<float> _tpsAntiS_bestRECO_mass,_tpsAntiS_bestRECO_massMinusNeutron,_tpsAntiS_bestRECO_pt,_tpsAntiS_bestRECO_eta,_tpsAntiS_bestRECO_phi,_tpsAntiS_bestRECO_pz,_tpsAntiS_bestRECO_Lxy_beampipeCenter,_tpsAntiS_bestRECO_Lxy_beamspot,_tpsAntiS_bestRECO_error_Lxy_beampipeCenter,_tpsAntiS_bestRECO_error_Lxy_beamspot,_tpsAntiS_bestRECO_vz,_tpsAntiS_bestRECO_vz_beamspot,_tpsAntiS_bestRECO_dxy_beamspot,_tpsAntiS_bestRECO_dz_beamspot,_tpsAntiS_bestRECO_charge,_tpsAntiS_returnCodeV0Fitter;
+    std::vector<float> _tpsAntiS_bestDeltaRWithRECO,_tpsAntiS_deltaLInteractionVertexAntiSmin,_tpsAntiS_mass,_tpsAntiS_pt,_tpsAntiS_eta,_tpsAntiS_phi,_tpsAntiS_pz,_tpsAntiS_Lxy_beampipeCenter,_tpsAntiS_Lxy_beamspot,_tpsAntiS_vz,_tpsAntiS_vz_beamspot,_tpsAntiS_dxy_beamspot,_tpsAntiS_dz_beamspot,_tpsAntiS_dz_AntiSCreationVertex,_tpsAntiS_dxyTrack_beamspot,_tpsAntiS_dzTrack_beamspot,_tpsAntiS_numberOfTrackerHits,_tpsAntiS_charge,_tpsAntiS_reconstructed,_tpsAntiS_event_weighting_factor,_tpsAntiS_event_weighting_factorPU;
+    std::vector<float> _tpsAntiS_bestRECO_mass,_tpsAntiS_bestRECO_massMinusNeutron,_tpsAntiS_bestRECO_pt,_tpsAntiS_bestRECO_eta,_tpsAntiS_bestRECO_phi,_tpsAntiS_bestRECO_pz,_tpsAntiS_bestRECO_Lxy_beampipeCenter,_tpsAntiS_bestRECO_Lxy_beamspot,_tpsAntiS_bestRECO_error_Lxy_beampipeCenter,_tpsAntiS_bestRECO_error_Lxy_beamspot,_tpsAntiS_bestRECO_vz,_tpsAntiS_bestRECO_vz_beamspot,_tpsAntiS_bestRECO_dxy_beamspot,_tpsAntiS_bestRECO_dz_beamspot,_tpsAntiS_bestRECO_dxyTrack_beamspot,_tpsAntiS_bestRECO_dzTrack_beamspot,_tpsAntiS_bestRECO_charge,_tpsAntiS_returnCodeV0Fitter;
     std::vector<int> _tpsAntiS_type,_tpsAntiS_pdgId;
 
     //for the V0Fitter:
