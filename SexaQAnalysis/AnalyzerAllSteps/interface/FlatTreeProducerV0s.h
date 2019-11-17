@@ -20,7 +20,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
     bool IsolationCriterium(reco::Muon muon);
-    void FillBranchesV0(const reco::VertexCompositeCandidate * V0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<View<reco::Track>> h_generalTracks, std::string V0Type);    
+    void FillBranchesV0(const reco::VertexCompositeCandidate * V0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, std::string V0Type);    
 
 
   private:
@@ -51,7 +51,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
     edm::InputTag m_genParticlesTag_SIM_GEANT;
-    edm::InputTag m_generalTracksTag;
+    //edm::InputTag m_generalTracksTag;
     edm::InputTag m_sCandsTag;
     edm::InputTag m_V0KsTag;
     edm::InputTag m_V0LTag;
@@ -63,7 +63,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<reco::Vertex>> m_offlinePVToken;
     edm::EDGetTokenT<vector<reco::GenParticle>> m_genParticlesToken_GEN; 
     edm::EDGetTokenT<vector<reco::GenParticle>> m_genParticlesToken_SIM_GEANT; 
-    edm::EDGetTokenT<View<reco::Track>> m_generalTracksToken;
+    //edm::EDGetTokenT<vector<reco::Track>> m_generalTracksToken;
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_sCandsToken;
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0KsToken;
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0LToken;

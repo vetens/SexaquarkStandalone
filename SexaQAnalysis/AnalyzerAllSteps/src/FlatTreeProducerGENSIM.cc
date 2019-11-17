@@ -116,6 +116,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_Ks_daughter0_vy",&_GEN_Ks_daughter0_vy);
 	_tree->Branch("_GEN_Ks_daughter0_vz",&_GEN_Ks_daughter0_vz);
 	_tree->Branch("_GEN_Ks_daughter0_lxy",&_GEN_Ks_daughter0_lxy);
+	_tree->Branch("_GEN_Ks_daughter0_lxy_zero",&_GEN_Ks_daughter0_lxy_zero);
 	_tree->Branch("_GEN_Ks_daughter0_dxy",&_GEN_Ks_daughter0_dxy);
 	_tree->Branch("_GEN_Ks_daughter0_dz",&_GEN_Ks_daughter0_dz);
 	_tree->Branch("_GEN_Ks_daughter0_openings_angle_displacement_momentum",&_GEN_Ks_daughter0_openings_angle_displacement_momentum);
@@ -144,6 +145,7 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_tree->Branch("_GEN_AntiLambda_AntiProton_vy",&_GEN_AntiLambda_AntiProton_vy);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_vz",&_GEN_AntiLambda_AntiProton_vz);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_lxy",&_GEN_AntiLambda_AntiProton_lxy);
+	_tree->Branch("_GEN_AntiLambda_AntiProton_lxy_zero",&_GEN_AntiLambda_AntiProton_lxy_zero);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_dxy",&_GEN_AntiLambda_AntiProton_dxy);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_dz",&_GEN_AntiLambda_AntiProton_dz);
 	_tree->Branch("_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum",&_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum);
@@ -229,13 +231,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
   	if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
    	nTotalGENS++;	
-	/*if(v_antiS_momenta_and_itt.size() == 0){//to get the thing started save the first antiS you encounter to the vector and continue
-		vector<float> dummyVec;
-		dummyVec.push_back(genParticle->eta());
-		dummyVec.push_back(1.);
-		v_antiS_momenta_and_itt.push_back(dummyVec);
-		continue;
-	}*/
+
 	int duplicateIt = -1; 
 	for(unsigned int j = 0; j<v_antiS_momenta_and_itt.size();j++){//check if this antiS is already in the list.
 		if(v_antiS_momenta_and_itt[j][0] == genParticle->eta()){//you found a duplicate
@@ -477,6 +473,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_Ks_daughter0_vz = genParticle->daughter(0)->daughter(0)->vz();
 	TVector3 GEN_Ks_daughter0_creation_vertex(genParticle->daughter(0)->daughter(0)->vx(),genParticle->daughter(0)->daughter(0)->vy(),genParticle->daughter(0)->daughter(0)->vz());
 	double GEN_Ks_daughter0_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_Ks_daughter0_creation_vertex);
+	double GEN_Ks_daughter0_lxy_zero = AnalyzerAllSteps::lxy(ZeroZeroZero,GEN_Ks_daughter0_creation_vertex);
 	double GEN_Ks_daughter0_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_Ks_daughter0_creation_vertex,GEN_Ks_daughter0_momentum,beamspot);
 	double GEN_Ks_daughter0_dz = AnalyzerAllSteps::dz_line_point(GEN_Ks_daughter0_creation_vertex,GEN_Ks_daughter0_momentum,beamspot);
 	reco::Candidate::Vector GEN_Ks_daughter0_creation_vertex_beamspot_vector(genParticle->daughter(0)->daughter(0)->vx()-beamspot.X(),genParticle->daughter(0)->daughter(0)->vy()-beamspot.Y(),genParticle->daughter(0)->daughter(0)->vz()-beamspot.Z());
@@ -520,6 +517,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_AntiLambda_AntiProton_vz = AntiLambdaAntiProton->vz();
 	TVector3 GEN_AntiLambda_AntiProton_creation_vertex(AntiLambdaAntiProton->vx(),AntiLambdaAntiProton->vy(),AntiLambdaAntiProton->vz());
 	double GEN_AntiLambda_AntiProton_lxy = AnalyzerAllSteps::lxy(beamspot,GEN_AntiLambda_AntiProton_creation_vertex);
+	double GEN_AntiLambda_AntiProton_lxy_zero = AnalyzerAllSteps::lxy(ZeroZeroZero,GEN_AntiLambda_AntiProton_creation_vertex);
 	double GEN_AntiLambda_AntiProton_dxy = AnalyzerAllSteps::dxy_signed_line_point(GEN_AntiLambda_AntiProton_creation_vertex,GEN_AntiLambda_AntiProton_momentum,beamspot);
 	double GEN_AntiLambda_AntiProton_dz = AnalyzerAllSteps::dz_line_point(GEN_AntiLambda_AntiProton_creation_vertex,GEN_AntiLambda_AntiProton_momentum,beamspot);
 	reco::Candidate::Vector GEN_AntiLambda_AntiProton_creation_vertex_beamspot_vector(AntiLambdaAntiProton->vx()-beamspot.X(),AntiLambdaAntiProton->vy()-beamspot.Y(),AntiLambdaAntiProton->vz()-beamspot.Z());
@@ -674,6 +672,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_Ks_daughter0_vy.push_back(GEN_Ks_daughter0_vy); 
 	_GEN_Ks_daughter0_vz.push_back(GEN_Ks_daughter0_vz); 
 	_GEN_Ks_daughter0_lxy.push_back(GEN_Ks_daughter0_lxy);
+	_GEN_Ks_daughter0_lxy_zero.push_back(GEN_Ks_daughter0_lxy_zero);
 	_GEN_Ks_daughter0_dxy.push_back(GEN_Ks_daughter0_dxy);
 	_GEN_Ks_daughter0_dz.push_back(GEN_Ks_daughter0_dz);
 	_GEN_Ks_daughter0_openings_angle_displacement_momentum.push_back(GEN_Ks_daughter0_openings_angle_displacement_momentum);
@@ -702,6 +701,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	_GEN_AntiLambda_AntiProton_vy.push_back(GEN_AntiLambda_AntiProton_vy);
 	_GEN_AntiLambda_AntiProton_vz.push_back(GEN_AntiLambda_AntiProton_vz);
 	_GEN_AntiLambda_AntiProton_lxy.push_back(GEN_AntiLambda_AntiProton_lxy);
+	_GEN_AntiLambda_AntiProton_lxy_zero.push_back(GEN_AntiLambda_AntiProton_lxy_zero);
 	_GEN_AntiLambda_AntiProton_dxy.push_back(GEN_AntiLambda_AntiProton_dxy);
 	_GEN_AntiLambda_AntiProton_dz.push_back(GEN_AntiLambda_AntiProton_dz);
 	_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum.push_back(GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum);
@@ -920,6 +920,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_Ks_daughter0_vy.clear(); 
 	_GEN_Ks_daughter0_vz.clear(); 
 	_GEN_Ks_daughter0_lxy.clear();
+	_GEN_Ks_daughter0_lxy_zero.clear();
 	_GEN_Ks_daughter0_dxy.clear();
 	_GEN_Ks_daughter0_dz.clear();
 	_GEN_Ks_daughter0_openings_angle_displacement_momentum.clear();
@@ -948,6 +949,7 @@ FlatTreeProducerGENSIM::Init()
 	_GEN_AntiLambda_AntiProton_vy.clear();
 	_GEN_AntiLambda_AntiProton_vz.clear();
 	_GEN_AntiLambda_AntiProton_lxy.clear();
+	_GEN_AntiLambda_AntiProton_lxy_zero.clear();
 	_GEN_AntiLambda_AntiProton_dxy.clear();
 	_GEN_AntiLambda_AntiProton_dz.clear();
 	_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum.clear();

@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-from Validation.RecoTrack.TrackingParticleSelectionForEfficiency_cfi import * 
-from SimTracker.TrackAssociation.LhcParametersDefinerForTP_cfi import * 
+#from Validation.RecoTrack.TrackingParticleSelectionForEfficiency_cfi import * 
+#from SimTracker.TrackAssociation.LhcParametersDefinerForTP_cfi import * 
 FlatTreeProducerV0s = cms.EDAnalyzer('FlatTreeProducerV0s',
     lookAtAntiS = cms.untracked.bool(False),
     runningOnData = cms.untracked.bool(False),
@@ -8,7 +8,7 @@ FlatTreeProducerV0s = cms.EDAnalyzer('FlatTreeProducerV0s',
     offlinePV = cms.InputTag("offlinePrimaryVertices","","RECO"),
     genCollection_GEN =  cms.InputTag("genParticles","","HLT"),
     genCollection_SIM_GEANT =  cms.InputTag("genParticlesPlusGEANT","","SIM"),
-    generalTracksCollection =  cms.InputTag("generalTracks","","RECO"),
+    #generalTracksCollection =  cms.InputTag("generalTracks","","RECO"),
     sexaqCandidates = cms.InputTag("lambdaKshortVertexFilter", "sParticles",""),
     V0KsCollection = cms.InputTag("generalV0Candidates","Kshort","SEXAQ"),
     V0LCollection = cms.InputTag("generalV0Candidates","Lambda","SEXAQ"),

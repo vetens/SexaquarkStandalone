@@ -18,40 +18,41 @@ maxNEntries = 1e99
 
 plots_output_dir = "plots_GENSIM/"
 
-inputFile = '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTreeGENSIM_Skimmed_trial25_1p8GeV_27102019_v1.root'
+inputFile = '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTreeGENSIM_Skimmed_trial17_1p8GeV_17102019_v1.root'
 fIn = TFile(inputFile,'read')
 tree = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevel') 
 treeAllAntiS = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevelAllAntiS') 
 
 fOut = TFile('macro_'+inputFile.rsplit('/', 1)[-1],'RECREATE')
+#fOut = TFile('test.root','RECREATE')
 
 all_antiS_dir = fOut.mkdir("all_antiS")
 all_antiS_dir.cd()
 
 h_eta_all_AntiS_non_weighted = TH1F('h_eta_all_AntiS_non_weighted','; #eta #bar{S}; #Entries/0.1#eta',160,-8,8)
 h_eta_all_AntiS = TH1F('h_eta_all_AntiS','; #eta #bar{S}; #Entries/0.1#eta',160,-8,8)
-h_vz_interaction_all_AntiS_non_weighted = TH1F('h_vz_interaction_all_AntiS_non_weighted','; absolute v_{z} interaction vertex #bar{S}; #Entries/5cm',100,-250,250)
-h_vz_interaction_all_AntiS = TH1F('h_vz_interaction_all_AntiS','; absolute v_{z} interaction vertex #bar{S}; #Entries/5cm',100,-250,250)
-h_vz_interaction_all_AntiS_zoom = TH1F('h_vz_interaction_all_AntiS_zoom','; absolute v_{z} interaction vertex #bar{S}; #Entries/0.5cm',100,-25,25)
+h_vz_interaction_all_AntiS_non_weighted = TH1F('h_vz_interaction_all_AntiS_non_weighted','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/5cm',100,-250,250)
+h_vz_interaction_all_AntiS = TH1F('h_vz_interaction_all_AntiS','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/5cm',100,-250,250)
+h_vz_interaction_all_AntiS_zoom = TH1F('h_vz_interaction_all_AntiS_zoom','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/0.5cm',100,-25,25)
 tprof_eta_weighting_factor = TProfile('tprof_eta_weighting_factor','; #eta #bar{S}; Event weighting factor/0.1#eta',90,-4.5,4.5)
-tprof_vz_weighting_factor = TProfile('tprof_vz_weighting_factor','; absolute v_{Z} #bar{S} interaction vertex; Event weighting factor/5cm',100,-250,250)
-tprof_vz_weighting_factor_zoom = TProfile('tprof_vz_weighting_factor_zoom','; absolute v_{Z} #bar{S} interaction vertex; Event weighting factor/2mm',100,-10,10)
-h_pt_all_AntiS = TH1F('h_pt_all_AntiS','; p_{t} #bar{S}; #Entries/0.1GeV',100,0,10)
-h_pz_all_AntiS = TH1F('h_pz_all_AntiS','; |p_{z}| #bar{S}; #Entries/1GeV',80,0,80)
+tprof_vz_weighting_factor = TProfile('tprof_vz_weighting_factor','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor/5cm',100,-250,250)
+tprof_vz_weighting_factor_zoom = TProfile('tprof_vz_weighting_factor_zoom','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor/2mm',100,-10,10)
+h_pt_all_AntiS = TH1F('h_pt_all_AntiS','; p_{T} #bar{S} (GeV/c); #Entries/0.1GeV/c',100,0,10)
+h_pz_all_AntiS = TH1F('h_pz_all_AntiS','; |p_{z}| #bar{S} (GeV/c); #Entries/1GeV/c',80,0,80)
 h_vz_creation_vertex_all_AntiS = TH1F('h_vz_creation_vertex_all_AntiS','; v_{z} creation vertex #bar{S}; #Entries/cm',60,-30,30)
 h_nPV_all_AntiS = TH1F('h_nPV_all_AntiS','; #PV; #Entries',60,0,60)
 
 
 #investigate the reconstructability: have to use histograms for nominator and denominator, because teff does not support weights and using tprofile the bins with y = 0 are not displayed
-h_nom_vz_antiS_reconstructable = TH1F('h_nom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex  (cm); Reconstructability/5cm',60,-150,150)
+h_nom_vz_antiS_reconstructable = TH1F('h_nom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability/5cm',60,-150,150)
 h_nom_eta_antiS_reconstructable = TH1F('h_nom_eta_antiS_reconstructable','; #eta #bar{S} interaction vertex  (cm); Reconstructability/0.1#eta',160,-8,8)
-h_nom_pt_antiS_reconstructable = TH1F('h_nom_pt_antiS_reconstructable','; p_{t} #bar{S} (cm); Reconstructability/0.2GeV',50,0,10)
-h_nom_pz_antiS_reconstructable = TH1F('h_nom_pz_antiS_reconstructable','; p_{z} #bar{S} (cm); Reconstructability/1GeV',80,0,80)
+h_nom_pt_antiS_reconstructable = TH1F('h_nom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability/0.2GeV/c',50,0,10)
+h_nom_pz_antiS_reconstructable = TH1F('h_nom_pz_antiS_reconstructable','; p_{z} #bar{S} (GeV/c); Reconstructability/1GeV/c',80,0,80)
 
-h_denom_vz_antiS_reconstructable = TH1F('h_denom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex  (cm); Reconstructability/5cm',60,-150,150)
+h_denom_vz_antiS_reconstructable = TH1F('h_denom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability/5cm',60,-150,150)
 h_denom_eta_antiS_reconstructable = TH1F('h_denom_eta_antiS_reconstructable','; #eta #bar{S} interaction vertex  (cm); Reconstructability/0.1#eta',160,-8,8)
-h_denom_pt_antiS_reconstructable = TH1F('h_denom_pt_antiS_reconstructable','; p_{t} #bar{S} (cm); Reconstructability/0.2GeV',50,0,10)
-h_denom_pz_antiS_reconstructable = TH1F('h_denom_pz_antiS_reconstructable','; p_{z} #bar{S} (cm); Reconstructability/1GeV',80,0,80)
+h_denom_pt_antiS_reconstructable = TH1F('h_denom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability/0.2GeV/c',50,0,10)
+h_denom_pz_antiS_reconstructable = TH1F('h_denom_pz_antiS_reconstructable','; p_{z} #bar{S} (GeV/c); Reconstructability/1GeV/c',80,0,80)
 
 
 #first do this small loop which runs over the tree containing all the antiS (i.e. also the ones which do not go the correct granddaughters)
@@ -300,7 +301,7 @@ for h in l_TH2F:
 	c.SetRightMargin(0.2) #make room for the tile of the z scale
 	if(h.GetSumw2N() == 0):
 		h.Sumw2(kTRUE)
-	h.Scale(1./h.Integral(), "width");
+	#h.Scale(1./h.Integral(), "width");
 	h.Draw("colz")
 	h.SetStats(0)
 	CMS_lumi.CMS_lumi(c, 0, 11)
@@ -324,9 +325,9 @@ h_antiS_lxy_creation_vertex = TH1F('h_antiS_lxy_creation_vertex','; #bar{S} cv l
 h_antiS_vz_creation_vertex = TH1F('h_antiS_vz_creation_vertex','; #bar{S} cv absolute v_{z} (cm); Events/cm',60,-30,30)
 h_antiS_lxy_interaction_vertex = TH1F('h_antiS_lxy_interaction_vertex','; l_{0,bs} interaction vertex #bar{S} (cm) ; Events/0.1mm',10,2.16,2.26)
 h_antiS_vz_interaction_vertex = TH1F('h_antiS_vz_interaction_vertex','; absolute v_{z}  interaction vertex #bar{S} (cm); Events/5cm',68,-170,170)
-h_neutron_momentum = TH1F('h_neutron_momentum','; p neutron (GeV); Events/0.01GeV',85,0,0.85)
-h2_antiS_inv_mass_p = TH2F("h2_antiS_inv_mass_p","; mass #bar{S} (GeV); p #bar{S} (GeV);#Entries",100,-10,10,60,0,60)
-h2_antiS_inv_mass_p_Ks_plus_Lambda = TH2F("h2_antiS_inv_mass_p_Ks_plus_Lambda","; m_{#bar{S},obs} (GeV); |#vec{p}_{K_{s}} + #vec{p}_{#bar{#Lambda}^{0}}| (GeV);Events/(0.1GeVx1GeV)",110,-5,6,40,0,40)
+h_neutron_momentum = TH1F('h_neutron_momentum','; p neutron (GeV/c); Events/0.01GeV/c',85,0,0.85)
+h2_antiS_inv_mass_p = TH2F("h2_antiS_inv_mass_p","; mass #bar{S} (GeV/c^{2}); p #bar{S} (GeV/c^{2});#Entries",100,-10,10,60,0,60)
+h2_antiS_inv_mass_p_Ks_plus_Lambda = TH2F("h2_antiS_inv_mass_p_Ks_plus_Lambda","; m_{#bar{S},obs} (GeV/c^{2}); |#vec{p}_{K_{s}} + #vec{p}_{#bar{#Lambda}^{0}}| (GeV/c);Events/(0.1GeV/c^{2}x1GeV/c)",110,-5,6,40,0,40)
 h_antiS_sumDaughters_openingsangle = TH1F('h_antiS_sumDaughters_openingsangle','; openings angle(#vec{p}_{K_{s}}+#vec{p}_{#bar{#Lambda}^{0}},#vec{p}_{#bar{S}}) (rad); Events/mrad',200,0,0.2)
 h_antiS_sumDaughters_deltaPhi = TH1F('h_antiS_sumDaughters_deltaPhi','; #Delta#phi(#vec{p}_{K_{s}}+#vec{p}_{#bar{#Lambda}^{0}},#vec{p}_{#bar{S}}) (rad); Events/10 mrad',30,0,0.3)
 h_antiS_sumDaughters_deltaEta = TH1F('h_antiS_sumDaughters_deltaEta','; #Delta#eta(#vec{p}_{K_{s}}+#vec{p}_{#bar{#Lambda}^{0}},#vec{p}_{#bar{S}}); Events/0.01#eta',30,0,0.3)
@@ -335,42 +336,42 @@ h_antiS_sumDaughters_deltaR = TH1F('h_antiS_sumDaughters_deltaR','; #DeltaR(#vec
 #properties of the antiS daughters and granddaughters
 momenta_daughters_and_grandaughters_dir = fOut.mkdir("momenta_daughters_and_grandaughters")
 momenta_daughters_and_grandaughters_dir.cd()
-h_pt_Ks = TH1F("h_pt_Ks",";p_{t} (GeV); #Entries",60,0,6)
-h_p_Ks = TH1F("h_p_Ks",";p (GeV); #Entries",60,0,6)
-h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_p_Ks_daug0 = TH1F("h_p_Ks_daug0",";p (GeV); Events/0.1GeV",60,0,6)
-h_p_Ks_daug1 = TH1F("h_p_Ks_daug1",";p (GeV); Events/0.1GeV",60,0,6)
-h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV); Events/1GeV",30,0,30)
-h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV); Events/1GeV",30,0,30)
-h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV); Events/1GeV",30,0,30)
-h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_eta_pt_Ks_daug0 = TH2F("h2_eta_pt_Ks_daug0",";#eta K_{s} daughter;p_{t} K_{s} daughter (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pt_Ks_daug1 = TH2F("h2_eta_pt_Ks_daug1",";#eta K_{s} daughter;p_{t} K_{s} daughter (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pz_Ks_daug0 = TH2F("h2_eta_pz_Ks_daug0",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_pz_Ks_daug1 = TH2F("h2_eta_pz_Ks_daug1",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV);  Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_p_Ks_daug0 = TH2F("h2_eta_p_Ks_daug0",";#eta K_{s} daughter;p K_{s} daughter (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
-h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta K_{s} daughter;p K_{s} daughter (GeV);  Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
+h_pt_Ks = TH1F("h_pt_Ks",";p_{T} (GeV/c); #Entries",60,0,6)
+h_p_Ks = TH1F("h_p_Ks",";p (GeV/c); #Entries",60,0,6)
+h_pt_Ks_daug0 = TH1F("h_pt_Ks_daug0",";p_{T} (GeV/c); Events/0.1GeV/c",60,0,6)
+h_pt_Ks_daug1 = TH1F("h_pt_Ks_daug1",";p_{T} (GeV/c); Events/0.1GeV/c",60,0,6)
+h_p_Ks_daug0 = TH1F("h_p_Ks_daug0",";p (GeV/c); Events/0.1GeV/c",60,0,6)
+h_p_Ks_daug1 = TH1F("h_p_Ks_daug1",";p (GeV/c); Events/0.1GeV/c",60,0,6)
+h_pz_Ks = TH1F("h_pz_Ks",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h_pz_Ks_daug0 = TH1F("h_pz_Ks_daug0",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h_pz_Ks_daug1 = TH1F("h_pz_Ks_daug1",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h2_pt_pz_Ks_daug0 = TH2F("h2_pt_pz_Ks_daug0",";p_{T} (GeV/c);|p_{z}| (GeV/c); Events/(1GeV/c*0.1GeV/c)",60,0,6,30,0,30)
+h2_pt_pz_Ks_daug1 = TH2F("h2_pt_pz_Ks_daug1",";p_{T} (GeV/c);|p_{z}| (GeV/c); Events/(1GeV/c*0.1GeV/c)",60,0,6,30,0,30)
+h2_eta_pt_Ks_daug0 = TH2F("h2_eta_pt_Ks_daug0",";#eta K_{s} daughter;p_{T} K_{s} daughter (GeV/c); Events/(0.1#eta*0.1GeV/c)",100,-5,5,60,0,6)
+h2_eta_pt_Ks_daug1 = TH2F("h2_eta_pt_Ks_daug1",";#eta K_{s} daughter;p_{T} K_{s} daughter (GeV/c);  Events/(0.1#eta*0.1GeV/c)",100,-5,5,60,0,6)
+h2_eta_pz_Ks_daug0 = TH2F("h2_eta_pz_Ks_daug0",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV/c); Events/(0.1#eta*1GeV/c)",100,-5,5,60,0,60)
+h2_eta_pz_Ks_daug1 = TH2F("h2_eta_pz_Ks_daug1",";#eta K_{s} daughter;|p_{z}| K_{s} daughter (GeV/c);  Events/(0.1#eta*1GeV/c)",100,-5,5,60,0,60)
+h2_eta_p_Ks_daug0 = TH2F("h2_eta_p_Ks_daug0",";#eta K_{s} daughter;p K_{s} daughter (GeV/c); Events/(0.1#eta*0.1GeV/c)",100,-5,5,600,0,60)
+h2_eta_p_Ks_daug1 = TH2F("h2_eta_p_Ks_daug1",";#eta K_{s} daughter;p K_{s} daughter (GeV/c);  Events/(0.1#eta*0.1GeV/c)",100,-5,5,600,0,60)
 
 
-h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_p_AntiLambda = TH1F("h_p_AntiLambda",";p (GeV); Events/0.001GeV",6000,0,6)
-h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_pt_AntiLambda_Pion = TH1F("h_pt_AntiLambda_Pion",";p_{t} (GeV); Events/0.1GeV",60,0,6)
-h_p_AntiLambda_AntiProton = TH1F("h_p_AntiLambda_AntiProton",";} (GeV); Events/0.01GeV",6000,0,6)
-h_p_AntiLambda_Pion = TH1F("h_p_AntiLambda_Pion",";p (GeV); Events/0.01GeV",6000,0,6)
-h_pz_AntiLambda = TH1F("h_pz_AntiLambda",";p_{z} (GeV); Events/1GeV",30,0,30)
-h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV); Events/1GeV",30,0,30)
-h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV); Events/1GeV",30,0,30)
-h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{t} (GeV);|p_{z}| (GeV); Events/(1GeV*0.1GeV)",60,0,6,30,0,30)
-h2_eta_pt_AntiLambda_AntiProton = TH2F("h2_eta_pt_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p_{t} #bar{#Lambda}^{0}-#bar{p} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,60,0,6)
-h2_eta_pt_AntiLambda_Pion = TH2F("h2_eta_pt_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};p_{t} #bar{#Lambda}^{0}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",80,-4,4,15,0,1.5)
-h2_eta_pz_AntiLambda_AntiProton = TH2F("h2_eta_pz_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p_{z}| #bar{#Lambda}^{0}-#bar{p} (GeV); Events/(0.1#eta*1GeV)",100,-5,5,60,0,60)
-h2_eta_pz_AntiLambda_Pion = TH2F("h2_eta_pz_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};|p_{z}| #bar{#Lambda}^{0}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",80,-4,4,60,0,6)
-h2_eta_p_AntiLambda_AntiProton = TH2F("h2_eta_p_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p #bar{#Lambda}^{0}-#bar{p} (GeV); Events/(0.1#eta*0.1GeV)",100,-5,5,600,0,60)
-h2_eta_p_AntiLambda_Pion = TH2F("h2_eta_p_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};p #bar{#Lambda}^{0}-#pi^{+} (GeV); Events/(0.1#eta*0.1GeV)",80,-4,4,60,0,6)
+h_pt_AntiLambda = TH1F("h_pt_AntiLambda",";p_{T} (GeV/c); Events/0.1GeV/c",60,0,6)
+h_p_AntiLambda = TH1F("h_p_AntiLambda",";p (GeV/c); Events/0.001GeV/c",6000,0,6)
+h_pt_AntiLambda_AntiProton = TH1F("h_pt_AntiLambda_AntiProton",";p_{T} (GeV/c); Events/0.1GeV/c",60,0,6)
+h_pt_AntiLambda_Pion = TH1F("h_pt_AntiLambda_Pion",";p_{T} (GeV/c); Events/0.1GeV/c",60,0,6)
+h_p_AntiLambda_AntiProton = TH1F("h_p_AntiLambda_AntiProton",";} (GeV/c); Events/0.01GeV/c",6000,0,6)
+h_p_AntiLambda_Pion = TH1F("h_p_AntiLambda_Pion",";p (GeV/c); Events/0.01GeV/c",6000,0,6)
+h_pz_AntiLambda = TH1F("h_pz_AntiLambda",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h_pz_AntiLambda_AntiProton = TH1F("h_pz_AntiLambda_AntiProton",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h_pz_AntiLambda_Pion = TH1F("h_pz_AntiLambda_Pion",";p_{z} (GeV/c); Events/1GeV/c",30,0,30)
+h2_pt_pz_AntiLambda_AntiProton = TH2F("h2_pt_pz_AntiLambda_AntiProton",";p_{T} (GeV/c);|p_{z}| (GeV/c); Events/(1GeV/c*0.1GeV/c)",60,0,6,30,0,30)
+h2_pt_pz_AntiLambda_Pion = TH2F("h2_pt_pz_AntiLambda_Pion",";p_{T} (GeV/c);|p_{z}| (GeV/c); Events/(1GeV/c*0.1GeV/c)",60,0,6,30,0,30)
+h2_eta_pt_AntiLambda_AntiProton = TH2F("h2_eta_pt_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p_{T} #bar{#Lambda}^{0}-#bar{p} (GeV/c); Events/(0.1#eta*0.1GeV/c)",100,-5,5,60,0,6)
+h2_eta_pt_AntiLambda_Pion = TH2F("h2_eta_pt_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};p_{T} #bar{#Lambda}^{0}-#pi^{+} (GeV/c); Events/(0.1#eta*0.1GeV/c)",80,-4,4,15,0,1.5)
+h2_eta_pz_AntiLambda_AntiProton = TH2F("h2_eta_pz_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p_{z}| #bar{#Lambda}^{0}-#bar{p} (GeV/c); Events/(0.1#eta*1GeV/c)",100,-5,5,60,0,60)
+h2_eta_pz_AntiLambda_Pion = TH2F("h2_eta_pz_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};|p_{z}| #bar{#Lambda}^{0}-#pi^{+} (GeV/c); Events/(0.1#eta*0.1GeV/c)",80,-4,4,60,0,6)
+h2_eta_p_AntiLambda_AntiProton = TH2F("h2_eta_p_AntiLambda_AntiProton",";#eta #bar{#Lambda}^{0}-#bar{p};p #bar{#Lambda}^{0}-#bar{p} (GeV/c); Events/(0.1#eta*0.1GeV/c)",100,-5,5,600,0,60)
+h2_eta_p_AntiLambda_Pion = TH2F("h2_eta_p_AntiLambda_Pion",";#eta #bar{#Lambda}^{0}-#pi^{+};p #bar{#Lambda}^{0}-#pi^{+} (GeV/c); Events/(0.1#eta*0.1GeV/c)",80,-4,4,60,0,6)
 
 #the 3D angle(displacement, momentum) of the Ks, Lambda and 4 granddaugthers. This learns what is the the fraction that is actually pointing backwards
 h_Ks_openings_angle_displacement_momentum = TH1F("h_Ks_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{bs,cv}) (rad);Events/0.1rad ",70,-3.5,3.5)
@@ -379,33 +380,39 @@ h_GEN_Ks_daughters_openings_angle_displacement_momentum = TH1F("h_GEN_Ks_daughte
 h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum = TH1F("h_GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{bs,cv}) (rad);Events/0.1rad ",70,-3.5,3.5)
 h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum = TH1F("h_GEN_AntiLambda_Pion_openings_angle_displacement_momentum",";openings angle (#vec{p},#vec{l}_{bs,cv}) (rad);Events/0.1rad ",70,-3.5,3.5)
 
-#PCAs of the granddughters of the antiS
+#PCAs of the granddughters of the antiS and the daugthers
 PCA_granddaughters_dir = fOut.mkdir("PCA_granddaughters")
 PCA_granddaughters_dir.cd()
 
-h_dxy_Ks_daug0 = TH1F("h_dxy_Ks_daug0",";d_{0} (cm); Events/mm",200,-10,10)
-h_dxy_Ks_daug1 = TH1F("h_dxy_Ks_daug1",";d_{0} (cm); Events/mm",200,-10,10)
-h_dz_Ks_daug0 = TH1F("h_dz_Ks_daug0",";d_{z} (cm); Events/5cm",60,-150,150)
-h_dz_Ks_daug1 = TH1F("h_dz_Ks_daug1",";d_{z} (cm); Events/5cm",60,-150,150)
+h_dxy_Ks = TH1F("h_dxy_Ks",";d_{0,bs} (cm); Events/mm",200,-10,10)
+h_dxy_AntiLambda = TH1F("h_dxy_AntiLambda",";d_{0,bs} (cm); Events/mm",200,-10,10)
 
-h_dxy_AntiLambda_AntiProton = TH1F("h_dxy_AntiLambda_AntiProton",";d_{0} (cm); Events/mm",200,-10,10)
-h_dxy_AntiLambda_Pion = TH1F("h_dxy_AntiLambda_Pion",";d_{0} (cm); Events/mm",200,-10,10)
-h_dz_AntiLambda_AntiProton = TH1F("h_dz_AntiLambda_AntiProton",";d_{z} (cm); Events/5cm",60,-150,150)
-h_dz_AntiLambda_Pion = TH1F("h_dz_AntiLambda_Pion",";d_{z} (cm); Events/5cm",60,-150,150)
+h_dz_Ks = TH1F("h_dz_Ks",";d_{z,bs} (cm); Events/5cm",60,-150,150)
+h_dz_AntiLambda = TH1F("h_dz_AntiLambda",";d_{z,bs} (cm); Events/5cm",60,-150,150)
+
+h_dxy_Ks_daug0 = TH1F("h_dxy_Ks_daug0",";d_{0,bs} (cm); Events/mm",200,-10,10)
+h_dxy_Ks_daug1 = TH1F("h_dxy_Ks_daug1",";d_{0,bs} (cm); Events/mm",200,-10,10)
+h_dz_Ks_daug0 = TH1F("h_dz_Ks_daug0",";d_{z,bs} (cm); Events/5cm",60,-150,150)
+h_dz_Ks_daug1 = TH1F("h_dz_Ks_daug1",";d_{z,bs} (cm); Events/5cm",60,-150,150)
+
+h_dxy_AntiLambda_AntiProton = TH1F("h_dxy_AntiLambda_AntiProton",";d_{0,bs} (cm); Events/mm",200,-10,10)
+h_dxy_AntiLambda_Pion = TH1F("h_dxy_AntiLambda_Pion",";d_{0,bs} (cm); Events/mm",200,-10,10)
+h_dz_AntiLambda_AntiProton = TH1F("h_dz_AntiLambda_AntiProton",";d_{z,bs} (cm); Events/5cm",60,-150,150)
+h_dz_AntiLambda_Pion = TH1F("h_dz_AntiLambda_Pion",";d_{z,bs} (cm); Events/5cm",60,-150,150)
 
 
 #info on the decay vertices of the V0s
 decay_vertex_dir = fOut.mkdir("decay_vertex_V0s")
 decay_vertex_dir.cd()
-h_lxy_creation_vertex_Ks_daughters = TH1F("h_lxy_creation_vertex_Ks_daughters",";l_{0,bs} cv (cm);Events/cm ",80,0,80)
+h_lxy_creation_vertex_Ks_daughters = TH1F("h_lxy_creation_vertex_Ks_daughters",";l_{0,bpc} cv (cm);Events/cm ",80,0,80) 
 h_vz_creation_vertex_Ks_daughters = TH1F("h_vz_creation_vertex_Ks_daughters",";absolute v_{z} cv (cm);Events/10cm",50,-250,250)
-h_lxy_creation_vertex_AntiLambda_daughters = TH1F("h_lxy_creation_vertex_AntiLambda_daughters",";l_{0,bs} cv (cm);Events/cm",80,0,80)
+h_lxy_creation_vertex_AntiLambda_daughters = TH1F("h_lxy_creation_vertex_AntiLambda_daughters",";l_{0,bpc} cv (cm);Events/cm",80,0,80)
 h_vz_creation_vertex_AntiLambda_daughters = TH1F("h_vz_creation_vertex_AntiLambda_daughters",";absoolute v_{z} cv (cm);Events/10cm",50,-250,250)
 
 h2_vx_vy_creation_vertex_Ks_daughters = TH2F("h2_vx_vy_creation_vertex_Ks_daughters",";absolute v_{x} decay vertex K_{S}^{0} (cm);absolute v_{y} decay vertex K_{S}^{0} (cm);Events/cm^{2}",160,-80,80,160,-80,80)
-h2_vz_lxy_creation_vertex_Ks_daughters = TH2F("h2_vz_lxy_creation_vertex_Ks_daughters",";absolute v_{z} decay vertex K_{S}^{0} (cm);l_{0,bs} decay vertex K_{S}^{0} (cm);Events/cm^{2}",500,-250,250,80,0,80)
+h2_vz_lxy_creation_vertex_Ks_daughters = TH2F("h2_vz_lxy_creation_vertex_Ks_daughters",";absolute v_{z} decay vertex K_{S}^{0} (cm);l_{0,bpc} decay vertex K_{S}^{0} (cm);Events/cm^{2}",500,-250,250,80,0,80)
 h2_vx_vy_creation_vertex_AntiLambda_daughters = TH2F("h2_vx_vy_creation_vertex_AntiLambda_daughters",";absolute v_{x} decay vertex #bar{#Lambda}^{0} (cm); absolute v_{y} decay vertex #bar{#Lambda}^{0} (cm);Events/cm^{2}",160,-80,80,160,-80,80)
-h2_vz_lxy_creation_vertex_AntiLambda_daughters = TH2F("h2_vz_lxy_creation_vertex_AntiLambda_daughters",";absolute v_{z} decay vertex #bar{#Lambda}^{0} (cm);l_{0,bs} decay vertex #bar{#Lambda}^{0} (cm);Events/cm^{2}",500,-250,250,80,0,80)
+h2_vz_lxy_creation_vertex_AntiLambda_daughters = TH2F("h2_vz_lxy_creation_vertex_AntiLambda_daughters",";absolute v_{z} decay vertex #bar{#Lambda}^{0} (cm);l_{0,bpc} decay vertex #bar{#Lambda}^{0} (cm);Events/cm^{2}",500,-250,250,80,0,80)
 
 
 for i in range(0,tree.GetEntries()):
@@ -456,6 +463,11 @@ for i in range(0,tree.GetEntries()):
 	h2_eta_p_Ks_daug0.Fill(tree._GEN_Ks_daughter0_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter0_pt[0],2)+np.power(tree._GEN_Ks_daughter0_pz[0],2)),weight_factor)
 	h2_eta_p_Ks_daug1.Fill(tree._GEN_Ks_daughter1_eta[0],np.sqrt(np.power(tree._GEN_Ks_daughter1_pt[0],2)+np.power(tree._GEN_Ks_daughter1_pz[0],2)),weight_factor)
 
+	h_dxy_Ks.Fill(tree._Ks_dxy[0],weight_factor)
+	h_dxy_AntiLambda.Fill(tree._Lambda_dxy[0],weight_factor)
+	h_dz_Ks.Fill(tree._Ks_dz[0],weight_factor)
+	h_dz_AntiLambda.Fill(tree._Lambda_dz[0],weight_factor)
+
 	h_dxy_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dxy[0],weight_factor)
 	h_dxy_Ks_daug1.Fill(tree._GEN_Ks_daughter1_dxy[0],weight_factor)
 	h_dz_Ks_daug0.Fill(tree._GEN_Ks_daughter0_dz[0],weight_factor)
@@ -494,15 +506,15 @@ for i in range(0,tree.GetEntries()):
 	h_dz_AntiLambda_Pion.Fill(tree._GEN_AntiLambda_Pion_dz[0],weight_factor)
 	
 	#need only one of the granddaughter of each V0, as their creation vertex is the same
-	h_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_lxy[0],weight_factor)
+	h_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_lxy_zero[0],weight_factor)
 	h_vz_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],weight_factor)
-	h_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_lxy[0],weight_factor)
+	h_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_lxy_zero[0],weight_factor)
 	h_vz_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],weight_factor)
 
 	h2_vx_vy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vx[0],tree._GEN_Ks_daughter0_vy[0],weight_factor)
-	h2_vz_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy[0],weight_factor)
+	h2_vz_lxy_creation_vertex_Ks_daughters.Fill(tree._GEN_Ks_daughter0_vz[0],tree._GEN_Ks_daughter0_lxy_zero[0],weight_factor)
 	h2_vx_vy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vx[0],tree._GEN_AntiLambda_AntiProton_vy[0],weight_factor)
-	h2_vz_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy[0],weight_factor)
+	h2_vz_lxy_creation_vertex_AntiLambda_daughters.Fill(tree._GEN_AntiLambda_AntiProton_vz[0],tree._GEN_AntiLambda_AntiProton_lxy_zero[0],weight_factor)
 
 	
 antiS_properties_dir.cd()
@@ -515,7 +527,7 @@ for h in l_TH2F:
 	c.SetRightMargin(0.2) #make room for the tile of the z scale
 	if(h.GetSumw2N() == 0):
 		h.Sumw2(kTRUE)
-	h.Scale(1./h.Integral(), "width");
+	#h.Scale(1./h.Integral(), "width");
 	h.Draw("colz")
 	h.SetStats(0)
 	CMS_lumi.CMS_lumi(c, 0, 11)
@@ -545,6 +557,7 @@ for h in l_TH1F:
 	if(h.GetSumw2N() == 0):
 		h.Sumw2(kTRUE)
 	h.Scale(1./h.Integral(), "width");
+	h.GetYaxis().SetTitle("1/N_{ev}"+h.GetYaxis().GetTitle())
 	h.Draw("CL")
 	h.SetStats(0)
 	CMS_lumi.CMS_lumi(c, 0, 11)
@@ -568,7 +581,7 @@ for h in l_TH2F:
         c.SetRightMargin(0.2) #make room for the tile of the z scale
         if(h.GetSumw2N() == 0):
                 h.Sumw2(kTRUE)
-        h.Scale(1./h.Integral(), "width");
+        #h.Scale(1./h.Integral(), "width");
         h.Draw("colz")
         h.SetStats(0)
 	c.SetLogz()
@@ -582,6 +595,7 @@ h_neutron_momentum.Draw("PCE1")
 if(h_neutron_momentum.GetSumw2N() == 0):
 	h_neutron_momentum.Sumw2(kTRUE)
 h_neutron_momentum.Scale(1./h_neutron_momentum.Integral(), "width");
+h_neutron_momentum.GetYaxis().SetTitle("1/N_{ev}"+h_neutron_momentum.GetYaxis().GetTitle())
 h_neutron_momentum.SetLineColor(colours[0])
 h_neutron_momentum.SetMarkerStyle(22)
 h_neutron_momentum.SetMarkerColor(colours[0])
@@ -599,6 +613,7 @@ for h in l_TH1F:
 	if(h.GetSumw2N() == 0):
 		h.Sumw2(kTRUE)
 	h.Scale(1./h.Integral(), "width");
+	h.GetYaxis().SetTitle("1/N_{ev}"+h.GetYaxis().GetTitle())
 	h.SetLineColor(colours[0])
 	h.SetMarkerStyle(22)
 	h.SetMarkerColor(colours[0])
@@ -613,7 +628,7 @@ c_h2_antiS_inv_mass_p_Ks_plus_Lambda= TCanvas(h2_antiS_inv_mass_p_Ks_plus_Lambda
 c_h2_antiS_inv_mass_p_Ks_plus_Lambda.SetRightMargin(0.2) #make room for the tile of the z scale
 if(h2_antiS_inv_mass_p_Ks_plus_Lambda.GetSumw2N() == 0):
 	h2_antiS_inv_mass_p_Ks_plus_Lambda.Sumw2(kTRUE)
-h2_antiS_inv_mass_p_Ks_plus_Lambda.Scale(1./h2_antiS_inv_mass_p_Ks_plus_Lambda.Integral(), "width");
+#h2_antiS_inv_mass_p_Ks_plus_Lambda.Scale(1./h2_antiS_inv_mass_p_Ks_plus_Lambda.Integral(), "width");
 #h2_antiS_inv_mass_p_Ks_plus_Lambda.Draw("SURF1") #for 3D plot
 h2_antiS_inv_mass_p_Ks_plus_Lambda.Draw("colz")
 h2_antiS_inv_mass_p_Ks_plus_Lambda.SetStats(0)
@@ -661,6 +676,7 @@ for l in ll_TH1F:
 		if(h.GetSumw2N() == 0):
         	       h.Sumw2(kTRUE)
         	h.Scale(1./h.Integral(), "width");
+		h.GetYaxis().SetTitle("1/N_{ev}"+h.GetYaxis().GetTitle())
 		h.SetLineColor(colours[i_l_TH1F])
 		h.SetMarkerStyle(22+i_l_TH1F)
 		h.SetMarkerColor(colours[i_l_TH1F])
@@ -721,6 +737,10 @@ decay_vertex_dir.cd()
 ll_TH1F = [
 [h_lxy_creation_vertex_Ks_daughters,h_lxy_creation_vertex_AntiLambda_daughters],
 [h_vz_creation_vertex_Ks_daughters,h_vz_creation_vertex_AntiLambda_daughters],
+[h_dxy_AntiLambda_AntiProton,h_dxy_AntiLambda_Pion,h_dxy_AntiLambda],
+[h_dz_AntiLambda_AntiProton,h_dz_AntiLambda_Pion,h_dz_AntiLambda],
+[h_dxy_Ks_daug0,h_dxy_Ks],
+[h_dz_Ks_daug0,h_dz_Ks],
 [h_dxy_AntiLambda_AntiProton,h_dxy_AntiLambda_Pion,h_dxy_Ks_daug0],
 [h_dz_AntiLambda_AntiProton,h_dz_AntiLambda_Pion,h_dz_Ks_daug0]
 ]
@@ -728,16 +748,21 @@ ll_TH1F = [
 ll_legend_text =  [
 ["K_{S}^{0} daughters","#bar{#Lambda}^{0} daughters"],
 ["K_{S}^{0} daughters","#bar{#Lambda}^{0} daughters"],
-["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","K_{S} daughters"],
-["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","K_{S} daughters"],
+["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","#bar{#Lambda}^{0}"],
+["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","#bar{#Lambda}^{0}"],
+["K_{S}^{0} daughters","K_{S}^{0}"],
+["K_{S}^{0} daughters","K_{S}^{0}"],
+["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","K_{S}^{0} daughters"],
+["#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}-#pi^{+}","K_{S}^{0} daughters"]
 ]
+
 for l in ll_TH1F:
 	for h in l:
 		h.SetDirectory(0)
 
 i_ll_TH1F = 0
 for l in ll_TH1F:
-	legend = TLegend(0.6,0.85,0.99,0.99)
+	legend = TLegend(0.7,0.85,0.99,0.99)
 	c = TCanvas("c_"+l[0].GetName(),"");
 	i_l_TH1F = 0
 	for h in l:
@@ -748,6 +773,7 @@ for l in ll_TH1F:
 		if(h.GetSumw2N() == 0):
         	       h.Sumw2(kTRUE)
         	h.Scale(1./h.Integral(), "width");
+		h.GetYaxis().SetTitle("1/N_{ev}"+h.GetYaxis().GetTitle())
 		h.SetLineColor(colours[i_l_TH1F])
 		h.SetMarkerStyle(22+i_l_TH1F)
 		h.SetMarkerColor(colours[i_l_TH1F])
@@ -770,7 +796,7 @@ for h in l_TH2F:
         c.SetRightMargin(0.2) #make room for the tile of the z scale
         if(h.GetSumw2N() == 0):
                 h.Sumw2(kTRUE)
-        h.Scale(1./h.Integral(), "width");
+        #h.Scale(1./h.Integral(), "width");
         h.Draw("colz")
         h.SetStats(0)
 	c.SetLogz()

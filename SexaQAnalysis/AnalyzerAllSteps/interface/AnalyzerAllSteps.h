@@ -57,10 +57,12 @@ using namespace std;
 class AnalyzerAllSteps : public edm::EDAnalyzer
  {
   public:
-    static constexpr double deltaRCutV0RECOKs = 0.04;
-    static constexpr double deltaRCutV0RECOLambda = 0.04;
+    static constexpr double deltaRCutV0RECOKs = 0.03;
+    static constexpr double deltaLCutV0RECOKs = 2.;
+    static constexpr double deltaRCutV0RECOLambda = 0.03;
+    static constexpr double deltaLCutV0RECOLambda = 3.;
     static constexpr double deltaRCutRECOAntiS = 0.5;
-    static constexpr double deltaLCutInteractionVertexAntiSmin = 1.;
+    static constexpr double deltaLCutInteractionVertexAntiSmin = 2.;
 
     //definition of the background cuts
     static constexpr double MinLxyCut = 1.9;

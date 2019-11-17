@@ -226,7 +226,7 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   _nPV.push_back(nPVs);
   _nGoodPV.push_back(ngoodPVs);
   _nGoodPVPOG.push_back(ngoodPVsPOG);
-  _tree_PV->Fill();
+  //_tree_PV->Fill();
 
   //beamspot
   TVector3 beamspot(999999,999999,999999);

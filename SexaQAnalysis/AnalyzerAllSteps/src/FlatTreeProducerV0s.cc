@@ -10,7 +10,7 @@ FlatTreeProducerV0s::FlatTreeProducerV0s(edm::ParameterSet const& pset):
   m_offlinePVTag(pset.getParameter<edm::InputTag>("offlinePV")),
   m_genParticlesTag_GEN(pset.getParameter<edm::InputTag>("genCollection_GEN")),
   m_genParticlesTag_SIM_GEANT(pset.getParameter<edm::InputTag>("genCollection_SIM_GEANT")),
-  m_generalTracksTag(pset.getParameter<edm::InputTag>("generalTracksCollection")),
+  //m_generalTracksTag(pset.getParameter<edm::InputTag>("generalTracksCollection")),
   m_sCandsTag(pset.getParameter<edm::InputTag>("sexaqCandidates")),
   m_V0KsTag(pset.getParameter<edm::InputTag>("V0KsCollection")),
   m_V0LTag(pset.getParameter<edm::InputTag>("V0LCollection")),
@@ -22,7 +22,7 @@ FlatTreeProducerV0s::FlatTreeProducerV0s(edm::ParameterSet const& pset):
   m_offlinePVToken    (consumes<vector<reco::Vertex>>(m_offlinePVTag)),
   m_genParticlesToken_GEN(consumes<vector<reco::GenParticle> >(m_genParticlesTag_GEN)),
   m_genParticlesToken_SIM_GEANT(consumes<vector<reco::GenParticle> >(m_genParticlesTag_SIM_GEANT)),
-  m_generalTracksToken(consumes<View<reco::Track> >(m_generalTracksTag)),
+  //m_generalTracksToken(consumes<vector<reco::Track> >(m_generalTracksTag)),
   m_sCandsToken(consumes<vector<reco::VertexCompositeCandidate> >(m_sCandsTag)),
   m_V0KsToken(consumes<vector<reco::VertexCompositeCandidate> >(m_V0KsTag)),
   m_V0LToken(consumes<vector<reco::VertexCompositeCandidate> >(m_V0LTag)),
@@ -219,8 +219,8 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
   //General tracks particles
   //edm::Handle<vector<reco::Track>> h_generalTracks;
-  edm::Handle<View<reco::Track>> h_generalTracks;
-  iEvent.getByToken(m_generalTracksToken, h_generalTracks);
+  //edm::Handle<View<reco::Track>> h_generalTracks;
+  //iEvent.getByToken(m_generalTracksToken, h_generalTracks);
 
   //lambdaKshortVertexFilter sexaquark candidates
   edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands;
@@ -422,19 +422,19 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 
 	//loop over the track collection and count the number of high purity tracks to have an idea 
-	int nHighPurityTracks = 0;
-	if(h_generalTracks.isValid()){
-		for(unsigned int i = 0; i < h_generalTracks->size(); ++i){
-			const reco::Track *ptr = &h_generalTracks->at(i);
-			if( AnalyzerAllSteps::trackQualityAsInt(ptr) == 2) nHighPurityTracks++;
-		}
-	}
+	//int nHighPurityTracks = 0;
+	//if(h_generalTracks.isValid()){
+	//	for(unsigned int i = 0; i < h_generalTracks->size(); ++i){
+	//		const reco::Track *ptr = &h_generalTracks->at(i);
+	//		if( AnalyzerAllSteps::trackQualityAsInt(ptr) == 2) nHighPurityTracks++;
+	//	}
+	//}
 
 	InitGeneral();
 	_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ);
 	_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ);
-	_general_eventTrackMultiplicity.push_back(h_generalTracks->size());
-	_general_eventTrackMultiplicity_highPurity.push_back(nHighPurityTracks);
+	//_general_eventTrackMultiplicity.push_back(h_generalTracks->size());
+	//_general_eventTrackMultiplicity_highPurity.push_back(nHighPurityTracks);
 	_tree_general->Fill();
 	
 
@@ -452,7 +452,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
         	TVector3 V0Momentum(Ks->px(),Ks->py(),Ks->pz());
 		double dz_PV0 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PV0);
 
-		if(  (abs(deltaPhiKsHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiKsBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(Ks, beamspot, beamspotVariance, h_offlinePV, h_genParticles,  h_generalTracks, "Ks");
+		if(  (abs(deltaPhiKsHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiKsBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(Ks, beamspot, beamspotVariance, h_offlinePV, h_genParticles,  "Ks");
 	      }
 	  }
 	_tree_Ks->Fill();
@@ -467,7 +467,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
         	TVector3 V0Momentum(L->px(),L->py(),L->pz());
 		double dz_PV0 = AnalyzerAllSteps::dz_line_point(V0CreationVertex,V0Momentum,PV0);
 
-		if(  (abs(deltaPhiLHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiLBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(L, beamspot, beamspotVariance, h_offlinePV,h_genParticles, h_generalTracks, "Lambda");
+		if(  (abs(deltaPhiLHardCone) >  TMath::Pi()/3 &&  abs(deltaPhiLBackToBackHardCone) >  TMath::Pi()/3)  || abs(dz_PV0)>1  )  FillBranchesV0(L, beamspot, beamspotVariance, h_offlinePV,h_genParticles, "Lambda");
 	      }
 	  }
 	_tree_Lambda->Fill();
@@ -480,7 +480,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 
 
-void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * RECOV0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<View<reco::Track>> h_generalTracks, std::string V0Type){
+void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * RECOV0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, std::string V0Type){
 
 
 	math::XYZPoint beamspotPoint(beamspot.X(),beamspot.Y(),beamspot.Z());

@@ -6,7 +6,7 @@ import ROOT as rt
 #   Updated by:   Dinko Ferencek (Rutgers)
 #
 
-cmsText     = "CMS";
+cmsText     = "";#normally this is "CMS"
 cmsTextFont   = 50 
 
 writeExtraText = True
@@ -20,7 +20,7 @@ cmsTextSize      = 0.75
 cmsTextOffset    = 0.1
 
 relPosX    = 0.045
-relPosY    = 0.035
+relPosY    = -0.035
 relExtraDY = 1.2
 
 extraOverCmsTextSize  = 0.76

@@ -2,8 +2,8 @@ import sys
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-runningOnData = True #this flag is used for choosing whether you want to produce trees for data or for MC.  
-lookAtAntiS =   False  #This flag should be False if you are running on data unless you want to unblind. If you are running on MC it should be True as you want to see the signal.
+runningOnData = False #this flag is used for choosing whether you want to produce trees for data or for MC.  
+lookAtAntiS =   True  #This flag should be False if you are running on data unless you want to unblind. If you are running on MC it should be True as you want to see the signal.
 
 options = VarParsing ('analysis')
 options.parseArguments()

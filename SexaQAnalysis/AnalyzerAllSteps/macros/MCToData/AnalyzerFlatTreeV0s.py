@@ -211,8 +211,8 @@ f_poisson = TF1("f_poisson","[0]*(TMath::Exp(-x/[1]))", 0, lxyz_Ks_max)
 h2_RECO_Ks_vz_lxy_data = TH2F("h2_RECO_Ks_vz_lxy_data",";v_{z} K_{S} decay (cm);l_{0} K_{S} decay (cm);#entries",50,-100,100,20,0,100)
 h2_RECO_Ks_vz_lxy_mc   = TH2F("h2_RECO_Ks_vz_lxy_mc",";v_{z} K_{S} decay (cm);l_{0} K_{S} decay (cm);#entries",50,-100,100,20,0,100)
 
-h_Ks_mass_data = TH1F("h_Ks_mass_data",";mass K_{s} (GeV);Entries/1MeV",50,0.47,0.52)
-h_Ks_mass_mc = TH1F("h_Ks_mass_mc",";mass K_{s} (GeV);Entries/1MeV",50,0.475,0.525)
+h_Ks_mass_data = TH1F("h_Ks_mass_data",";mass K_{s} (GeV/c^{2});Entries/1MeV/c^{2}",35,0.48,0.515)
+h_Ks_mass_mc = TH1F("h_Ks_mass_mc",";mass K_{s} (GeV/c^{2});Entries/1MeV/c^{2}",35,0.48,0.515)
 
 iFile = 0
 for fIn in fIns:

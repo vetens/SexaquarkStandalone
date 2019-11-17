@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-day = "01102019"
+day = "02102019"
 version = "v1"
 mass = "1p8GeV"
 trial = "17"
@@ -18,7 +18,7 @@ config.JobType.priority = 101
 
 config.section_('Data') 
 config.Data.unitsPerJob = 25
-config.Data.totalUnits = 8909
+config.Data.totalUnits = 8910
 config.Data.publication = True
 config.Data.splitting = 'FileBased' 
 config.Data.outLFNDirBase = '/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed' 

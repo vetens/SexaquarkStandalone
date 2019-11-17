@@ -71,22 +71,23 @@ void fixsplithist(TH1* htop, TH1* hbot){
   double s = htop->GetYaxis()->GetLabelSize() * scale;
   double ss = htop->GetYaxis()->GetLabelSize();
   //hbot->GetYaxis()->SetLabelSize(s);
-  hbot->GetYaxis()->SetLabelSize(0.04);
+  hbot->GetYaxis()->SetLabelSize(0.05);
   //htop->GetYaxis()->SetLabelSize(ss);
-  htop->GetYaxis()->SetLabelSize(.1);
-  s = htop->GetYaxis()->GetTitleSize() * scale;
-  hbot->GetYaxis()->SetTitleSize(0.04);
+  htop->GetYaxis()->SetLabelSize(.6);
+  htop->GetYaxis()->SetTitleSize(.6);
+  //s = htop->GetYaxis()->GetTitleSize() * scale;
+  hbot->GetYaxis()->SetTitleSize(0.05);
 
-   hbot->GetYaxis()->SetTitleOffset(.45);  
-   htop->GetYaxis()->SetTitleOffset(.55);  
+   hbot->GetYaxis()->SetTitleOffset(.3);  
+   htop->GetYaxis()->SetTitleOffset(.2);  
 
   s = htop->GetYaxis()->GetLabelOffset() * scale;
 
-  s = htop->GetXaxis()->GetLabelSize() * scale;
-  hbot->GetXaxis()->SetLabelSize(0.04);
+  s = htop->GetXaxis()->GetLabelSize() ;
+  hbot->GetXaxis()->SetLabelSize(0.06);
   htop->GetXaxis()->SetLabelSize(0.);
   s = htop->GetXaxis()->GetTitleSize() * scale;
-  hbot->GetXaxis()->SetTitleSize(0.04);
+  hbot->GetXaxis()->SetTitleSize(0.06);
 
  
 
@@ -100,14 +101,14 @@ void colorIt(TH1D *hMidA, int kCyan ){
 	hMidA->SetMarkerColor(kCyan);
 	hMidA->SetLineColor(kCyan);
 	hMidA->SetMarkerStyle(22);//24
-    hMidA->SetMarkerSize(0.6);
+    hMidA->SetMarkerSize(0.9);
 //	hMidA->SetFillColor(kCyan);
 //	hMidA->SetFillStyle(0);	
     hMidA->GetXaxis()->SetLabelSize(0.05);
-	hMidA->GetXaxis()->SetTitleSize(0.06);
-    hMidA->GetYaxis()->SetTitleSize(0.05);
+	hMidA->GetXaxis()->SetTitleSize(0.1);
+    hMidA->GetYaxis()->SetTitleSize(0.1);
 	hMidA->GetYaxis()->SetTitleOffset(0.55);
-	hMidA->GetYaxis()->SetLabelSize(0.05);
+	hMidA->GetYaxis()->SetLabelSize(0.12);
 	hMidA->SetTitleFont(42, "XYZ");
     hMidA->SetLabelFont(42, "XYZ");
         }
@@ -288,12 +289,18 @@ void loop_macro_exc_inc(){
 
       c1->cd(); 
       auto legend = new TLegend(0.75,0.75,0.9,0.9);
-      colorIt(data,kBlack);  
+      colorIt(data,kBlue);  
       splithist(0.5);
       c1->cd(1);
       gPad->SetLogy(); 
       gPad->SetGridx(); 
-      gPad->SetGridy(); 
+      gPad->SetGridy();
+      mc->GetYaxis()->SetLabelSize(0.05);
+      data->GetYaxis()->SetLabelSize(0.05);
+      mc->GetYaxis()->SetTitleOffset(1.);
+      data->GetYaxis()->SetTitleOffset(1.);
+      mc->GetYaxis()->SetTitleSize(0.05);
+      data->GetYaxis()->SetTitleSize(0.05);
       mc->Draw("hhist");
       legend->AddEntry(mc,"MC","l");
       //for lambda
@@ -309,6 +316,7 @@ void loop_macro_exc_inc(){
       Mont->SetMinimum(0.5);
       Mont->SetMaximum(1.99);
       Mont->GetXaxis()->SetTitleOffset(1.2);
+      Mont->GetYaxis()->SetTitleOffset(1.2);
       Mont->SetYTitle("Data/MC");
       Mont->Draw("peX0C");// rec/gen
       fixsplithist(data,Mont);

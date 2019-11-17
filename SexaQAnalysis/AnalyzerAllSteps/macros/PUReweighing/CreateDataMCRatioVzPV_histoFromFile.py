@@ -50,8 +50,8 @@ NEventsData = h2_nPV_vzPV_Data.GetEntries()/h2_nPV_vzPV_Data.GetMean(1)
 NEventsMC   = h2_nPV_vzPV_MC.GetEntries()/h2_nPV_vzPV_MC.GetMean(1)
 h2_nPV_vzPV_Data.Scale(NEventsMC/NEventsData)
 
-print 'Events in the data: ', NEventsData 
-print 'Events in the MC:   ', NEventsMC
+print 'PVs in the data: ', h2_nPV_vzPV_Data.GetEntries() 
+print 'PVs in the MC:   ', h2_nPV_vzPV_MC.GetEntries()
 
 h_nPV_Data = h2_nPV_vzPV_Data.ProjectionX()
 h_nPV_MC = h2_nPV_vzPV_MC.ProjectionX()
@@ -143,6 +143,12 @@ h_nPV_MC_reweighed_2D.Write()
 h_vzPV_MC_reweighed_2D.Write()
 h2_nPV_vzPV_MC_reweighed_2D.Write()
 
+h_vzPV_Data.SetTitle(';absolute v_{z} valid PVs (cm);entries/5mm')
+h_vzPV_MC.SetTitle(';absolute v_{z} valid PVs (cm);entries/5mm')
+h_vzPV_MC_reweighed_2D.SetTitle(';absolute v_{z} valid PVs (cm);entries/5mm')
+h_vzPV_Data.Rebin(5)
+h_vzPV_MC.Rebin(5)
+h_vzPV_MC_reweighed_2D.Rebin(5)
 TH1_l = [h_vzPV_Data,h_vzPV_MC,h_vzPV_MC_reweighed_2D]
 Legend_l = ["Data","MC","MC reweighted"]
 Legend_l_type = ["l","l","lep"]
@@ -176,6 +182,9 @@ c.Write()
 c_name = "c_nPV_2D_PUReweighing"
 c = TCanvas(c_name,"")
 legend = TLegend(0.8,0.85,0.99,0.99)
+h_nPV_Data.SetTitle(';# valid PVs;#entries')
+h_nPV_MC.SetTitle(';# valid PVs;#entries')
+h_nPV_MC_reweighed_2D.SetTitle(';# valid PVs;#entries')
 TH1_l = [h_nPV_Data,h_nPV_MC,h_nPV_MC_reweighed_2D]
 
 for j in [2,1,0]:

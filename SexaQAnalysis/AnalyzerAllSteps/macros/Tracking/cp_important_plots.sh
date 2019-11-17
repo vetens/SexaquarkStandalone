@@ -68,6 +68,15 @@ array=(
 'c_h_GENRECO_matcher2_antiS.pdf'
 'c_h_GENRECO_matcher2_Ks.pdf'
 'h2_allTracksMoreThan6Hits_efficiency.pdf'
+
+'h2_teff_nomAntiS_RECO_eff_lxy_antiS.pdf'
+'h2_teff_nomKs_RECO_eff_vz_lxy_antiS.pdf'
+'h2_teff_nomAntiLambda_RECO_eff_vz_lxy_antiS.pdf'
+'h2_teff_nomKsdaughters_RECO_eff_vz_lxy_antiS.pdf'
+'h2_teff_nomAntiLambdaPion_RECO_eff_vz_lxy_antiS.pdf'
+'h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS.pdf'
+
+
 )
 
 source_dir="plots_Tracking_AntiS_specific/"

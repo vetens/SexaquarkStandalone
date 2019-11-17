@@ -21,11 +21,11 @@ tdrstyle.setTDRStyle()
 
 colours = [4,2,35,1,38,41]
 
-maxEvents = 5e99
+maxEvents = 1e99
 
 
 #you can use this script to compared different collections of S and antiS to eachother. The most common one is comparing Data-S-BKG to MC-AntiS-Signal. The other option is comparing MC-S-BKG to MC-AntiS-BKG to Data-S-BKG
-configuration = "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" # "MC-AntiS-Signal" "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" 
+configuration = "all" # "MC-AntiS-Signal" "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" 
 post_BDT = False
 
 
@@ -38,9 +38,9 @@ BkgFile_Data_S  = ROOT.TFile.Open(config_dict["config_BkgFileData"])
 
 #for when you have the BDT parameter in your tree:
 if(post_BDT):
-	BkgFile_MC_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected18Parameters_CutLxy_CutErrorLxy_CutDxyOverLxy_CutFiducialRegionSyst_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-S-BKG-DYJets_blablablablablabl.root")
-	BkgFile_MC_AntiS  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected18Parameters_CutLxy_CutErrorLxy_CutDxyOverLxy_CutFiducialRegionSyst_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-AntiS-BKG-DYJets_blablablablablabl.root")
-	BkgFile_Data_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected18Parameters_CutLxy_CutErrorLxy_CutDxyOverLxy_CutFiducialRegionSyst_SignalWeighing/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+	BkgFile_MC_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-S-BKG-DYJets_blablablablablabl.root")
+	BkgFile_MC_AntiS  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-AntiS-BKG-DYJets_blablablablablabl.root")
+	BkgFile_Data_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
 
 #select the trees
 # Get signal and background trees from file
@@ -134,9 +134,6 @@ if(configuration == "all"):
 	Legend = Legend_all
 	l_tree = [selectedBkgTree_MC_S_BKG, selectedBkgTree_MC_AntiS_BKG, selectedBkgTree_Data_S_BKG,selectedSignalTree]
 
-#first loop over all the entries to see how much each of the pre-BDT cuts is excluding
-numerators = [[0,0,0,0]*len(l_tree)] #for each tree there are 4 cuts to evaluate
-denominators = [[0,0,0,0]*len(l_tree)] #for each tree there are 4 cuts to evaluate
 
 TH1_ll = [] #list of list of 1D histos 
 TH2_ll = [] #list of list of 2D histos
@@ -147,8 +144,8 @@ for tree in l_tree:
 	h_S_vz_interaction_vertex= TH1F('h_S_vz_interaction_vertex','; absolute v_{z} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/3cm',20,-40,40)
 	h_S_lxy_interaction_vertex = TH1F('h_S_lxy_interaction_vertex','; l_{0,bpc} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/0.2mm',31,1.9,2.52)
 
-	h_S_daughters_deltaphi = TH1F('h_S_daughters_deltaphi','; #Delta#phi( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0}) (rad); 1/N_{ev} Events/0.2rad',34,-3.4,3.4)
-	h_S_daughters_deltaeta = TH1F('h_S_daughters_deltaeta','; #Delta#eta( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0}) ; 1/N_{ev} Events/0.2rad',30,-3,3)
+	h_S_daughters_deltaphi = TH1F('h_S_daughters_deltaphi','; #Delta#phi( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0}) (rad); 1/N_{ev} Events/0.2rad',32,-3.2,3.2)
+	h_S_daughters_deltaeta = TH1F('h_S_daughters_deltaeta','; #Delta#eta( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0}) ; 1/N_{ev} Events/0.2rad',31,-3.1,3.1)
 	h_S_daughters_openingsangle = TH1F('h_S_daughters_openingsangle','; openings angle( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0} ) (rad); 1/N_{ev} Events/0.1rad',35,0,3.5)
 	h_S_daughters_DeltaR = TH1F('h_S_daughters_DeltaR','; #DeltaR( ^{(} #bar{#Lambda} ^{)} ^{0} , K_{S}^{0} ); 1/N_{ev} Events/0.1#DeltaR',60,0.5,6.5)
 	h_S_Ks_openingsangle = TH1F('h_S_Ks_openingsangle','; openings angle( ^{(} #bar{S} ^{)} , K_{S}^{0}) (rad); 1/N_{ev} Events/0.1rad',20,0,2)
@@ -187,7 +184,7 @@ for tree in l_tree:
 		tree.GetEntry(i)
 		
 		#for when you have the BDT parameter in your tree:
-		if(post_BDT and tree.SexaqBDT <= -0.1):continue
+		if(post_BDT and tree.SexaqBDT <= -0.15):continue
 
 		#need to reweigh the MC signal events, because the ones with high eta are more important, because they will pass more material
 		reweighing_factor = config.calc_reweighing_factor(tree._S_eta[0],'MC-#bar{S}-Signal' in Legend[iTree])

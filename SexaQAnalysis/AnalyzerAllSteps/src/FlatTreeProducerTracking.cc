@@ -276,6 +276,40 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
   if(!h_TP.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackingParticles collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
   if(!h_trackAssociator.isValid()){ std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackAssociator collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;}
 
+  //loop over the gen particles, check for this antiS if there are any antiS with the same eta, so duplicates
+  //save the number of duplicates in a vector of vectors. Each vector has  as a first element the eta of the antiS and 2nd element the # of antiS with this eta. 
+  vector<vector<float>> v_antiS_momenta_and_itt; 
+  for(unsigned int i = 0; i < h_genParticles->size(); ++i){
+	const reco::Candidate * genParticle = &h_genParticles->at(i);
+
+  	if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
+
+	int duplicateIt = -1; 
+	for(unsigned int j = 0; j<v_antiS_momenta_and_itt.size();j++){//check if this antiS is already in the list.
+		if(v_antiS_momenta_and_itt[j][0] == genParticle->eta()){//you found a duplicate
+			duplicateIt = j;
+		}
+	}
+
+	if(duplicateIt>-1){	
+			v_antiS_momenta_and_itt[duplicateIt][1]++;
+	}
+	else{//this is a new antiS
+		double weight_PU = 0.;
+		if(nGoodPV < AnalyzerAllSteps::v_mapPU.size()) weight_PU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],genParticle->vz());
+		nTotalUniqueGenS_weighted = nTotalUniqueGenS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
+		vector<float> dummyVec; 
+		dummyVec.push_back(genParticle->eta());
+		dummyVec.push_back(1.);
+		v_antiS_momenta_and_itt.push_back(dummyVec);
+
+
+	}
+  }
+  std::cout << "In this event found " << v_antiS_momenta_and_itt.size() << " unique AntiS, with following #duplicates: " << std::endl;
+  for(unsigned int j = 0; j<v_antiS_momenta_and_itt.size();j++){
+	std::cout << v_antiS_momenta_and_itt[j][1] << " with eta " << v_antiS_momenta_and_itt[j][0] << std::endl;
+  }
 //evaluate tracking performance
 /*  if(h_generalTracks.isValid() && h_TP.isValid() && h_trackAssociator.isValid()){
 	for(size_t i=0; i<TPColl.size(); ++i) {
@@ -341,7 +375,7 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 		//the duplicate antiS from the looping have their creation vertex at the same location as the production vertex, so exclude these
 		if(tp.vx()==antisDecayVx && tp.vy() == antisDecayVy && tp.vz() == antisDecayVz) continue;
 		nUniqueAntiSInThisEvent++;
-		
+		totalNumberOfUniqueAntiS_FromTrackingParticles++;		
 
 		int returnCodeFillTreesAntiSAndDaughters = FillTreesAntiSAndDaughters(tp, beamspot, beamspotPoint, beamspotVariance, nPVs, h_generalTracks, h_TP, h_trackAssociator, h_V0Ks, h_V0L, h_sCands, TPColl, simRecColl, theBeamSpot, theMagneticField,nGoodPV);
  		if(returnCodeFillTreesAntiSAndDaughters == 0 || returnCodeFillTreesAntiSAndDaughters == 1) nUniqueAntiSWithCorrectGranddaughtersThisEvent++;
@@ -458,7 +492,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	int tp_it_AntiLambda_posPion = -1;
 	int tp_it_AntiLambda_AntiProton = -1;
 
-	int numberOfGranddaughtersFound = 0;
+	int numberOfGranddaughtersFoundThisEvent = 0;
 	
 	tv_iterator antiS_firstDecayVertex = tp.decayVertices_begin();
 	double antisDecayVx = (**antiS_firstDecayVertex).position().X(); double antisDecayVy = (**antiS_firstDecayVertex).position().Y(); double antisDecayVz = (**antiS_firstDecayVertex).position().Z();
@@ -493,10 +527,10 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
                                                 if(daughterdecayVx == granddaughterProductionVx && daughterdecayVy == granddaughterProductionVy && daughterdecayVz == granddaughterProductionVz){
 
-							if(abs(tp_daughter.pdgId()) == AnalyzerAllSteps::pdgIdKs && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdPosPion){ tp_Ks_posPion = tp_granddaughter;numberOfGranddaughtersFound++;tp_it_Ks_posPion = k;}
-							if(abs(tp_daughter.pdgId()) == AnalyzerAllSteps::pdgIdKs && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdNegPion){ tp_Ks_negPion = tp_granddaughter;numberOfGranddaughtersFound++;tp_it_Ks_negPion = k;}
-							if( tp_daughter.pdgId() == AnalyzerAllSteps::pdgIdAntiLambda && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdPosPion){ tp_AntiLambda_posPion = tp_granddaughter;numberOfGranddaughtersFound++;tp_it_AntiLambda_posPion = k;}
-							if( tp_daughter.pdgId() == AnalyzerAllSteps::pdgIdAntiLambda && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdAntiProton){ tp_AntiLambda_AntiProton = tp_granddaughter;numberOfGranddaughtersFound++;tp_it_AntiLambda_AntiProton = k;}
+							if(abs(tp_daughter.pdgId()) == AnalyzerAllSteps::pdgIdKs && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdPosPion){ tp_Ks_posPion = tp_granddaughter;numberOfGranddaughtersFoundThisEvent++;tp_it_Ks_posPion = k;}
+							if(abs(tp_daughter.pdgId()) == AnalyzerAllSteps::pdgIdKs && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdNegPion){ tp_Ks_negPion = tp_granddaughter;numberOfGranddaughtersFoundThisEvent++;tp_it_Ks_negPion = k;}
+							if( tp_daughter.pdgId() == AnalyzerAllSteps::pdgIdAntiLambda && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdPosPion){ tp_AntiLambda_posPion = tp_granddaughter;numberOfGranddaughtersFoundThisEvent++;tp_it_AntiLambda_posPion = k;}
+							if( tp_daughter.pdgId() == AnalyzerAllSteps::pdgIdAntiLambda && tp_granddaughter.pdgId() == AnalyzerAllSteps::pdgIdAntiProton){ tp_AntiLambda_AntiProton = tp_granddaughter;numberOfGranddaughtersFoundThisEvent++;tp_it_AntiLambda_AntiProton = k;}
                                                 }
                                         }//end if good granddaughter
                                 }//end loop over the tp to find granddaughter
@@ -504,8 +538,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
                 }//end check for pdgId daughter
         }//end loop over tp to find daughters
 
-	std::cout << "numberOfGranddaughtersFound in this event: " << numberOfGranddaughtersFound << std::endl;
-	totalNumberOfUniqueAntiS++;
+	std::cout << "number trackingParticle granddaughters found in this event: " << numberOfGranddaughtersFoundThisEvent << std::endl;
 
 	//now only when there are 4 correct tp granddaughters found you have the chance to actually reconstruct them, so save only those events in the tree
 	if(tp_it_Ks_posPion == -1 || tp_it_Ks_negPion == -1 || tp_it_AntiLambda_posPion == -1 || tp_it_AntiLambda_AntiProton == -1) return -1;
@@ -541,7 +574,6 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
 		}
 	}
-	if( deltaLInteractionVertexAntiSmin < AnalyzerAllSteps::deltaLCutInteractionVertexAntiSmin) RECOAntiSFound = true;
 
 	
 	double deltaRminKs = 999.;
@@ -561,7 +593,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	double deltaRminKs_deltaL = 999.;
 	if(bestMatchingKs > -1) deltaRminKs_deltaL = sqrt( pow(tp_Ks_posPion.vx() - h_V0Ks->at(bestMatchingKs).vx(),2) + pow(tp_Ks_posPion.vy() - h_V0Ks->at(bestMatchingKs).vy(),2) + pow(tp_Ks_posPion.vz() - h_V0Ks->at(bestMatchingKs).vz(),2) );
 
-	if( deltaRminKs <  AnalyzerAllSteps::deltaRCutV0RECOKs) RECOKsFound = true;
+	if( deltaRminKs <  AnalyzerAllSteps::deltaRCutV0RECOKs && deltaRminKs_deltaL < AnalyzerAllSteps::deltaLCutV0RECOKs ) RECOKsFound = true;
 
 	double deltaRminAntiL = 999.;
 	int bestMatchingAntiL = -1;
@@ -579,7 +611,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	double deltaRminAntiL_deltaL = 999.;
 	if(bestMatchingAntiL > -1) deltaRminAntiL_deltaL = sqrt( pow(tp_AntiLambda_posPion.vx() - h_V0L->at(bestMatchingAntiL).vx(),2) + pow(tp_AntiLambda_posPion.vy() - h_V0L->at(bestMatchingAntiL).vy(),2) + pow(tp_AntiLambda_posPion.vz() - h_V0L->at(bestMatchingAntiL).vz(),2) );
 
-	if( deltaRminAntiL <  AnalyzerAllSteps::deltaRCutV0RECOLambda) RECOAntiLambdaFound = true;
+	if( deltaRminAntiL <  AnalyzerAllSteps::deltaRCutV0RECOLambda && deltaRminAntiL_deltaL < AnalyzerAllSteps::deltaLCutV0RECOLambda) RECOAntiLambdaFound = true;
 
 
 	//for the granddaughters you have to do this based on hit matching
@@ -660,6 +692,13 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
 	TVector3 AntiSCreationVertex(tp.vx(),tp.vy(),tp.vz());
 
+	//now count the number of reconstructed antiS. This counting also uses the fact if matches between tracks and V0s were found
+	if(RECOKsPosPionFound && RECOKsNegPionFound && RECOAntiLambda_posPionFound && RECOAntiLambda_AntiProtonFound &&
+		RECOKsFound && RECOAntiLambdaFound &&
+		  deltaLInteractionVertexAntiSmin < AnalyzerAllSteps::deltaLCutInteractionVertexAntiSmin && deltaRminAntiS < AnalyzerAllSteps::deltaRCutRECOAntiS){ 
+			RECOAntiSFound = true;
+	}
+
 
 	//now if you have both tracks of a V0 in theory you can reconstruct this V0. Pass the tracks to the V0Fitter and check if the V0 gets reconstructed, but more importantly if it does not get reconstructed, check where things go wrong
 	//for the Ks, first check for both daughter tracks if they were reconstructed if they pass the cuts in the V0Fitter
@@ -669,8 +708,6 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	int returnCodeV0Fitter_KsNegPion_track = -1;
 	if(matchedTrackPointer_KsNegPion) returnCodeV0Fitter_KsNegPion_track =  V0Fitter_trackSelection(matchedTrackPointer_KsNegPion,theBeamSpot);
 
-	if(matchedTrackPointer_KsPosPion) std::cout << "I found a pos track of a AntiS-Ks which got reconstructed. The return code for this track for passing the cuts in the V0Fitter is: " << returnCodeV0Fitter_KsPosPion_track<< std::endl;
-	if(matchedTrackPointer_KsNegPion) std::cout << "I found a neg track of a AntiS-Ks which got reconstructed. The return code for this track for passing the cuts in the V0Fitter is: " << returnCodeV0Fitter_KsNegPion_track<< std::endl;
 
 	//now if two tracks from a V0 got reconstructed check where the V0 fitting failed: is it both tracks which did not pass the preselection in the V0Fitter? Is it the trackpair that does not pass a cut? Did the V0 get reconstructed?
 	int returnCodeV0Fitter_Ks = -1;
@@ -679,7 +716,6 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 		else if(returnCodeV0Fitter_KsPosPion_track != 0) returnCodeV0Fitter_Ks = 51;
 		else if(returnCodeV0Fitter_KsNegPion_track != 0) returnCodeV0Fitter_Ks = 52;
 		else if(returnCodeV0Fitter_KsPosPion_track == 0 && returnCodeV0Fitter_KsNegPion_track == 0) returnCodeV0Fitter_Ks = V0Fitter(matchedTrackPointer_KsPosPion,matchedTrackPointer_KsNegPion,theBeamSpot, theMagneticField, true, false, false);
-		 std::cout << "I found 2 reconstruted daughter tracks of the KS of an antiS. The return code for the V0 Fitter is: " << returnCodeV0Fitter_Ks << std::endl;	
 	}
 
 	//for the AntiLambda, first check for both daughter tracks if they were reconstructed if they pass the cuts in the V0Fitter
@@ -689,8 +725,6 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	int returnCodeV0Fitter_AntiLambda_AntiProton = -1;
 	if(matchedTrackPointer_AntiLambda_AntiProton) returnCodeV0Fitter_AntiLambda_AntiProton =  V0Fitter_trackSelection(matchedTrackPointer_AntiLambda_AntiProton,theBeamSpot);
 
-	if(matchedTrackPointer_AntiLambda_posPion) std::cout << "I found a pos track of a AntiS-AntiLambda which got reconstructed. The return code for this track for passing the cuts in the V0Fitter is: " << returnCodeV0Fitter_AntiLambdaPosPion_track<< std::endl;
-	if(matchedTrackPointer_AntiLambda_AntiProton) std::cout << "I found a neg track of a AntiS-AntiLambda which got reconstructed. The return code for this track for passing the cuts in the V0Fitter is: " << returnCodeV0Fitter_AntiLambda_AntiProton << std::endl;
 
 	//now if the tracks passed the cuts in the V0 Fitter you can go and look at the V0 itself which will be created from this track
 	int returnCodeV0Fitter_AntiLambda = -1;
@@ -699,7 +733,6 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 		else if(returnCodeV0Fitter_AntiLambdaPosPion_track != 0) returnCodeV0Fitter_AntiLambda = 51;
 		else if(returnCodeV0Fitter_AntiLambda_AntiProton   != 0) returnCodeV0Fitter_AntiLambda = 52;
 		else if(returnCodeV0Fitter_AntiLambdaPosPion_track == 0 && returnCodeV0Fitter_AntiLambda_AntiProton == 0) returnCodeV0Fitter_AntiLambda = V0Fitter(matchedTrackPointer_AntiLambda_posPion,matchedTrackPointer_AntiLambda_AntiProton,theBeamSpot, theMagneticField, false, false, true);
-		std::cout << "I found 2 reconstruted daughter tracks of the AntiL of an antiS. The return code for the V0 Fitter is: " << returnCodeV0Fitter_AntiLambda << std::endl;	
 	}
 
 
@@ -709,10 +742,13 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
 	//for each of the 7 particles in the game fill first a tree (FillFlatTreeTpsAntiS) which contains the kinematics of the tp, so this is on GEN level. Then fill a tree (FillFlatTreeTpsAntiSRECO) containing info on the best matching RECO object. For the first 3 particles these are VertexCompositeCandidate, for the other 4 these matching RECO objects are tracks. I can only fill this second part of the tree if indeed a RECO object was found. If a RECO object was not found I should still make a dummy entry in the vector to keep the order in the vector correct, as entry 0 is the the antiS, 1 is the Ks, 2 is the antiLambda, 3 is the pi plus of the ks, 4 the pi minus of the Ks, 5 the pos pion of the antiLambda, 6 the anti proton of the antiLambda. 
 	FillFlatTreeTpsAntiS(beamspot,AntiSCreationVertex,tp,RECOAntiSFound,0,deltaRminAntiS,999,deltaLInteractionVertexAntiSmin, theMagneticField);
-	std::cout << "nGoodPV: " <<  nGoodPV << std::endl;
-	_tpsAntiS_event_weighting_factor.push_back(AnalyzerAllSteps::EventWeightingFactor(tp.theta()));
-	if(nGoodPV < AnalyzerAllSteps::v_mapPU.size())_tpsAntiS_event_weighting_factorPU.push_back(AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],tp.vz()));
-	else _tpsAntiS_event_weighting_factorPU.push_back(0.);
+
+	double weightBeampipe = AnalyzerAllSteps::EventWeightingFactor(tp.theta());
+	_tpsAntiS_event_weighting_factor.push_back(weightBeampipe);
+	double weightPV = 0.;
+	if(nGoodPV < AnalyzerAllSteps::v_mapPU.size()) weightPV = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],tp.vz());
+	_tpsAntiS_event_weighting_factorPU.push_back(weightPV);
+
 	if(bestMatchingAntiS>-1){//for the antiS just save a few extras:
 
 		FillFlatTreeTpsAntiSRECO(beamspot,beamspotPoint,RECOAntiSFound,0,h_sCands->at(bestMatchingAntiS));
@@ -764,7 +800,9 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 	else FillFlatTreeTpsAntiSRECODummy();
 
 	_tree_tpsAntiS->Fill();
-	
+
+
+	if(RECOAntiSFound) weighedRecoAntiS  += weightBeampipe*weightPV; 
 	
 	return RECOAntiSFound;
 }
@@ -2481,8 +2519,11 @@ FlatTreeProducerTracking::fillDescriptions(edm::ConfigurationDescriptions& descr
 FlatTreeProducerTracking::~FlatTreeProducerTracking()
 {
 
-	std::cout << "number of antiS found which interact: " << totalNumberOfUniqueAntiS << std::endl;
-	std::cout << "number of antiS found with the correct granddaughters: " << numberOfAntiSWithCorrectGranddaughters << std::endl;
+	std::cout << "number of antiS found which interact (based on the number of trackingParticles which should have their decay vertex different from their creation vertex): " << totalNumberOfUniqueAntiS_FromTrackingParticles<< std::endl;
+	std::cout << "number of antiS found with the correct trackingparticle granddaughters: " << numberOfAntiSWithCorrectGranddaughters << std::endl;
+
+	std::cout << "weighed number of generated antiS (unique): " << nTotalUniqueGenS_weighted << std::endl;
+	std::cout << "weighed number of reconstructed antiS: " << weighedRecoAntiS << std::endl;
 
 }
 

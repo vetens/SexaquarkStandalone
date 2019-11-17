@@ -21,12 +21,12 @@ colours = [1,2,4,35,38,41]
 
 maxEvents = 1e99
 
-verbose = True
+verbose = False
 
 plots_output_dir = "plots_syst_evaluation/"
 
 #inFiles = [TFile("/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/test_FlatTreeSkimming_Step1_Step2_Skimming_FlatTree_trial17_1p8GeV_17102019_v1_191017_220444_numberOfTrackerHits.root",'read')]
-inFiles = [TFile("/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed/Skimmed_trial17_1p8GeV_14102019_v1_191014_132642/crab_FlatTreeProducerTracking_trial17_22102019_v1_1p8GeV/191022_204709/0000/combined/FlatTree_Tracking_trial17_22102019_v1_1p8GeV.root",'read')]
+inFiles = [TFile("file:/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/FlatTree_Skimmed/CRAB_SimSexaq_trial21/crab_FlatTreeProducerTracking_trial21_02112019_v1_1p8GeV/191102_062811/0000/combined/combined_FlatTreeTracking_trial21_02112019_v1_1p8GeV.root",'read')]
 
 fOut = TFile(plots_output_dir+'macro_syst_evaluation_antiS_RECO_eff2.root','RECREATE')
 
@@ -68,7 +68,7 @@ h_corr_factor_dxy = TH1F("corr_factor_dxy",";correction factor dxy;",100,0.2,1.8
 h_corr_factor_dz = TH1F("corr_factor_dz",";correction factor dz;",100,0.2,1.8)
 h_corr_factor_lxy = TH1F("corr_factor_lxy",";correction factor lxy;",100,0.2,1.8)
 h_corr_factor_vz = TH1F("corr_factor_vz",";correction factor vz;",100,0.2,1.8)
-h_corr_factor_this_antiS = TH1F("h_corr_factor_this_antiS",";correction factor;",16,0.2,1.8)
+h_corr_factor_this_antiS = TH1F("h_corr_factor_this_antiS",";correction factor (C_{k});#Events;",16,0.2,1.8)
 
 #for each kinematic variable plot the correction factor of that kinematic variable versus the correction parameters of the others.
 nbins_corr_par = 60
@@ -140,7 +140,7 @@ l_h_FiducialRegionCuts = [h_FiducialRegionCuts_1,h_FiducialRegionCuts_2,h_Fiduci
 
 
 #a list with counters for the reconstructed particles, so there are 7 entries for each of the 7 particles
-nAntiS = 0.
+nAntiS_reconstructable = 0.
 nAntiSRecoAlsoOutsideFiducialRegion = 0.
 nAntiSRecoInsideFiducialRegion = 0.
 nAntiSRecoWeightedWithCorrFactors = 0.
@@ -162,22 +162,37 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 		tree.GetEntry(i)
 		printProgress(i)
 
-		weightFactor = tree._tpsAntiS_event_weighting_factor[0]
+		weightFactor = tree._tpsAntiS_event_weighting_factor[0]*tree._tpsAntiS_event_weighting_factorPU[0]
 
 		boolNGrandDaughtersWithTrackerHitsLargerThan6 = False
-		if(tree._tpsAntiS_numberOfTrackerHits[3] >= 7 and tree._tpsAntiS_numberOfTrackerHits[4] >= 7 and tree._tpsAntiS_numberOfTrackerHits[5] >= 7 and tree._tpsAntiS_numberOfTrackerHits[6] >= 7): 
-			boolNGrandDaughtersWithTrackerHitsLargerThan6 = True
+#		if(tree._tpsAntiS_numberOfTrackerHits[3] >= 7 and tree._tpsAntiS_numberOfTrackerHits[4] >= 7 and tree._tpsAntiS_numberOfTrackerHits[5] >= 7 and tree._tpsAntiS_numberOfTrackerHits[6] >= 7): 
+#			boolNGrandDaughtersWithTrackerHitsLargerThan6 = True
+
+
+		NGrandDaughtersWithTrackerHitsLargerThan6 = 0
+		for j in range(0,len(tree._tpsAntiS_type)):
+			#now look at _tpAntiS_type from 3 to 6, this are the granddaughters:
+			if(tree._tpsAntiS_type[j] >= 3 and tree._tpsAntiS_type[j] <= 6 ):
+				if(tree._tpsAntiS_numberOfTrackerHits[j] >= 7):
+					NGrandDaughtersWithTrackerHitsLargerThan6 += 1
+
+		boolNGrandDaughtersWithTrackerHitsLargerThan6 =  NGrandDaughtersWithTrackerHitsLargerThan6==4
+
+		antiSReconstructed = False
+		KsReconstructed = False
+		antiLambdaReconstructed = False
+		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[1] < config_dict["GENRECO_matcher_Ks_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[1] < config_dict["GENRECO_matcher_Ks_deltaR"]):
+                        KsReconstructed = True
+                if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[2] < config_dict["GENRECO_matcher_AntiL_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[2] < config_dict["GENRECO_matcher_AntiL_deltaR"]):
+                        antiLambdaReconstructed = True
+                if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
+                        antiSReconstructed = True
 
 		#only evaluate the below for reconstructable antiS
 		if(not boolNGrandDaughtersWithTrackerHitsLargerThan6): continue
 
-		nAntiS+=weightFactor
+		nAntiS_reconstructable+=weightFactor
 
-		#my requirement for having reconstructed antiS: based on the 3D distance between the GEN and RECO interaction vertex of the antiS and akisng for all daughters and granddaughters to be RECO
-		antiSReconstructed = False
-		#if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < 0.5 and tree._tpsAntiS_reconstructed[1] == 1 and tree._tpsAntiS_reconstructed[2] == 1 and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and tree._tpsAntiS_Lxy_beampipeCenter[1] > 1.9):
-		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1):
-			antiSReconstructed = True	
 
 		if(antiSReconstructed): nAntiSRecoAlsoOutsideFiducialRegion+=weightFactor	
 
@@ -410,12 +425,12 @@ print "#########################################################################
 print "########################################RECO EFF###################################################"
 print "###################################################################################################"
 
-print "AntiS reconstruction efficiency (weighted for the path length through the beampipe) for antiS with final state particles which are reconstructable: ", nAntiSRecoAlsoOutsideFiducialRegion,"/",nAntiS, " = ", nAntiSRecoAlsoOutsideFiducialRegion/nAntiS, "       --> so 1 out of: " , nAntiS/nAntiSRecoAlsoOutsideFiducialRegion
+print "AntiS reconstruction efficiency (weighted for the path length through the beampipe and PV) for antiS with final state particles which are reconstructable: ", nAntiSRecoAlsoOutsideFiducialRegion,"/",nAntiS_reconstructable, " = ", nAntiSRecoAlsoOutsideFiducialRegion/nAntiS_reconstructable, "       --> so 1 out of: " , nAntiS_reconstructable/nAntiSRecoAlsoOutsideFiducialRegion
 
-print "AntiS reconstruction efficiency (weighted for the path length through the beampipe) for antiS with final state particles which are reconstructable and have to be in the fiducial region: ", nAntiSRecoInsideFiducialRegion,"/",nAntiS, " = ", nAntiSRecoInsideFiducialRegion/nAntiS, "       --> so 1 out of: " , nAntiS/nAntiSRecoInsideFiducialRegion
+print "AntiS reconstruction efficiency (weighted for the path length through the beampipe and PV) for antiS with final state particles which are reconstructable and have to be in the fiducial region: ", nAntiSRecoInsideFiducialRegion,"/",nAntiS_reconstructable, " = ", nAntiSRecoInsideFiducialRegion/nAntiS_reconstructable, "       --> so 1 out of: " , nAntiS_reconstructable/nAntiSRecoInsideFiducialRegion
 
-print "The reweighted (both for pathlength through the beampipe and tracking efficiencies) for antiS with final state particles which are reconstructable, reconstruction efficiency is: ", nAntiSRecoWeightedWithCorrFactors,"/",nAntiS, " = ", nAntiSRecoWeightedWithCorrFactors/nAntiS, "       --> so 1 out of: " , nAntiS/nAntiSRecoWeightedWithCorrFactors
-print "error on the reweighted reconstruction efficiency is: ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors), "/" , nAntiS, " = ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors)/nAntiS
+print "The reweighted (both for pathlength through the beampipe and PV and tracking efficiencies) for antiS with final state particles which are reconstructable, reconstruction efficiency is: ", nAntiSRecoWeightedWithCorrFactors,"/",nAntiS_reconstructable, " = ", nAntiSRecoWeightedWithCorrFactors/nAntiS_reconstructable, "       --> so 1 out of: " , nAntiS_reconstructable/nAntiSRecoWeightedWithCorrFactors
+print "error on the reweighted reconstruction efficiency is: ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors), "/" , nAntiS_reconstructable, " = ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors)/nAntiS_reconstructable
 
 print "------------------------------------------"
 print "Ks if both daughters got reconstructed: ", nKsRECOIfBothDaughtersReco,"/",nKsTOTALIfBothDaughtersReco," = ", nKsRECOIfBothDaughtersReco/nKsTOTALIfBothDaughtersReco, "              --> so 1 out of :", nKsTOTALIfBothDaughtersReco/nKsRECOIfBothDaughtersReco
