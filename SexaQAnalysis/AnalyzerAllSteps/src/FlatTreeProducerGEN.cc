@@ -19,6 +19,10 @@ void FlatTreeProducerGEN::beginJob() {
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+	_tree_pi = fs->make <TTree>("FlatTreeGENLevelPi","treePi");
+	_tree_pi->Branch("_pi_eta",&_pi_eta);
+
+
         _tree = fs->make <TTree>("FlatTreeGENLevel","tree");
 
 
@@ -61,24 +65,38 @@ void FlatTreeProducerGEN::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
 
-
+  nEvents++;
 
   //first find the GEN particles which are proper antiS
   if(!m_runningOnData && m_lookAtAntiS){
 	  if(h_genParticles.isValid()){
+	      int nPionsThisEvent = 0;
+	      int nPionsThisEventEtaSmaller4 = 0;
+	      InitPi();
 	      for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT
 
 			const reco::Candidate * genParticle = &h_genParticles->at(i);
+			//count the number of charged pions
+			if( abs(genParticle->pdgId() ) == 211 ){
+				 nPionsThisEvent++;
+				 if(abs(genParticle->eta()) < 4) nPionsThisEventEtaSmaller4++;
+				 FillBranchesPion(genParticle->eta());
+			}
+
+			//and now for antiS
 			if(genParticle->pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
 			nTotalGENS++;	
 			if(genParticle->eta()>0)nTotalGENSPosEta++;	
 			if(genParticle->eta()<0)nTotalGENSNegEta++;
-			if(abs(genParticle->eta())<4.3)nTotalGENSEtaSmallerThan4p3++;
 				
 			FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance);
 
 
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
+	      _tree_pi->Fill();
+	      std::cout << "nPionsThisEvent: " << nPionsThisEvent << std::endl;
+	      nPions = nPions + nPionsThisEvent;
+	      nPionsEtaSmaller4 = nPionsEtaSmaller4 + nPionsThisEventEtaSmaller4;
 	  }//if(h_genParticles.isValid())
   }
 
@@ -86,6 +104,9 @@ void FlatTreeProducerGEN::analyze(edm::Event const& iEvent, edm::EventSetup cons
  } //end of analyzer
 
 
+void FlatTreeProducerGEN::FillBranchesPion(double eta){
+	_pi_eta.push_back(eta);	
+}
 
 void FlatTreeProducerGEN::FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance){
   
@@ -164,19 +185,24 @@ FlatTreeProducerGEN::~FlatTreeProducerGEN()
 	if(m_lookAtAntiS){
 		particle = "anti-S";
 	}
+
+	std::cout << "The total number of events: " << nEvents << std::endl;
+	std::cout << "The total number of pions: " << nPions << std::endl;
+	std::cout << "The total number of pions with |eta| smaller than 4: " << nPionsEtaSmaller4 << std::endl;
 	
 
 	std::cout << "The total number GEN " << particle << " that were found is: " << nTotalGENS << std::endl; 
-	std::cout << "The total number GEN " << particle << " that have |eta| < 4 is: " << nTotalGENSEtaSmallerThan4p3 << std::endl;
-	std::cout << "So the total number of GEN " << particle << " with |eta| > 4 is: " << nTotalGENS - nTotalGENSEtaSmallerThan4p3 << std::endl;
-	std::cout << "So the efficiency factor due to the |eta| < 4 requirement in the SIM step is: " << (double)nTotalGENSEtaSmallerThan4p3/(double)nTotalGENS << std::endl; 
 	std::cout << "The total number GEN " << particle << " that were found with pos eta is: " << nTotalGENSPosEta << std::endl; 
 	std::cout << "The total number GEN " << particle << " that were found with neg eta is: " << nTotalGENSNegEta << std::endl; 
 }
 
 
-void
-FlatTreeProducerGEN::Init()
+void FlatTreeProducerGEN::InitPi()
+{
+	_pi_eta.clear();
+}
+
+void FlatTreeProducerGEN::Init()
 {
 
 

@@ -19,83 +19,138 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = ""
 tdrstyle.setTDRStyle()
 
-colours = [4,2,35,1,38,41]
+colours = [4,2,35,30,43,1,6]
+markerStyle = [20,21,22,23,33,34,35]
 
 maxEvents = 1e99
 
 
 #you can use this script to compared different collections of S and antiS to eachother. The most common one is comparing Data-S-BKG to MC-AntiS-Signal. The other option is comparing MC-S-BKG to MC-AntiS-BKG to Data-S-BKG
 configuration = "all" # "MC-AntiS-Signal" "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" 
-post_BDT = False
+#cut on the BDT parameter to select a minimal BDT, to go and look in the tail of the BDT distribution (towards the signal), put to -999 if you want all the events
+min_BDT_classifier = -999. #-999 or -0.15
 
 
-# Open file
-SignFile= ROOT.TFile.Open(config_dict["config_SignalFile"]) 
+#################################################################
+#With FiducialRegionCut applied
+#################################################################
+#MC_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/MC_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_S_Bkg_Tree = MC_S_Bkg_File.Get("FlatTree")
+#
+##MC AntiS BKG from DYJets sample
+#MC_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/MC_AntiS_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_AntiS_Bkg_Tree = MC_AntiS_Bkg_File.Get("FlatTree")
+#
+##Data S Bkg from SingleMuon Run2016H
+#Data_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/Data_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_S_Bkg_Tree = Data_S_Bkg_File.Get("FlatTree")
+#
+##Data antiS Bkg from SingleMuon Run2016H, this is BKG because it is for a small BDT parameter
+#Data_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/Data_AntiS_Bkg/BDTApplied_partialUnblinding_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_AntiS_Bkg_Tree = Data_AntiS_Bkg_File.Get("FlatTree")
+#
+##The signal MC
+#MC_AntiS_Sgn_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/MC_AntiS_Signal/BDTApplied_unblindMC_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_combined_FlatTreeBDT_trial17AND21_1p8GeV_02112019_v1.root")
+#MC_AntiS_Sgn_Tree = MC_AntiS_Sgn_File.Get("FlatTree")
+#
+##Data antiS from SingleElectron Run2016H with antiS reconstructed X events
+#Data_AntiS_XEvent_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_Cut/Data_AntiS_BKG_XEvent/BDTApplied_unblind_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_test_SingleMuonRun2016H_XEventAntiS.root")
+#Data_AntiS_XEvent_Tree = Data_AntiS_XEvent_File.Get("FlatTree")
 
-BkgFile_MC_S  = ROOT.TFile.Open(config_dict["config_BkgFileMC"])  
-BkgFile_MC_AntiS  = ROOT.TFile.Open(config_dict["config_BkgFileMC"]) 
-BkgFile_Data_S  = ROOT.TFile.Open(config_dict["config_BkgFileData"]) 
-
-#for when you have the BDT parameter in your tree:
-if(post_BDT):
-	BkgFile_MC_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-S-BKG-DYJets_blablablablablabl.root")
-	BkgFile_MC_AntiS  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/ziscrApplied_FlatTreeBDT_MC-AntiS-BKG-DYJets_blablablablablabl.root")
-	BkgFile_Data_S  = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
-
-#select the trees
-# Get signal and background trees from file
-SignalTree = SignFile.Get("FlatTreeProducerBDT/FlatTree")
-
-BkgTree_MC_S = BkgFile_MC_S.Get("FlatTreeProducerBDT/FlatTree")
-BkgTree_MC_AntiS = BkgFile_MC_AntiS.Get("FlatTreeProducerBDT/FlatTree")
-BkgTree_Data_S = BkgFile_Data_S.Get("FlatTreeProducerBDT/FlatTree")
-
-#for when you have the BDT parameter in your tree:
-if(post_BDT):
-	BkgTree_MC_S = BkgFile_MC_S.Get("FlatTree")
-	BkgTree_MC_AntiS = BkgFile_MC_AntiS.Get("FlatTree")
-	BkgTree_Data_S = BkgFile_Data_S.Get("FlatTree")
-
-
-#I only want the antiS which match a GEN antiS in lxyz of the interaction vertex and the charge should also be negative
-gROOT.cd()
-selectedSignalTree_preBDT_cuts = SignalTree.CopyTree(config_dict["config_SelectionSignalAntiS"])
-selectedSignalTree = SignalTree.CopyTree(config_dict["config_SelectionSignalAntiS"]+ ' && ' + config_dict["config_pre_BDT_cuts"])
-#for the MC signal the efficiency calculation is not so easy as for the MC samples below as I have to reweigh the events
-den = 0.
-nom = 0.
-for entry in selectedSignalTree_preBDT_cuts:
-	den += config.calc_reweighing_factor(selectedSignalTree_preBDT_cuts._S_eta[0],True)	
-for entry in  selectedSignalTree:
-	nom += config.calc_reweighing_factor(selectedSignalTree._S_eta[0],True)
-print "The efficiency for signal for the pre-BDT cuts: ", nom/den
+#################################################################
+#With FiducialRegionCut and DeltaPhi cut applied
+#################################################################
+#MC_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/MC_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_S_Bkg_Tree = MC_S_Bkg_File.Get("FlatTree")
+#
+##MC AntiS BKG from DYJets sample
+#MC_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/MC_AntiS_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_AntiS_Bkg_Tree = MC_AntiS_Bkg_File.Get("FlatTree")
+#
+##Data S Bkg from SingleMuon Run2016H
+#Data_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/Data_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_S_Bkg_Tree = Data_S_Bkg_File.Get("FlatTree")
+#
+##Data antiS Bkg from SingleMuon Run2016H, this is BKG because it is for a small BDT parameter
+#Data_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/Data_AntiS_Bkg/BDTApplied_partialUnblinding_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_AntiS_Bkg_Tree = Data_AntiS_Bkg_File.Get("FlatTree")
+#
+##The signal MC
+#MC_AntiS_Sgn_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/MC_AntiS_Signal/BDTApplied_unblindMC_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_combined_FlatTreeBDT_trial17AND21_1p8GeV_02112019_v1.root")
+#MC_AntiS_Sgn_Tree = MC_AntiS_Sgn_File.Get("FlatTree")
+#
+##Data antiS from SingleElectron Run2016H with antiS reconstructed X events
+#Data_AntiS_XEvent_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Cut/Data_AntiS_BKG_XEvent/BDTApplied_unblind_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_test_SingleMuonRun2016H_XEventAntiS.root")
+#Data_AntiS_XEvent_Tree = Data_AntiS_XEvent_File.Get("FlatTree")
 
 
-gROOT.cd()
-#for selecting MC S BKG: 
-nEntries_MC_S_BKG_preBDTCuts = BkgTree_MC_S.GetEntries(config_dict["config_SelectionBkgS"])
-selectedBkgTree_MC_S_BKG = BkgTree_MC_S.CopyTree(config_dict["config_SelectionBkgS"] + ' && ' + config_dict["config_pre_BDT_cuts"])
-print "The efficiency for MC_S_BKG for the pre-BDT cuts: ", float(selectedBkgTree_MC_S_BKG.GetEntries())/float(nEntries_MC_S_BKG_preBDTCuts)
-#for selecting MC antiS BKG: 
-nEntries_MC_AntiS_BKG_preBDTCuts = BkgTree_MC_AntiS.GetEntries(config_dict["config_SelectionBkgAntiS"])
-selectedBkgTree_MC_AntiS_BKG = BkgTree_MC_AntiS.CopyTree(config_dict["config_SelectionBkgAntiS"] +' &&' + config_dict["config_pre_BDT_cuts"])
-print "The efficiency for MC_AntiS_BKG for the pre-BDT cuts: ", float(selectedBkgTree_MC_AntiS_BKG.GetEntries())/float(nEntries_MC_AntiS_BKG_preBDTCuts)
-#for selecting Data S BKG: ---> standard
-nEntries_Data_S_BKG_preBDTCuts = BkgTree_Data_S.GetEntries(config_dict["config_SelectionBkgS"])
-selectedBkgTree_Data_S_BKG = BkgTree_Data_S.CopyTree(config_dict["config_SelectionBkgS"] + ' && ' + config_dict["config_pre_BDT_cuts"])
-print "The efficiency for Data_S_BKG for the pre-BDT cuts: ", float(selectedBkgTree_Data_S_BKG.GetEntries())/float(nEntries_Data_S_BKG_preBDTCuts)
+
+##################################################################
+##With FiducialRegionCut and DeltaPhi cut and lxy cut applied
+##################################################################
+#MC_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/MC_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_S_Bkg_Tree = MC_S_Bkg_File.Get("FlatTree")
+#
+##MC AntiS BKG from DYJets sample
+#MC_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/MC_AntiS_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8__31102019_v1.root")
+#MC_AntiS_Bkg_Tree = MC_AntiS_Bkg_File.Get("FlatTree")
+#
+##Data S Bkg from SingleMuon Run2016H
+#Data_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/Data_S_BKG/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_S_Bkg_Tree = Data_S_Bkg_File.Get("FlatTree")
+#
+##Data antiS Bkg from SingleMuon Run2016H, this is BKG because it is for a small BDT parameter
+#Data_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/Data_AntiS_Bkg/BDTApplied_partialUnblinding_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+#Data_AntiS_Bkg_Tree = Data_AntiS_Bkg_File.Get("FlatTree")
+#
+##The signal MC
+#MC_AntiS_Sgn_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/MC_AntiS_Signal/BDTApplied_unblindMC_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_combined_FlatTreeBDT_trial17AND21_1p8GeV_02112019_v1.root")
+#MC_AntiS_Sgn_Tree = MC_AntiS_Sgn_File.Get("FlatTree")
+#
+##Data antiS from SingleElectron Run2016H with antiS reconstructed X events
+#Data_AntiS_XEvent_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/Results_OverLapBDTDistributions_CutFlow/FiducialRegion_DeltaPhi_Lxy_Cut/Data_AntiS_BKG_XEvent/BDTApplied_unblind_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapFalse/DiscrApplied_test_SingleMuonRun2016H_XEventAntiS.root")
+#Data_AntiS_XEvent_Tree = Data_AntiS_XEvent_File.Get("FlatTree")
+
+
+##################################################################
+##With all pre BDT cuts applied
+##################################################################
+#Open files and trees:
+#MC S BKG from DYJets sample
+MC_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/BkgReference/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckFalse/ziscrApplied_FlatTreeBDT_MC-S-BKG-DYJets_blablablablablabl.root")
+MC_S_Bkg_Tree = MC_S_Bkg_File.Get("FlatTree")
+
+#MC AntiS BKG from DYJets sample
+MC_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/BkgReference/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckFalse/ziscrApplied_FlatTreeBDT_MC-AntiS-BKG-DYJets_blablablablablabl.root")
+MC_AntiS_Bkg_Tree = MC_AntiS_Bkg_File.Get("FlatTree")
+
+#Data S Bkg from SingleMuon Run2016H
+Data_S_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/BkgReference/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+Data_S_Bkg_Tree = Data_S_Bkg_File.Get("FlatTree")
+
+#Data antiS Bkg from SingleMuon Run2016H, this is BKG because it is for a small BDT parameter
+Data_AntiS_Bkg_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/partialUnblinding/BDTApplied_partialUnblinding_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckFalse/DiscrApplied_FlatTreeBDT_SingleMuon_Run2016H-07Aug17-v1_trialR.root")
+Data_AntiS_Bkg_Tree = Data_AntiS_Bkg_File.Get("FlatTree")
+
+#The signal MC
+MC_AntiS_Sgn_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/Unblinded/SignalMC/DiscrApplied_combined_FlatTreeBDT_trial17AND21_1p8GeV_02112019_v1.root")
+MC_AntiS_Sgn_Tree = MC_AntiS_Sgn_File.Get("FlatTree")
+
+#Data antiS from SingleElectron Run2016H with antiS reconstructed X events
+Data_AntiS_XEvent_File = ROOT.TFile.Open("/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA/Step2/BDTApplied/Unblinded/Data_AntiS_BKG_XEvent/DiscrApplied_test_SingleMuonRun2016H_XEventAntiS.root")
+Data_AntiS_XEvent_Tree = Data_AntiS_XEvent_File.Get("FlatTree")
 
 l_y_axis_ranges = [
 0.08,
 14.,
-1,
+1.1,
 1,
 2.5,
 2,
 2,
 4.5,
-0.5,
-0.5,
+0.6,
+0.6,
 0.5,
 15,
 10,
@@ -108,38 +163,30 @@ l_y_axis_ranges = [
 10.,
 0.05,
 250.,
-0.5,
+0.95,
+50,
 50
 ]
 
-Legend_MC_AntiS_Signal = ["MC-S-BKG","MC-#bar{S}-Signal"]
-Legend_Data_S_BKG_to_MC_AntiS_Signal = ["MC-#bar{S}-Signal", "Data-S-BKG"]
-Legend_MC_S_BKG_to_MC_AntiS_BKG_to_Data_S_BKG = ["MC-S-BKG","MC-#bar{S}-BKG","Data-S-BKG"]
-Legend_all = ["MC-S-BKG","MC-#bar{S}-BKG","Data-S-BKG","MC-#bar{S}-Signal"]
+Legend = ["MC-S-BKG"   ,"MC-#bar{S}-BKG" ,"Data-S-BKG"   ,"Data-#bar{S}-BKG (BDT < 0.1)  ","Data-#bar{S}-X event BKG" ,"MC-#bar{S}-Signal"]
+l_tree = [MC_S_Bkg_Tree,MC_AntiS_Bkg_Tree,Data_S_Bkg_Tree,Data_AntiS_Bkg_Tree             , Data_AntiS_XEvent_Tree    , MC_AntiS_Sgn_Tree]
 
 plots_output_dir = "plots_BackgroundVsSignal/"+configuration+"/"
-
-Legend = Legend_Data_S_BKG_to_MC_AntiS_Signal
-l_tree = [selectedSignalTree,selectedBkgTree_Data_S_BKG]
-
-if(configuration == "MC-AntiS-Signal"):
-	Legend = Legend_MC_AntiS_Signal
-	l_tree = [selectedSignalTree]
-
-if(configuration == "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG"):
-	Legend = Legend_MC_S_BKG_to_MC_AntiS_BKG_to_Data_S_BKG
-	l_tree = [selectedBkgTree_MC_S_BKG, selectedBkgTree_MC_AntiS_BKG, selectedBkgTree_Data_S_BKG]
-
-if(configuration == "all"):
-	Legend = Legend_all
-	l_tree = [selectedBkgTree_MC_S_BKG, selectedBkgTree_MC_AntiS_BKG, selectedBkgTree_Data_S_BKG,selectedSignalTree]
-
 
 TH1_ll = [] #list of list of 1D histos 
 TH2_ll = [] #list of list of 2D histos
 
 iTree = 0
-for tree in l_tree:
+for inTree in l_tree:
+
+	gROOT.cd()
+	nEntries1 = inTree.GetEntries()
+#	tree = inTree.CopyTree(config_dict["config_pre_BDT_cuts"])
+	tree = inTree.CopyTree(config_dict["pre_BDT_noCut"])
+	nEntries2 = tree.GetEntries()
+	print "---------------------------------------------------"
+	print "running for ", Legend[iTree]
+	print "ratio of the number of events surviving the config_pre_BDT_cuts, just as a check. This should be = 1: ", float(nEntries2) ,"/",float(nEntries1), " = ", float(nEntries2)/float(nEntries1)
 
 	h_S_vz_interaction_vertex= TH1F('h_S_vz_interaction_vertex','; absolute v_{z} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/3cm',20,-40,40)
 	h_S_lxy_interaction_vertex = TH1F('h_S_lxy_interaction_vertex','; l_{0,bpc} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/0.2mm',31,1.9,2.52)
@@ -163,20 +210,21 @@ for tree in l_tree:
 	h_Ks_dz_min = TH1F('h_Ks_dz_min','; min d_{z,bs} K_{S}^{0} (cm); 1/N_{ev} Events/cm',60,-30,30)
 	h_Lambda_dz_min = TH1F('h_Lambda_dz_min','; min d_{z,bs}  ^{(} #bar{#Lambda} ^{)} ^{0}  (cm); 1/N_{ev} Events/cm',60,-30,30)
 
-	h_Ks_pt = TH1F('h_Ks_pt','; p_{t} K_{S}^{0} (GeV); 1/N_{ev} Events/0.4GeV',20,0,8)
+	h_Ks_pt = TH1F('h_Ks_pt','; p_{t} K_{S}^{0} (GeV/c); 1/N_{ev} Events/0.4GeV/c',20,0,8)
 
 	h_Lambda_lxy_decay_vertex = TH1F('h_Lambda_lxy_decay_vertex','; l_{0} ^{(} #bar{#Lambda} ^{)} ^{0} decay vertex (cm); 1/N_{ev} Events/cm',20,1.9,21.9)
 	h_S_chi2_ndof = TH1F('h_S_chi2_ndof','; #chi^{2}/ndof ^{(}#bar{S} ^{)} annihilation vertex; 1/N_{ev} Events',44,0,11)
 
-	h_S_pz = TH1F('h_S_pz','; p_{z}  ( ^{(} #bar{S} ^{)} ) (GeV); 1/N_{ev} Events/5GeV',16,-40,40)
+	h_S_pz = TH1F('h_S_pz','; p_{z}  ( ^{(} #bar{S} ^{)} ) (GeV/c); 1/N_{ev} Events/5GeV/c',16,-40,40)
 
 	h_S_error_lxy_interaction_vertex = TH1F('h_S_error_lxy_interaction_vertex','; #sigma(l_{0,bpc} iv ^{(}#bar{S} ^{)} ) (cm); 1/N_{ev} Events/0.004mm',10,0,0.04)
-	h_S_mass = TH1F('h_S_mass','; m_{ ^{(} #bar{S} ^{)} ,obs} (GeV); 1/N_{ev} Events/0.5GeV',20,-5,5)
+	h_S_mass = TH1F('h_S_mass','; m_{ ^{(} #bar{S} ^{)} ,obs} (GeV/c^{2}); 1/N_{ev} Events/0.25GeV/c^{2}',40,-5,5)
+
+	h_S_BDT = TH1F('h_S_BDT','; BDT classifier; 1/N_{ev} Events/0.05 BDT class.',40,-1,1)
 	tprof_reweighing_factor = TProfile('tprof_reweighing_factor',';#eta ^{(}#bar{S} ^{)};reweighing factor',20,-5,5,0,50)
 
-	nEntries = tree.GetEntries()
-	print 'Number of entries in the tree: ', nEntries
-	for i in range(0,nEntries):
+	for i in range(0,nEntries2):
+		if(i==0): print 'charge of the S/antiS: ', tree._S_charge[0]
 		if(i==maxEvents):
 			break
 		if(i%1e4 == 0):
@@ -184,7 +232,7 @@ for tree in l_tree:
 		tree.GetEntry(i)
 		
 		#for when you have the BDT parameter in your tree:
-		if(post_BDT and tree.SexaqBDT <= -0.15):continue
+		if(tree.SexaqBDT <= min_BDT_classifier):continue
 
 		#need to reweigh the MC signal events, because the ones with high eta are more important, because they will pass more material
 		reweighing_factor = config.calc_reweighing_factor(tree._S_eta[0],'MC-#bar{S}-Signal' in Legend[iTree])
@@ -227,10 +275,11 @@ for tree in l_tree:
 
 		h_S_error_lxy_interaction_vertex.Fill(tree._S_error_lxy_interaction_vertex_beampipeCenter[0],reweighing_factor)  
 		h_S_mass.Fill(tree._S_mass[0],reweighing_factor)
+		h_S_BDT.Fill(tree.SexaqBDT,reweighing_factor)
 
 		tprof_reweighing_factor.Fill(tree._S_eta[0],reweighing_factor)	
 
-	TH1_l = [h_S_vz_interaction_vertex,h_S_lxy_interaction_vertex,h_S_daughters_deltaphi,h_S_daughters_deltaeta,h_S_daughters_openingsangle,h_S_daughters_DeltaR,h_S_Ks_openingsangle,h_S_Lambda_openingsangle,h_S_eta,h_Ks_eta,h_Lambda_eta,h_S_dxy_over_lxy,h_Ks_dxy_over_lxy,h_Lambda_dxy_over_lxy,h_S_dz_min,h_Ks_dz_min,h_Lambda_dz_min,h_Ks_pt,h_Lambda_lxy_decay_vertex,h_S_chi2_ndof,h_S_pz,h_S_error_lxy_interaction_vertex,h_S_mass,tprof_reweighing_factor]
+	TH1_l = [h_S_vz_interaction_vertex,h_S_lxy_interaction_vertex,h_S_daughters_deltaphi,h_S_daughters_deltaeta,h_S_daughters_openingsangle,h_S_daughters_DeltaR,h_S_Ks_openingsangle,h_S_Lambda_openingsangle,h_S_eta,h_Ks_eta,h_Lambda_eta,h_S_dxy_over_lxy,h_Ks_dxy_over_lxy,h_Lambda_dxy_over_lxy,h_S_dz_min,h_Ks_dz_min,h_Lambda_dz_min,h_Ks_pt,h_Lambda_lxy_decay_vertex,h_S_chi2_ndof,h_S_pz,h_S_error_lxy_interaction_vertex,h_S_mass,h_S_BDT,tprof_reweighing_factor]
 	for h in TH1_l:
 		h.SetDirectory(0) 
 	TH1_ll.append(TH1_l)
@@ -254,7 +303,7 @@ for i in range(0,nHistos):#each list contains a list of histograms. Each list re
 	h = TH1_ll[0][i]
 	c_name = "c_"+h.GetName()
 	c = TCanvas(c_name,"")
-	legend = TLegend(0.7,0.85,0.99,0.99)
+	legend = TLegend(0.65,0.77,0.99,0.99)
 	for j in range(0,nSamples):
 		h = TH1_ll[j][i]
 		if(h.GetName() != "tprof_reweighing_factor"):
@@ -269,21 +318,23 @@ for i in range(0,nHistos):#each list contains a list of histograms. Each list re
 			h.GetYaxis().SetRangeUser(1e-5,l_y_axis_ranges[i])
 		if("chi2_ndof" in h.GetName()):
 			h.GetYaxis().SetRangeUser(1e-3,l_y_axis_ranges[i])
+		if("BDT" in h.GetName()):
+			h.GetYaxis().SetRangeUser(1e-3,l_y_axis_ranges[i])
 		if j == 0:
 			h.Draw("L")
 			c.Update()
 		else:
 			h.Draw("PCE1same")
 			c.Update()
-		if("dxy_over_lxy" in h.GetName() or "dz_min" in h.GetName() or "chi2_ndof" in h.GetName()):
+		if("dxy_over_lxy" in h.GetName() or "dz_min" in h.GetName() or "chi2_ndof" in h.GetName() or "BDT" in h.GetName()):
 			c.SetLogy()
 		h.SetLineColor(colours[j])
 		h.SetLineWidth(2)
-		h.SetMarkerStyle(22+j)
+		h.SetMarkerStyle(markerStyle[j])
 		h.SetMarkerColor(colours[j])
 		h.SetMarkerSize(0.8)
 		h.SetStats(0)
-		legend.AddEntry(h, Legend[j],"lep")
+		legend.AddEntry(h, Legend[j],"ep")
 	legend.Draw()
 	CMS_lumi.CMS_lumi(c, 0, 11)
 	c.SaveAs(plots_output_dir+c_name.replace(".", "p")+".pdf")

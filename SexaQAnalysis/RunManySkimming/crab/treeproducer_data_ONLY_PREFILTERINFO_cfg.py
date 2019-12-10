@@ -67,7 +67,7 @@ options.register(
 process = cms.Process("SEXAQ")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
@@ -170,9 +170,9 @@ process.TFileService = cms.Service('TFileService',
 process.out = cms.OutputModule("PoolOutputModule",
   outputCommands = collections_to_keep,
    fileName = cms.untracked.string("events_skimmed.root"),
-    SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring('p')
-  )
+#    SelectEvents = cms.untracked.PSet(
+#    SelectEvents = cms.vstring('p')
+#  )
 )
 
 process.output_step = cms.EndPath(process.out)

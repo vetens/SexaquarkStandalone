@@ -148,7 +148,8 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree->Branch("_RECO_Ks_daughter1_dz_beamspot",&_RECO_Ks_daughter1_dz_beamspot);
 
         _tree_counter = fs->make <TTree>("FlatTreeCounter","tree_counter");
-	_tree_counter->Branch("_nGENAntiSWithCorrectGranddaughters",&_nGENAntiSWithCorrectGranddaughters);
+	_tree_counter->Branch("_RECO_S_total_lxy_beampipeCenter",&_RECO_S_total_lxy_beampipeCenter);
+	_tree_counter->Branch("_RECO_S_saved_lxy_beampipeCenter",&_RECO_S_saved_lxy_beampipeCenter);
 
 
 }
@@ -245,10 +246,8 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	FillBranches(antiS, beamspot, beamspotVariance, h_offlinePV,m_runningOnData,  h_genParticles, h_V0Ks,  h_V0L, ngoodPVsPOG, randomPVz);
       }
   }
+  else std::cout << "!!!!!!!!!!!!!h_sCands not valid!!!!!!!!!!!!!!!!!!!!!!!" << std::endl; 
 
-  Init_Counter();
-  _nGENAntiSWithCorrectGranddaughters.push_back(nGENAntiSWithCorrectGranddaughtersThisEvent);
-  _tree_counter->Fill();
 
  } //end of analyzer
 
@@ -290,18 +289,16 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	double event_weighting_factor = AnalyzerAllSteps::EventWeightingFactor(RECO_S->theta()); 
 	double event_weighting_factorPU = 1.; 
 	//you only need to calculate a reweighing parameter for the PU and z location if you are running on MC
-	std::cout << "just before event_weighting_factorPU: " << ngoodPVsPOG << ", " << AnalyzerAllSteps::v_mapPU.size() << " , " << bestMatchingAntiS << std::endl;
         if(ngoodPVsPOG < AnalyzerAllSteps::v_mapPU.size() && bestMatchingAntiS > -1) {
-		std::cout << "event_weighting_factorPU for signal" << event_weighting_factorPU << std::endl;
 		event_weighting_factorPU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[ngoodPVsPOG],h_genParticles->at(bestMatchingAntiS).vz());
 	}
 	else if(ngoodPVsPOG < AnalyzerAllSteps::v_mapPU.size()){ //but if the MC does not contain any antiS you have to reweigh on the 'event', so pick a random PVz location to reweigh on
 		event_weighting_factorPU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[ngoodPVsPOG],randomPVz);
 		event_weighting_factorPU = event_weighting_factorPU * ngoodPVsPOG / 18.479;
-		std::cout << "event_weighting_factorPU for BKG" << event_weighting_factorPU << std::endl;
 	}
 
 	nTotalRECOS++;
+	nTotalRECOSWeighed = nTotalRECOSWeighed + event_weighting_factor*event_weighting_factorPU;
 	//calculate some kinematic variables for the RECO AntiS
 	TVector3 RECOAntiSMomentumVertex(RECO_S->px(),RECO_S->py(),RECO_S->pz());
 	double RECOErrorLxy_interactionVertex = AnalyzerAllSteps::std_dev_lxy(RECO_S->vx(), RECO_S->vy(), RECO_S->vertexCovariance(0,0), RECO_S->vertexCovariance(1,1), beamspot.X(), beamspot.Y(), beamspotVariance.X(), beamspotVariance.Y());
@@ -447,10 +444,20 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	//if the RECO S particle fails one of the below cuts than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice for computational reasons
 	//if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut)return;
-	if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut  )return;
+
+	Init_Counter();
+	if(RECO_S->charge()==1)_RECO_S_total_lxy_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
+	if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut  ){
+        	_tree_counter->Fill();
+		return;
+	}
+
+        if(RECO_S->charge()==1)_RECO_S_saved_lxy_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
+        _tree_counter->Fill();
 
 
 	nSavedRECOS++;
+	nSavedRECOSWeighed++;
 
 	Init();	
 
@@ -609,16 +616,10 @@ FlatTreeProducerBDT::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 
 FlatTreeProducerBDT::~FlatTreeProducerBDT()
 {
-	if(m_lookAtAntiS){
-			std::cout << "The total number of GEN anti-S with all correct granddaughters: " << nGENAntiSWithCorrectGranddaughters << std::endl;
-			std::cout << "The total number RECO anti-S that were found is: " << nTotalRECOS << std::endl; 
-			std::cout << "The total number RECO anti-S that were saved is: " << nSavedRECOS << std::endl; 
-	}
-	if(!m_lookAtAntiS){
-			std::cout << "The total number RECO S that were found is: " << nTotalRECOS << std::endl; 
-			std::cout << "The total number RECO S that were saved is: " << nSavedRECOS << std::endl; 
-	}
-	std::cout << "saved/found = " << (double)nSavedRECOS/(double)nTotalRECOS << std::endl;
+	std::cout << "total number of S or antiS found: " << nTotalRECOS << std::endl;
+	std::cout << "total number of S or antiS found, weighed: " << nTotalRECOSWeighed << std::endl;
+	std::cout << "total number of S or antiS saved: " << nSavedRECOS << std::endl;
+	std::cout << "total number of S or antiS saved, weighed: " << nSavedRECOSWeighed << std::endl;
 }
 
 void FlatTreeProducerBDT::Init_PV()
@@ -639,7 +640,9 @@ void FlatTreeProducerBDT::Init_PV()
 
 void FlatTreeProducerBDT::Init_Counter()
 {
-	_nGENAntiSWithCorrectGranddaughters.clear();
+	_RECO_S_total_lxy_beampipeCenter.clear();
+	_RECO_S_saved_lxy_beampipeCenter.clear();
+
 }
 
 void FlatTreeProducerBDT::Init()

@@ -21,6 +21,8 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
 
     int nTotalRECOS=0;
     int nSavedRECOS=0;
+    double nTotalRECOSWeighed=0.;
+    double nSavedRECOSWeighed=0.;
     int nGENAntiSWithCorrectGranddaughters=0;
     bool m_lookAtAntiS;
     bool m_runningOnData; 
@@ -85,7 +87,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     std::vector<float> _RECO_Ks_daughter0_charge,_RECO_Ks_daughter0_pt,_RECO_Ks_daughter0_pz,_RECO_Ks_daughter0_dxy_beamspot,_RECO_Ks_daughter0_dz_beamspot;   
     std::vector<float> _RECO_Ks_daughter1_charge,_RECO_Ks_daughter1_pt,_RECO_Ks_daughter1_pz,_RECO_Ks_daughter1_dxy_beamspot,_RECO_Ks_daughter1_dz_beamspot;   
 
-    std::vector<float> _nGENAntiSWithCorrectGranddaughters;
+    std::vector<float> _RECO_S_total_lxy_beampipeCenter, _RECO_S_saved_lxy_beampipeCenter;
 
 
      };

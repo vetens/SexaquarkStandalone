@@ -75,7 +75,9 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     int numberOfAntiSWithCorrectGranddaughters = 0;
     int totalNumberOfUniqueAntiS_FromTrackingParticles= 0;
     double nTotalUniqueGenS_weighted = 0.;
+    double nTotalUniqueGenS_Nonweighted = 0.;
     double weighedRecoAntiS = 0.;
+    double nonweighedRecoAntiS= 0.;
 
     //---- configurable parameters --------
     bool m_lookAtAntiS;

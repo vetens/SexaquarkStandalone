@@ -115,12 +115,12 @@ h_corr_lxy_lxy = TH2F("h_corr_lxy_lxy",";lxy correction factor;lxy correction fa
 h_corr_lxy_vz = TH2F("h_corr_lxy_vz",";lxy correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 
 #dxy against the others
-h_corr_vz_pt = TH2F("h_corr_vz_pt",";dz correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-h_corr_vz_pz = TH2F("h_corr_vz_pz",";dz correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-h_corr_vz_dxy = TH2F("h_corr_vz_dxy",";dz correction factor;dxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-h_corr_vz_dz = TH2F("h_corr_vz_dz",";dz correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-h_corr_vz_lxy = TH2F("h_corr_vz_lxy",";dz correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-h_corr_vz_vz = TH2F("h_corr_vz_vz",";dz correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_pt = TH2F("h_corr_vz_pt",";vz correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_pz = TH2F("h_corr_vz_pz",";vz correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_dxy = TH2F("h_corr_vz_dxy",";vz correction factor;dxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_dz = TH2F("h_corr_vz_dz",";vz correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_lxy = TH2F("h_corr_vz_lxy",";vz correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
+h_corr_vz_vz = TH2F("h_corr_vz_vz",";vz correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 
 ll_corr_eff = [
 [h_corr_pt_pt,h_corr_pt_pz,h_corr_pt_dxy,h_corr_pt_dz,h_corr_pt_lxy,h_corr_pt_vz],
@@ -143,8 +143,6 @@ l_h_FiducialRegionCuts = [h_FiducialRegionCuts_1,h_FiducialRegionCuts_2,h_Fiduci
 nAntiS_reconstructable = 0.
 nAntiSRecoAlsoOutsideFiducialRegion = 0.
 nAntiSRecoInsideFiducialRegion = 0.
-nAntiSRecoWeightedWithCorrFactors = 0.
-error_nAntiSRecoWeightedWithCorrFactors = 0.
 #and count separately the reconstruction efficiency of the Ks, antiLambda and antiS if their respective daughters got reconstructed.
 nKsRECOIfBothDaughtersReco = 0.
 nKsTOTALIfBothDaughtersReco = 0.
@@ -326,8 +324,6 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			h_corr_factor_dz.Fill(corrections_factors[3])
 			h_corr_factor_lxy.Fill(corrections_factors[4])
 			h_corr_factor_vz.Fill(corrections_factors[5])
-			nAntiSRecoWeightedWithCorrFactors = nAntiSRecoWeightedWithCorrFactors + corr_factor_this_antiS*weightFactor
-			error_nAntiSRecoWeightedWithCorrFactors = error_nAntiSRecoWeightedWithCorrFactors + np.power(error_corr_factor_this_antiS,2)
 
 			
 		#now select tracks which have the antiS properly reconstructed and check for these events how the kinematics look like of the final state particles.
@@ -429,8 +425,6 @@ print "AntiS reconstruction efficiency (weighted for the path length through the
 
 print "AntiS reconstruction efficiency (weighted for the path length through the beampipe and PV) for antiS with final state particles which are reconstructable and have to be in the fiducial region: ", nAntiSRecoInsideFiducialRegion,"/",nAntiS_reconstructable, " = ", nAntiSRecoInsideFiducialRegion/nAntiS_reconstructable, "       --> so 1 out of: " , nAntiS_reconstructable/nAntiSRecoInsideFiducialRegion
 
-print "The reweighted (both for pathlength through the beampipe and PV and tracking efficiencies) for antiS with final state particles which are reconstructable, reconstruction efficiency is: ", nAntiSRecoWeightedWithCorrFactors,"/",nAntiS_reconstructable, " = ", nAntiSRecoWeightedWithCorrFactors/nAntiS_reconstructable, "       --> so 1 out of: " , nAntiS_reconstructable/nAntiSRecoWeightedWithCorrFactors
-print "error on the reweighted reconstruction efficiency is: ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors), "/" , nAntiS_reconstructable, " = ", np.sqrt(error_nAntiSRecoWeightedWithCorrFactors)/nAntiS_reconstructable
 
 print "------------------------------------------"
 print "Ks if both daughters got reconstructed: ", nKsRECOIfBothDaughtersReco,"/",nKsTOTALIfBothDaughtersReco," = ", nKsRECOIfBothDaughtersReco/nKsTOTALIfBothDaughtersReco, "              --> so 1 out of :", nKsTOTALIfBothDaughtersReco/nKsRECOIfBothDaughtersReco

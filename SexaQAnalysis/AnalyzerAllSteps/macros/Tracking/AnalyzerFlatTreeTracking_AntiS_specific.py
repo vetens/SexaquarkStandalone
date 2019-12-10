@@ -19,7 +19,7 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-maxEvents1 = 2e4
+maxEvents1 = 1e4
 maxEvents2 = 1e99
 
 
@@ -44,30 +44,48 @@ def FillHistosEfficiency(tree,ll_efficiencies,i_particle,index,weightFactor,i):
 	if(i_particle == 0): #if antiS use interaction vertex as point of reference
 		ll_efficiencies[index][2].Fill(tree._tpsAntiS_vz[1],weightFactor)
 		ll_efficiencies[index][3].Fill(tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
+		if(abs(tree._tpsAntiS_eta[i_particle])<.8): ll_efficiencies[index][4].Fill(tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>.8 and abs(tree._tpsAntiS_eta[i_particle])<1.): ll_efficiencies[index][5].Fill(tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>1. and abs(tree._tpsAntiS_eta[i_particle])<3.): ll_efficiencies[index][6].Fill(tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
 	elif(i_particle == 1): #if Ks use the  decay vertex as point of reference
 		ll_efficiencies[index][2].Fill(tree._tpsAntiS_vz[3],weightFactor)
 		ll_efficiencies[index][3].Fill(tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
+		if(abs(tree._tpsAntiS_eta[i_particle])<.8): ll_efficiencies[index][4].Fill(tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>.8 and abs(tree._tpsAntiS_eta[i_particle])<1.): ll_efficiencies[index][5].Fill(tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>1. and abs(tree._tpsAntiS_eta[i_particle])<3.): ll_efficiencies[index][6].Fill(tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
 	elif(i_particle == 2): #if AntiL use the  decay vertex as point of reference
 		ll_efficiencies[index][2].Fill(tree._tpsAntiS_vz[5],weightFactor)
 		ll_efficiencies[index][3].Fill(tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
+		if(abs(tree._tpsAntiS_eta[i_particle])<.8): ll_efficiencies[index][4].Fill(tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>.8 and abs(tree._tpsAntiS_eta[i_particle])<1.): ll_efficiencies[index][5].Fill(tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
+                elif(abs(tree._tpsAntiS_eta[i_particle])>1. and abs(tree._tpsAntiS_eta[i_particle])<3.): ll_efficiencies[index][6].Fill(tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
 	elif(i_particle == 3 or i_particle == 4 or i_particle == 5 or i_particle == 6): #for the tracks use there creation vertex as point of reference
 		ll_efficiencies[index][2].Fill(tree._tpsAntiS_vz[i_particle],weightFactor)
 		ll_efficiencies[index][3].Fill(tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
-	ll_efficiencies[index][4].Fill(tree._tpsAntiS_pt[i_particle],weightFactor)
-	ll_efficiencies[index][5].Fill(tree._tpsAntiS_pz[i_particle],weightFactor)
-	ll_efficiencies[index][6].Fill(np.sqrt(tree._tpsAntiS_pz[i_particle]*tree._tpsAntiS_pz[i_particle]+tree._tpsAntiS_pt[i_particle]*tree._tpsAntiS_pt[i_particle]),weightFactor)
-	ll_efficiencies[index][7].Fill(tree._tpsAntiS_dxyTrack_beamspot[i_particle],weightFactor)
-	ll_efficiencies[index][8].Fill(tree._tpsAntiS_dzTrack_beamspot[i_particle],weightFactor)
-	ll_efficiencies[index][9].Fill(tree._tpsAntiS_numberOfTrackerHits[i_particle],weightFactor)
-	ll_efficiencies[index][10].Fill(tree._tpsAntiS_phi[i_particle],weightFactor)
+		if(abs(tree._tpsAntiS_eta[i_particle])<.8): ll_efficiencies[index][4].Fill(tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
+		elif(abs(tree._tpsAntiS_eta[i_particle])>.8 and abs(tree._tpsAntiS_eta[i_particle])<1.): ll_efficiencies[index][5].Fill(tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
+                elif(abs(tree._tpsAntiS_eta[i_particle])>1. and abs(tree._tpsAntiS_eta[i_particle])<3.): ll_efficiencies[index][6].Fill(tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
+	ll_efficiencies[index][7].Fill(tree._tpsAntiS_bestRECO_Lxy_beampipeCenter[i_particle],weightFactor)
+	ll_efficiencies[index][8].Fill(tree._tpsAntiS_bestRECO_vz[i_particle],weightFactor)
+	ll_efficiencies[index][9].Fill(tree._tpsAntiS_pt[i_particle],weightFactor)
+	if(abs(tree._tpsAntiS_eta[i_particle])<.8): ll_efficiencies[index][10].Fill(tree._tpsAntiS_pt[i_particle],weightFactor)
+	elif(abs(tree._tpsAntiS_eta[i_particle])>0.8 and abs(tree._tpsAntiS_eta[i_particle])<1.): ll_efficiencies[index][11].Fill(tree._tpsAntiS_pt[i_particle],weightFactor)
+	elif(abs(tree._tpsAntiS_eta[i_particle])>1. and abs(tree._tpsAntiS_eta[i_particle])<3.): ll_efficiencies[index][12].Fill(tree._tpsAntiS_pt[i_particle],weightFactor)
+
+	ll_efficiencies[index][13].Fill(tree._tpsAntiS_pz[i_particle],weightFactor)
+	ll_efficiencies[index][14].Fill(np.sqrt(tree._tpsAntiS_pz[i_particle]*tree._tpsAntiS_pz[i_particle]+tree._tpsAntiS_pt[i_particle]*tree._tpsAntiS_pt[i_particle]),weightFactor)
+	ll_efficiencies[index][15].Fill(tree._tpsAntiS_dxyTrack_beamspot[i_particle],weightFactor)
+	ll_efficiencies[index][16].Fill(tree._tpsAntiS_dzTrack_beamspot[i_particle],weightFactor)
+	ll_efficiencies[index][17].Fill(tree._tpsAntiS_numberOfTrackerHits[i_particle],weightFactor)
+	ll_efficiencies[index][18].Fill(tree._tpsAntiS_phi[i_particle],weightFactor)
 	if(i_particle == 0): #if antiS use interaction vertex as point of reference
-		ll_efficiencies[index][11].Fill(tree._tpsAntiS_vz[1],tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
+		ll_efficiencies[index][19].Fill(tree._tpsAntiS_vz[1],tree._tpsAntiS_Lxy_beampipeCenter[1],weightFactor)
 	elif(i_particle == 1): #if Ks use the  decay vertex as point of reference
-		ll_efficiencies[index][11].Fill(tree._tpsAntiS_vz[3],tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
+		ll_efficiencies[index][19].Fill(tree._tpsAntiS_vz[3],tree._tpsAntiS_Lxy_beamspot[3],weightFactor)
 	elif(i_particle == 2): #if AntiL use the  decay vertex as point of reference
-		ll_efficiencies[index][11].Fill(tree._tpsAntiS_vz[5],tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
-	elif(i_particle == 3 or i_particle == 4 or i_particle == 5 or i_particle == 6): #for the tracks use there creation vertex as point of reference
-		ll_efficiencies[index][11].Fill(tree._tpsAntiS_vz[i_particle],tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
+		ll_efficiencies[index][19].Fill(tree._tpsAntiS_vz[5],tree._tpsAntiS_Lxy_beamspot[5],weightFactor)
+	elif(i_particle == 3 or i_particle == 4 or i_particle == 5 or i_particle == 6): #for the tracks use their creation vertex as point of reference
+		ll_efficiencies[index][19].Fill(tree._tpsAntiS_vz[i_particle],tree._tpsAntiS_Lxy_beamspot[i_particle],weightFactor)
 
 
 #first make a few plots on the PV distribution to check the reweighing
@@ -159,7 +177,15 @@ h_teff_nomAntiS_RECO_eff_eta_antiS= TH1F('h_teff_nomAntiS_RECO_eff_eta_antiS',";
 h_teff_nomAntiS_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomAntiS_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiS_RECO_eff_vz_antiS= TH1F('h_teff_nomAntiS_RECO_eff_vz_antiS',";absolute v_{z} interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiS_RECO_eff_lxy_antiS= TH1F('h_teff_nomAntiS_RECO_eff_lxy_antiS',";l_{0}(bpc) interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/0.1mm",50,2,2.5) 
+h_teff_nomAntiS_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomAntiS_RECO_eff_lxy_barrel_antiS',";l_{0}(bpc) interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/0.1mm",50,2,2.5) 
+h_teff_nomAntiS_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomAntiS_RECO_eff_lxy_transition_antiS',";l_{0}(bpc) interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/0.1mm",50,2,2.5) 
+h_teff_nomAntiS_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomAntiS_RECO_eff_lxy_endcap_antiS',";l_{0}(bpc) interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/0.1mm",50,2,2.5) 
+h_teff_nomAntiS_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomAntiS_RECO_eff_lxy_antiS_reco',";l_{0}(bpc) interaction vertex reconstructed #bar{S} (cm);Efficiency or 1/N_{ev} Events/0.2mm",31,1.9,2.52) 
+h_teff_nomAntiS_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomAntiS_RECO_eff_vz_antiS_reco',";absolute v_{z} interaction vertex reconstructed #bar{S} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiS_RECO_eff_pt_antiS= TH1F('h_teff_nomAntiS_RECO_eff_pt_antiS',";p_{T} simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiS_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomAntiS_RECO_eff_pt_barrel_antiS',";p_{T} simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiS_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomAntiS_RECO_eff_pt_transition_antiS',";p_{T} simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiS_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomAntiS_RECO_eff_pt_endcap_antiS',";p_{T} simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomAntiS_RECO_eff_pz_antiS= TH1F('h_teff_nomAntiS_RECO_eff_pz_antiS',";p_{z} simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomAntiS_RECO_eff_p_antiS= TH1F('h_teff_nomAntiS_RECO_eff_p_antiS',";p simulated #bar{S} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomAntiS_RECO_eff_dxy_antiS= TH1F('h_teff_nomAntiS_RECO_eff_dxy_antiS',";d_{0}(bs) simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -172,7 +198,15 @@ h_teff_nomKs_RECO_eff_eta_antiS= TH1F('h_teff_nomKs_RECO_eff_eta_antiS',";#eta s
 h_teff_nomKs_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomKs_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomKs_RECO_eff_vz_antiS= TH1F('h_teff_nomKs_RECO_eff_vz_antiS',";absolute v_{z} decay vertex simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/4cm;",100,-200,200)
 h_teff_nomKs_RECO_eff_lxy_antiS= TH1F('h_teff_nomKs_RECO_eff_lxy_antiS',";l_{0}(bs) decay vertex simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKs_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomKs_RECO_eff_lxy_barrel_antiS',";l_{0}(bs) decay vertex simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKs_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomKs_RECO_eff_lxy_transition_antiS',";l_{0}(bs) decay vertex simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKs_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomKs_RECO_eff_lxy_endcap_antiS',";l_{0}(bs) decay vertex simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKs_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomKs_RECO_eff_lxy_antiS_reco',";l_{0}(bs) decay vertex reconstructed K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKs_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomKs_RECO_eff_vz_antiS_reco',";absolute v_{z} decay vertex reconstructed K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/4cm;",100,-200,200)
 h_teff_nomKs_RECO_eff_pt_antiS= TH1F('h_teff_nomKs_RECO_eff_pt_antiS',";p_{T} simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKs_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomKs_RECO_eff_pt_barrel_antiS',";p_{T} simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKs_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomKs_RECO_eff_pt_transition_antiS',";p_{T} simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKs_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomKs_RECO_eff_pt_endcap_antiS',";p_{T} simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomKs_RECO_eff_pz_antiS= TH1F('h_teff_nomKs_RECO_eff_pz_antiS',";p_{z} simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomKs_RECO_eff_p_antiS= TH1F('h_teff_nomKs_RECO_eff_p_antiS',";p simulated K_{S}^{0} (GeV/c); Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomKs_RECO_eff_dxy_antiS= TH1F('h_teff_nomKs_RECO_eff_dxy_antiS',";d_{0}(bs) simulated K_{S}^{0} (cm); Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -185,7 +219,15 @@ h_teff_nomAntiLambda_RECO_eff_eta_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_eta
 h_teff_nomAntiLambda_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiLambda_RECO_eff_vz_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_vz_antiS',";absolute v_{z} decay vertex simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/4cm;",100,-200,200) 
 h_teff_nomAntiLambda_RECO_eff_lxy_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_lxy_antiS',";l_{0}(bs) decay vertex simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambda_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_lxy_barrel_antiS',";l_{0}(bs) decay vertex simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambda_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_lxy_transition_antiS',";l_{0}(bs) decay vertex simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambda_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_lxy_endcap_antiS',";l_{0}(bs) decay vertex simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambda_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomAntiLambda_RECO_eff_lxy_antiS_reco',";l_{0}(bs) decay vertex reconstructed #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambda_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomAntiLambda_RECO_eff_vz_antiS_reco',";absolute v_{z} decay vertex reconstructed #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/4cm;",100,-200,200) 
 h_teff_nomAntiLambda_RECO_eff_pt_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_pt_antiS',";p_{T} simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambda_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_pt_barrel_antiS',";p_{T} simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambda_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_pt_transition_antiS',";p_{T} simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambda_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_pt_endcap_antiS',";p_{T} simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomAntiLambda_RECO_eff_pz_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomAntiLambda_RECO_eff_p_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_p_antiS',";p simulated #bar{#Lambda}^{0} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomAntiLambda_RECO_eff_dxy_antiS= TH1F('h_teff_nomAntiLambda_RECO_eff_dxy_antiS',";d_{0}(bs) simulated #bar{#Lambda}^{0} (cm);Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -198,7 +240,15 @@ h_teff_nomKsdaugthers_RECO_eff_eta_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_e
 h_teff_nomKsdaughters_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomKsdaughters_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomKsdaugthers_RECO_eff_vz_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_vz_antiS',";absolute v_{z} cv simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200)
 h_teff_nomKsdaugthers_RECO_eff_lxy_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_lxy_antiS',";l_{0}(bs) cv simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKsdaugthers_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_lxy_barrel_antiS',";l_{0}(bs) cv simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKsdaugthers_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_lxy_transition_antiS',";l_{0}(bs) cv simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKsdaugthers_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_lxy_endcap_antiS',";l_{0}(bs) cv simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKsdaugthers_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomKsdaugthers_RECO_eff_lxy_antiS_reco',";l_{0}(bs) cv reconstructed K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomKsdaugthers_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomKsdaugthers_RECO_eff_vz_antiS_reco',";absolute v_{z} cv reconstructed K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200)
 h_teff_nomKsdaugthers_RECO_eff_pt_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_pt_antiS',";p_{T} simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKsdaugthers_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_pt_barrel_antiS',";p_{T} simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKsdaugthers_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_pt_transition_antiS',";p_{T} simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomKsdaugthers_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_pt_endcap_antiS',";p_{T} simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomKsdaugthers_RECO_eff_pz_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_pz_antiS',";p_{z} simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomKsdaugthers_RECO_eff_p_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_p_antiS',";p simulated K_{S}^{0} daughters (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomKsdaugthers_RECO_eff_dxy_antiS= TH1F('h_teff_nomKsdaugthers_RECO_eff_dxy_antiS',";d_{0}(bs) simulated K_{S}^{0} daughters (cm);Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -211,7 +261,15 @@ h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO
 h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS',";absolute v_{z} cv simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaPion_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_lxy_barrel_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaPion_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff__lxy_transition_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaPion_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_lxy_endcap_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS_reco',";l_{0}(bs) cv reconstructed #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS_reco',";absolute v_{z} cv reconstructed #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiLambdaPion_RECO_eff_pt_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_pt_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaPion_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_pt_barrel_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaPion_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_pt_transition_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaPion_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_pt_endcap_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomAntiLambdaPion_RECO_eff_pz_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomAntiLambdaPion_RECO_eff_p_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_p_antiS',";p simulated #bar{#Lambda}^{0}-#pi^{+} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomAntiLambdaPion_RECO_eff_dxy_antiS= TH1F('h_teff_nomAntiLambdaPion_RECO_eff_dxy_antiS',";d_{0}(bs) simulated #bar{#Lambda}^{0}-#pi^{+} (cm);Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -224,7 +282,15 @@ h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS= TH1F('h_teff_nomAntiLambdaAnt
 h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS',";absolute v_{z} cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_barrel_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_barrel_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_transition_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_transition_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_endcap_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_endcap_antiS',";l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS_reco= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS_reco',";l_{0}(bs) cv reconstructed #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",80,0,80) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS_reco= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS_reco',";absolute v_{z} cv reconstructed #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_barrel_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_barrel_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_transition_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_transition_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
+h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_endcap_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_endcap_antiS',";p_{T} simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",100,0,10) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_pz_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_pz_antiS',";p_{z} simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/1GeV/c",80,0,80) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_p_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_p_antiS',";p simulated #bar{#Lambda}^{0}-#bar{p} (GeV/c);Efficiency or 1/N_{ev} Events/0.1GeV/c",400,0,40) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_dxy_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_dxy_antiS',";d_{0}(bs) simulated #bar{#Lambda}^{0}-#bar{p} (cm);Efficiency or 1/N_{ev} Events/cm",40,-20,20) 
@@ -234,12 +300,18 @@ h_teff_nomAntiLambdaAntiProton_RECO_eff_phi_antiS= TH1F('h_teff_nomAntiLambdaAnt
 h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS= TH2F('h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS',";absolute v_{z} cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm); Efficiency",80,-200,200,40,0,80)
 
 ll_efficiencies_nom = [
-[h_teff_nomAntiS_RECO_eff_eta_antiS,h_teff_nomAntiS_RECO_eff_eta_antiS_antiS,h_teff_nomAntiS_RECO_eff_vz_antiS,h_teff_nomAntiS_RECO_eff_lxy_antiS,h_teff_nomAntiS_RECO_eff_pt_antiS,h_teff_nomAntiS_RECO_eff_pz_antiS,h_teff_nomAntiS_RECO_eff_p_antiS,h_teff_nomAntiS_RECO_eff_dxy_antiS,h_teff_nomAntiS_RECO_eff_dz_antiS,h_teff_nomAntiS_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiS_RECO_eff_phi_antiS,h2_teff_nomAntiS_RECO_eff_vz_lxy_antiS],
-[h_teff_nomKs_RECO_eff_eta_antiS,h_teff_nomKs_RECO_eff_eta_antiS_antiS,h_teff_nomKs_RECO_eff_vz_antiS,h_teff_nomKs_RECO_eff_lxy_antiS,h_teff_nomKs_RECO_eff_pt_antiS,h_teff_nomKs_RECO_eff_pz_antiS,h_teff_nomKs_RECO_eff_p_antiS,h_teff_nomKs_RECO_eff_dxy_antiS,h_teff_nomKs_RECO_eff_dz_antiS,h_teff_nomKs_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomKs_RECO_eff_phi_antiS,h2_teff_nomKs_RECO_eff_vz_lxy_antiS],
-[h_teff_nomAntiLambda_RECO_eff_eta_antiS,h_teff_nomAntiLambda_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambda_RECO_eff_vz_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_antiS,h_teff_nomAntiLambda_RECO_eff_pt_antiS,h_teff_nomAntiLambda_RECO_eff_pz_antiS,h_teff_nomAntiLambda_RECO_eff_p_antiS,h_teff_nomAntiLambda_RECO_eff_dxy_antiS,h_teff_nomAntiLambda_RECO_eff_dz_antiS,h_teff_nomAntiLambda_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambda_RECO_eff_phi_antiS,h2_teff_nomAntiLambda_RECO_eff_vz_lxy_antiS],
-[h_teff_nomKsdaugthers_RECO_eff_eta_antiS,h_teff_nomKsdaughters_RECO_eff_eta_antiS_antiS,h_teff_nomKsdaugthers_RECO_eff_vz_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_antiS,h_teff_nomKsdaugthers_RECO_eff_pt_antiS,h_teff_nomKsdaugthers_RECO_eff_pz_antiS,h_teff_nomKsdaugthers_RECO_eff_p_antiS,h_teff_nomKsdaugthers_RECO_eff_dxy_antiS,h_teff_nomKsdaugthers_RECO_eff_dz_antiS,h_teff_nomKsdaugthers_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomKsdaugthers_RECO_eff_phi_antiS,h2_teff_nomKsdaughters_RECO_eff_vz_lxy_antiS],
-[h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS,h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pt_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_p_antiS,h_teff_nomAntiLambdaPion_RECO_eff_dxy_antiS,h_teff_nomAntiLambdaPion_RECO_eff_dz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambdaPion_RECO_eff_phi_antiS,h2_teff_nomAntiLambdaPion_RECO_eff_vz_lxy_antiS],
-[h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_p_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_dxy_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_dz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_phi_antiS,h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS]
+[h_teff_nomAntiS_RECO_eff_eta_antiS,h_teff_nomAntiS_RECO_eff_eta_antiS_antiS,h_teff_nomAntiS_RECO_eff_vz_antiS,h_teff_nomAntiS_RECO_eff_lxy_antiS,h_teff_nomAntiS_RECO_eff_lxy_barrel_antiS,h_teff_nomAntiS_RECO_eff_lxy_transition_antiS,h_teff_nomAntiS_RECO_eff_lxy_endcap_antiS,h_teff_nomAntiS_RECO_eff_lxy_antiS_reco,h_teff_nomAntiS_RECO_eff_vz_antiS_reco,h_teff_nomAntiS_RECO_eff_pt_antiS,h_teff_nomAntiS_RECO_eff_pt_barrel_antiS,h_teff_nomAntiS_RECO_eff_pt_transition_antiS,h_teff_nomAntiS_RECO_eff_pt_endcap_antiS,h_teff_nomAntiS_RECO_eff_pz_antiS,h_teff_nomAntiS_RECO_eff_p_antiS,h_teff_nomAntiS_RECO_eff_dxy_antiS,h_teff_nomAntiS_RECO_eff_dz_antiS,h_teff_nomAntiS_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiS_RECO_eff_phi_antiS,h2_teff_nomAntiS_RECO_eff_vz_lxy_antiS],
+
+[h_teff_nomKs_RECO_eff_eta_antiS,h_teff_nomKs_RECO_eff_eta_antiS_antiS,h_teff_nomKs_RECO_eff_vz_antiS,h_teff_nomKs_RECO_eff_lxy_antiS,h_teff_nomKs_RECO_eff_lxy_barrel_antiS,h_teff_nomKs_RECO_eff_lxy_transition_antiS,h_teff_nomKs_RECO_eff_lxy_endcap_antiS,h_teff_nomKs_RECO_eff_lxy_antiS_reco,h_teff_nomKs_RECO_eff_vz_antiS_reco,h_teff_nomKs_RECO_eff_pt_antiS,h_teff_nomKs_RECO_eff_pt_barrel_antiS,h_teff_nomKs_RECO_eff_pt_transition_antiS,h_teff_nomKs_RECO_eff_pt_endcap_antiS,h_teff_nomKs_RECO_eff_pz_antiS,h_teff_nomKs_RECO_eff_p_antiS,h_teff_nomKs_RECO_eff_dxy_antiS,h_teff_nomKs_RECO_eff_dz_antiS,h_teff_nomKs_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomKs_RECO_eff_phi_antiS,h2_teff_nomKs_RECO_eff_vz_lxy_antiS],
+
+[h_teff_nomAntiLambda_RECO_eff_eta_antiS,h_teff_nomAntiLambda_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambda_RECO_eff_vz_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_barrel_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_transition_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_endcap_antiS,h_teff_nomAntiLambda_RECO_eff_lxy_antiS_reco,h_teff_nomAntiLambda_RECO_eff_vz_antiS_reco,h_teff_nomAntiLambda_RECO_eff_pt_antiS,h_teff_nomAntiLambda_RECO_eff_pt_barrel_antiS,h_teff_nomAntiLambda_RECO_eff_pt_transition_antiS,h_teff_nomAntiLambda_RECO_eff_pt_endcap_antiS,h_teff_nomAntiLambda_RECO_eff_pz_antiS,h_teff_nomAntiLambda_RECO_eff_p_antiS,h_teff_nomAntiLambda_RECO_eff_dxy_antiS,h_teff_nomAntiLambda_RECO_eff_dz_antiS,h_teff_nomAntiLambda_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambda_RECO_eff_phi_antiS,h2_teff_nomAntiLambda_RECO_eff_vz_lxy_antiS],
+
+[h_teff_nomKsdaugthers_RECO_eff_eta_antiS,h_teff_nomKsdaughters_RECO_eff_eta_antiS_antiS,h_teff_nomKsdaugthers_RECO_eff_vz_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_barrel_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_transition_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_endcap_antiS,h_teff_nomKsdaugthers_RECO_eff_lxy_antiS_reco,h_teff_nomKsdaugthers_RECO_eff_vz_antiS_reco,h_teff_nomKsdaugthers_RECO_eff_pt_antiS,h_teff_nomKsdaugthers_RECO_eff_pt_barrel_antiS,h_teff_nomKsdaugthers_RECO_eff_pt_transition_antiS,h_teff_nomKsdaugthers_RECO_eff_pt_endcap_antiS,h_teff_nomKsdaugthers_RECO_eff_pz_antiS,h_teff_nomKsdaugthers_RECO_eff_p_antiS,h_teff_nomKsdaugthers_RECO_eff_dxy_antiS,h_teff_nomKsdaugthers_RECO_eff_dz_antiS,h_teff_nomKsdaugthers_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomKsdaugthers_RECO_eff_phi_antiS,h2_teff_nomKsdaughters_RECO_eff_vz_lxy_antiS],
+
+[h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS,h_teff_nomAntiLambdaPion_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_barrel_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_transition_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_endcap_antiS,h_teff_nomAntiLambdaPion_RECO_eff_lxy_antiS_reco,h_teff_nomAntiLambdaPion_RECO_eff_vz_antiS_reco,h_teff_nomAntiLambdaPion_RECO_eff_pt_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pt_barrel_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pt_transition_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pt_endcap_antiS,h_teff_nomAntiLambdaPion_RECO_eff_pz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_p_antiS,h_teff_nomAntiLambdaPion_RECO_eff_dxy_antiS,h_teff_nomAntiLambdaPion_RECO_eff_dz_antiS,h_teff_nomAntiLambdaPion_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambdaPion_RECO_eff_phi_antiS,h2_teff_nomAntiLambdaPion_RECO_eff_vz_lxy_antiS],
+
+[h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_eta_antiS_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_barrel_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_transition_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_endcap_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_vz_antiS_reco,h_teff_nomAntiLambdaAntiProton_RECO_eff_lxy_antiS_reco,h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_barrel_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_transition_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pt_endcap_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_pz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_p_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_dxy_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_dz_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiLambdaAntiProton_RECO_eff_phi_antiS,h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS]
+
 ]
 
 for l in ll_efficiencies_nom:
@@ -380,7 +452,9 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			KsReconstructed = True
 		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[2] < config_dict["GENRECO_matcher_AntiL_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[2] < config_dict["GENRECO_matcher_AntiL_deltaR"]):
 			antiLambdaReconstructed = True
-		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
+		#if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
+		#	antiSReconstructed = True	
+		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"]):
 			antiSReconstructed = True	
 	
 		printProgress(i)
@@ -551,7 +625,7 @@ for l in ll_kinematics_granddaughters_of_RECO_AntiS:
 
 nHistos = len(ll_kinematics_granddaughters_of_RECO_AntiS[0])
 n_granddaughters = len(ll_kinematics_granddaughters_of_RECO_AntiS)
-leg_granddaugthers = ["K_{S}^{0} daughters","#bar{#Lambda}^{0}-#pi^{+}","#bar{#Lambda}^{0}-#bar{p}"]
+leg_granddaugthers = ["K_{S}^{0} daughters ","#bar{#Lambda}^{0}-#pi^{+} ","#bar{#Lambda}^{0}-#bar{p} "]
 for i in range(0,nHistos):#each list contains a list of histograms. the histos need to be overlaid one list to the other,
 	c_name = "c_"+ll_kinematics_granddaughters_of_RECO_AntiS[0][i].GetName()
 	c = TCanvas(c_name,"")
@@ -696,9 +770,12 @@ for i in range(0,len(ll_efficiencies_nom)):
 		elif(j==len(ll_efficiencies_nom[i])-1): #special for the 2D efficiency plots
 			gStyle.SetPalette(55)
 			tmp_clone = ll_efficiencies_nom[i][j].Clone()
+			tmp_clone.SetName(tmp_clone.GetName()+'_eff')
 			tmp_clone.Divide(ll_efficiencies_denom[i][j])
 			ll_efficiencies[i].append(tmp_clone)
 			tmp_clone.Write()
+			ll_efficiencies_nom[i][j].Write()
+			ll_efficiencies_denom[i][j].Write()
 
 			c= TCanvas(tmp_clone.GetName(),"");
 			c.SetRightMargin(0.2) #make room for the tile of the z scale
@@ -740,10 +817,9 @@ for il, l in enumerate(ll_efficiencies,start = 0):
 		elif("eta" in hc_PassedHistogram.GetName()):
 			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1#eta")	
 		elif("lxy" in hc_PassedHistogram.GetName()):
-			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.1mm")
-			c.SetLogy()	
+			hc_PassedHistogram.GetYaxis().SetTitle("Events/0.2mm")
 		elif("vz" in hc_PassedHistogram.GetName()):
-			hc_PassedHistogram.GetYaxis().SetTitle("Events/5cm")	
+			hc_PassedHistogram.GetYaxis().SetTitle("Events/4cm")	
 		hc_PassedHistogram.SetLineColor(colours[0])
 		hc_PassedHistogram.SetLineWidth(2)
 		hc_PassedHistogram.SetMarkerStyle(22+0)
@@ -776,7 +852,8 @@ for il, l in enumerate(ll_efficiencies_acceptance,start = 0):
 		#now make for each particle and for each variable a single plot which contains on the same plot the normalised distribution of a certain kin variable and the reconstruction eff wrt that kin variable
 		c_name = "c_"+hc.GetName()+"_distribution_and_efficiency"
 		c = TCanvas(c_name,"")
-		legend = TLegend(0.7,0.9,0.99,0.99)
+		legend = TLegend(0.55,0.92,0.99,0.99)
+		print hc_TotalHistogram.GetName()
 		if(hc_TotalHistogram.GetSumw2N() == 0):
 			hc_TotalHistogram.Sumw2(kTRUE)
 		hc_TotalHistogram.Scale(1./hc_TotalHistogram.Integral(), "width");

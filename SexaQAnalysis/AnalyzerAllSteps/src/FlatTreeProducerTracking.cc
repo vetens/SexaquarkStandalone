@@ -298,6 +298,7 @@ void FlatTreeProducerTracking::analyze(edm::Event const& iEvent, edm::EventSetup
 		double weight_PU = 0.;
 		if(nGoodPV < AnalyzerAllSteps::v_mapPU.size()) weight_PU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],genParticle->vz());
 		nTotalUniqueGenS_weighted = nTotalUniqueGenS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
+		nTotalUniqueGenS_Nonweighted = nTotalUniqueGenS_Nonweighted + 1;
 		vector<float> dummyVec; 
 		dummyVec.push_back(genParticle->eta());
 		dummyVec.push_back(1.);
@@ -803,6 +804,7 @@ int FlatTreeProducerTracking::FillTreesAntiSAndDaughters(const TrackingParticle&
 
 
 	if(RECOAntiSFound) weighedRecoAntiS  += weightBeampipe*weightPV; 
+	if(RECOAntiSFound) nonweighedRecoAntiS  = nonweighedRecoAntiS + 1; 
 	
 	return RECOAntiSFound;
 }
@@ -2525,6 +2527,8 @@ FlatTreeProducerTracking::~FlatTreeProducerTracking()
 	std::cout << "weighed number of generated antiS (unique): " << nTotalUniqueGenS_weighted << std::endl;
 	std::cout << "weighed number of reconstructed antiS: " << weighedRecoAntiS << std::endl;
 
+	std::cout << "non weighed number of generated antiS (unique): " << nTotalUniqueGenS_Nonweighted << std::endl;
+	std::cout << "non weighed number of reconstructed antiS: " << nonweighedRecoAntiS << std::endl;
 }
 
 

@@ -14,7 +14,7 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-maxNEntries = 1e99
+maxNEntries = 1e5
 
 plots_output_dir = "plots_GENSIM/"
 
@@ -34,9 +34,9 @@ h_eta_all_AntiS = TH1F('h_eta_all_AntiS','; #eta #bar{S}; #Entries/0.1#eta',160,
 h_vz_interaction_all_AntiS_non_weighted = TH1F('h_vz_interaction_all_AntiS_non_weighted','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/5cm',100,-250,250)
 h_vz_interaction_all_AntiS = TH1F('h_vz_interaction_all_AntiS','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/5cm',100,-250,250)
 h_vz_interaction_all_AntiS_zoom = TH1F('h_vz_interaction_all_AntiS_zoom','; absolute v_{z} interaction vertex #bar{S} (cm); #Entries/0.5cm',100,-25,25)
-tprof_eta_weighting_factor = TProfile('tprof_eta_weighting_factor','; #eta #bar{S}; Event weighting factor/0.1#eta',90,-4.5,4.5)
-tprof_vz_weighting_factor = TProfile('tprof_vz_weighting_factor','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor/5cm',100,-250,250)
-tprof_vz_weighting_factor_zoom = TProfile('tprof_vz_weighting_factor_zoom','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor/2mm',100,-10,10)
+tprof_eta_weighting_factor = TProfile('tprof_eta_weighting_factor','; #eta #bar{S}; Event weighting factor',90,-4.5,4.5)
+tprof_vz_weighting_factor = TProfile('tprof_vz_weighting_factor','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor',100,-250,250)
+tprof_vz_weighting_factor_zoom = TProfile('tprof_vz_weighting_factor_zoom','; absolute v_{z} #bar{S} interaction vertex (cm); Event weighting factor',100,-10,10)
 h_pt_all_AntiS = TH1F('h_pt_all_AntiS','; p_{T} #bar{S} (GeV/c); #Entries/0.1GeV/c',100,0,10)
 h_pz_all_AntiS = TH1F('h_pz_all_AntiS','; |p_{z}| #bar{S} (GeV/c); #Entries/1GeV/c',80,0,80)
 h_vz_creation_vertex_all_AntiS = TH1F('h_vz_creation_vertex_all_AntiS','; v_{z} creation vertex #bar{S}; #Entries/cm',60,-30,30)
@@ -44,15 +44,15 @@ h_nPV_all_AntiS = TH1F('h_nPV_all_AntiS','; #PV; #Entries',60,0,60)
 
 
 #investigate the reconstructability: have to use histograms for nominator and denominator, because teff does not support weights and using tprofile the bins with y = 0 are not displayed
-h_nom_vz_antiS_reconstructable = TH1F('h_nom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability/5cm',60,-150,150)
-h_nom_eta_antiS_reconstructable = TH1F('h_nom_eta_antiS_reconstructable','; #eta #bar{S} interaction vertex  (cm); Reconstructability/0.1#eta',160,-8,8)
-h_nom_pt_antiS_reconstructable = TH1F('h_nom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability/0.2GeV/c',50,0,10)
-h_nom_pz_antiS_reconstructable = TH1F('h_nom_pz_antiS_reconstructable','; p_{z} #bar{S} (GeV/c); Reconstructability/1GeV/c',80,0,80)
+h_nom_vz_antiS_reconstructable = TH1F('h_nom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability',60,-150,150)
+h_nom_eta_antiS_reconstructable = TH1F('h_nom_eta_antiS_reconstructable','; #eta #bar{S}; Reconstructability',160,-8,8)
+h_nom_pt_antiS_reconstructable = TH1F('h_nom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability',50,0,10)
+h_nom_pz_antiS_reconstructable = TH1F('h_nom_pz_antiS_reconstructable','; |p_{z}| #bar{S} (GeV/c); Reconstructability',80,0,80)
 
-h_denom_vz_antiS_reconstructable = TH1F('h_denom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability/5cm',60,-150,150)
-h_denom_eta_antiS_reconstructable = TH1F('h_denom_eta_antiS_reconstructable','; #eta #bar{S} interaction vertex  (cm); Reconstructability/0.1#eta',160,-8,8)
-h_denom_pt_antiS_reconstructable = TH1F('h_denom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability/0.2GeV/c',50,0,10)
-h_denom_pz_antiS_reconstructable = TH1F('h_denom_pz_antiS_reconstructable','; p_{z} #bar{S} (GeV/c); Reconstructability/1GeV/c',80,0,80)
+h_denom_vz_antiS_reconstructable = TH1F('h_denom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability',60,-150,150)
+h_denom_eta_antiS_reconstructable = TH1F('h_denom_eta_antiS_reconstructable','; #eta #bar{S}; Reconstructability',160,-8,8)
+h_denom_pt_antiS_reconstructable = TH1F('h_denom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability',50,0,10)
+h_denom_pz_antiS_reconstructable = TH1F('h_denom_pz_antiS_reconstructable','; |p_{z}| #bar{S} (GeV/c); Reconstructability',80,0,80)
 
 
 #first do this small loop which runs over the tree containing all the antiS (i.e. also the ones which do not go the correct granddaughters)

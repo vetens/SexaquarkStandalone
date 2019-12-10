@@ -76,6 +76,8 @@ array=(
 'h2_teff_nomAntiLambdaPion_RECO_eff_vz_lxy_antiS.pdf'
 'h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS.pdf'
 
+'c_h_teff_denomAntiS_RECO_eff_lxy_antiS_reco_clone_passed.pdf'
+'c_h_teff_denomAntiS_RECO_eff_vz_antiS_reco_clone_passed.pdf'
 
 )
 

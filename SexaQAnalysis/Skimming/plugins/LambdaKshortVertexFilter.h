@@ -53,6 +53,10 @@ class LambdaKshortVertexFilter : public edm::EDFilter {
     //initial chi2 and ndf before kinematic fits. The chi2 of the reconstruction is not considered
     float chi = 0.;
     float ndf = 0.;
+ 
+    //for looking X events:
+    //static std::vector<RefCountedKinematicParticle> kshortKinFittedPrevEvent;
+    //static std::vector<RefCountedKinematicVertex> kshortKinFittedVertexPrevEvent;
 
  private:
 
@@ -74,7 +78,7 @@ class LambdaKshortVertexFilter : public edm::EDFilter {
     RefCountedKinematicTree KinfitTwoTTracks(reco::TransientTrack ttrack1, reco::TransientTrack ttrack2, ParticleMass trackMass1, float trackMassSigma1, ParticleMass trackMass2, float trackMassSigma2, ParticleMass combinedMass, float combinedMassSigma);
     RefCountedKinematicParticle getTopParticleFromTree(RefCountedKinematicTree Tree);
     RefCountedKinematicVertex returnVertexFromTree(const RefCountedKinematicTree& myTree) const;
-    
+    reco::VertexCompositeCandidate FitS(RefCountedKinematicParticle lambdaKinFitted, RefCountedKinematicParticle kshortKinFitted,RefCountedKinematicVertex lambdaKinFittedVertex, RefCountedKinematicVertex kshortKinFittedVertex, int cProton); 
 };
 
 

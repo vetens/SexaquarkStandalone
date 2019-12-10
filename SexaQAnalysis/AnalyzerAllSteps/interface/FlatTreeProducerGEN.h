@@ -12,11 +12,14 @@ class FlatTreeProducerGEN : public edm::EDAnalyzer
     virtual ~FlatTreeProducerGEN();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
+    void FillBranchesPion(double eta);
     void FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance);
 
   private:
+    int nPions=0;
+    int nPionsEtaSmaller4=0;
     int nTotalGENS=0;
-    int nTotalGENSEtaSmallerThan4p3=0;
+    int nEvents = 0;
     int nTotalGENSNegEta=0;
     int nTotalGENSPosEta=0;
     bool m_lookAtAntiS;
@@ -32,6 +35,7 @@ class FlatTreeProducerGEN : public edm::EDAnalyzer
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
     void Init();
+    void InitPi();
 
     edm::Service<TFileService> m_fs;
  
@@ -41,9 +45,12 @@ class FlatTreeProducerGEN : public edm::EDAnalyzer
     edm::EDGetTokenT<reco::BeamSpot> m_bsToken;
     edm::EDGetTokenT<vector<reco::GenParticle>> m_genParticlesToken_GEN; 
  
+    TTree* _tree_pi;   
     TTree* _tree;   
 
     //definition of variables which should go to tree
+    std::vector<float> _pi_eta;	
+
     std::vector<float> _S_charge;
     std::vector<float> _S_mass;
     std::vector<float> _S_dxy;

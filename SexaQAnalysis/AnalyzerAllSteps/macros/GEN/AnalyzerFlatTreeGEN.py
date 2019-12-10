@@ -42,15 +42,15 @@ iFile = 0
 for f in fIn:
 	tree = f.Get('FlatTreeProducerGEN/FlatTreeGENLevel') 
 
-	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{T} (GeV/c); Events/0.1GeV/c',100,0,10)
-	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV/c); Events/1GeV/c',80,0,80)
-	h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; Events/0.1#eta',160,-8,8)
-	h_antiS_vz = TH1F('h_antiS_vz','; #bar{S} absolute creation vertex z (cm) ; Events/cm',40,-20,20)
-	h_antiS_vz_interaction_vertex = TH1F('h_antiS_vz_interaction_vertex','; #bar{S} absolute interaction vertex z (cm) ; Events/5cm',100,-250,250)
-	h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} absolute creation vertex l_{0} (cm) ; Events/mm',20,-1,1)
+	h_antiS_pt = TH1F('h_antiS_pt','; #bar{S} p_{T} (GeV/c); 1/N_{ev} Events/0.1GeV/c',100,0,10)
+	h_antiS_pz = TH1F('h_antiS_pz','; #bar{S} |p_{z}| (GeV/c); 1/N_{ev} Events/1GeV/c',80,0,80)
+	h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; 1/N_{ev} Events/0.1#eta',160,-8,8)
+	h_antiS_vz = TH1F('h_antiS_vz','; #bar{S} absolute creation vertex z (cm) ; 1/N_{ev} Events/cm',40,-20,20)
+	h_antiS_vz_interaction_vertex = TH1F('h_antiS_vz_interaction_vertex','; #bar{S} beampipe crossing location absolute z (cm) ; 1/N_{ev} Events/5cm',100,-250,250)
+	h_antiS_lxy = TH1F('h_antiS_lxy','; #bar{S} absolute creation vertex l_{0} (cm) ; 1/N_{ev} Events/mm',20,-1,1)
 
-	h_antiS_eta_pt = TH2F('h_antiS_eta_pt',';#bar{S} #eta; #bar{S} p_{T} (GeV/c); Events/0.1#eta/0.1GeV/c',160,-8,8,100,0,10)
-	h_antiS_eta_pz = TH2F('h_antiS_eta_pz',';#bar{S} #eta; #bar{S} |p_{z}| (GeV/c); #Entries/0.1#eta/1GeV/c',160,-8,8,100,0,100)
+	h_antiS_eta_pt = TH2F('h_antiS_eta_pt',';#bar{S} #eta; #bar{S} p_{T} (GeV/c); 1/N_{ev} Events/0.1#eta/0.1GeV/c',160,-8,8,100,0,10)
+	h_antiS_eta_pz = TH2F('h_antiS_eta_pz',';#bar{S} #eta; #bar{S} |p_{z}| (GeV/c); 1/N_{ev} Events/0.1#eta/1GeV/c',160,-8,8,100,0,100)
 
 	nEntries = tree.GetEntries()
 	print 'Number of entries in the tree: ', nEntries

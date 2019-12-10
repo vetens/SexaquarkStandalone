@@ -50,7 +50,6 @@ bool LambdaKshortFilter::filter(edm::Event & iEvent, edm::EventSetup const & iSe
       std::cout << "Missing collection during LambdaKshortFilter : " << kshortCollectionTag_ << " ... skip entry !" << std::endl;
       return false;
     }
-    std::cout << "LambdaKshortFilter: Starting a new event" << std::endl;
     // select the lambdas passing kinematic cuts
     for (unsigned int l = 0; l < h_lambda->size(); ++l) {
       if (h_lambda->at(l).pt()       > minPtLambda_   &&
