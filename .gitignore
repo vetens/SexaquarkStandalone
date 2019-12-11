@@ -17,3 +17,5 @@ crab.log
 *.err
 *.log
 *.dat
+*.xml
+*.card
