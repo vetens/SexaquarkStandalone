@@ -127,11 +127,8 @@ void FlatTreeProducerGEN::FillBranchesGENAntiS(const reco::Candidate  * genParti
 
 	_S_eta.push_back(genParticle->eta());
 
-
 	_S_pt.push_back(genParticle->pt());
-	
 	_S_pz.push_back(genParticle->pz());
-
 
 	_S_vx.push_back(genParticle->vx());	
 	_S_vy.push_back(genParticle->vy());	

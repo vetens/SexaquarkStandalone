@@ -5,7 +5,6 @@ from RecoVertex.V0Producer.generalV0Candidates_cff import *
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing('python')
 
-#for MC: you want to add the extra collections so that you will be able to do the trackmatching on hits.
 collections_to_keep = cms.untracked.vstring(
     'drop *',
     'keep *_InitialProducer_*_*',
@@ -17,36 +16,20 @@ collections_to_keep = cms.untracked.vstring(
     'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
     'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
     'keep *_*_*_SEXAQ',
-    "keep *_genParticlesPlusGEANT_*_*",#this is for MC
-    "keep *_g4SimHits_*_*",#this is for MC
-    "keep *_simSiPixelDigis_*_*",#this is for MC
-    "keep *_simMuonRPCDigis_*_*",#this is for MC
-    "keep *_simSiStripDigis_*_*",#this is for MC
-    "keep *_mix_MergedTrackTruth_*",#this is for MC
-    "keep *_siPixelDigis_*_*",#this is for MC
-    "keep *_siStripDigis_*_*",#this is for MC
-    "keep *_siStripDigis_*_*",#this is for MC
-    "keep *_siPixelClusters_*_*",#this is for MC
-    "keep *_siStripClusters_*_*",#this is for MC
-    "keep *_generalTracks_*_*"#this is for MC
+    "keep *_genParticlesPlusGEANT_*_*",
+#    "keep *_g4SimHits_*_*",
+    "keep *_simSiPixelDigis_*_*",
+#    "keep *_simMuonRPCDigis_*_*",
+    "keep *_simSiStripDigis_*_*",
+    "keep *_mix_MergedTrackTruth_*",
+#    "keep *_siPixelDigis_*_*",
+#    "keep *_siStripDigis_*_*",
+#    "keep *_siStripDigis_*_*",
+    "keep *_siPixelClusters_*_*",
+    "keep *_siStripClusters_*_*",
+    "keep *_generalTracks_*_*"
   )
 
-#for data: do not save the extra collections as things will get heavy
-#collections_to_keep = cms.untracked.vstring(
-#   'drop *',
-#   'keep *_generalTracks_*_*',
-#   'keep *_InitialProducer_*_*',
-#   'keep recoVertexs_offlinePrimaryVertices_*_*',
-#   'keep recoBeamSpot_offlineBeamSpot_*_*',
-#   'keep *_genParticles_*_HLT',
-#   'keep recoVertexCompositeCandidates_generalV0Candidates_*_*',
-#   'keep recoTracks_lambdaKshortVertexFilter_sParticlesTracks_*',
-#   'keep recoVertexCompositePtrCandidates_rMassFilter_sVertexCompositePtrCandidate_*',
-#   'keep recoVertexCompositePtrCandidates_sMassFilter_sVertexCompositePtrCandidate_*',
-#   'keep *_*_*_SEXAQ',
-#   'keep *_muons_*_RECO',
-#   'keep *_ak4PFJets_*_RECO'
-# )
 
 #collections_to_keep = cms.untracked.vstring(
 #   'keep *'
@@ -67,7 +50,7 @@ options.register(
 process = cms.Process("SEXAQ")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')

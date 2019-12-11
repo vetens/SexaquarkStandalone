@@ -16,3 +16,4 @@ crab.log
 *.txt.*
 *.err
 *.log
+*.dat

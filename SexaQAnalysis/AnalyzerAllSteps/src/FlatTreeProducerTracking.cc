@@ -87,6 +87,12 @@ void FlatTreeProducerTracking::beginJob() {
 	_tree_PV->Branch("_goodPVzPOG",&_goodPVzPOG);
 	_tree_PV->Branch("_goodPV_weightPU",&_goodPV_weightPU);
 
+	//counting the number of reco antiS and the total number of GEN antiS
+	_tree_counter = fs->make <TTree>("FlatTreeCounter","treeCounter");
+	_tree_counter->Branch("_nGENAntiS",&_nGENAntiS);
+	_tree_counter->Branch("_nRECOAntiS",&_nRECOAntiS);
+
+
 	//tree for all the tracks, normally I don't use this as it way too heavy (there are a looooot of tracks)	
 	_tree_tracks = fs->make <TTree>("FlatTreeTracks","treeTracks");
 	
@@ -2526,6 +2532,12 @@ FlatTreeProducerTracking::~FlatTreeProducerTracking()
 
 	std::cout << "weighed number of generated antiS (unique): " << nTotalUniqueGenS_weighted << std::endl;
 	std::cout << "weighed number of reconstructed antiS: " << weighedRecoAntiS << std::endl;
+
+	_nGENAntiS.clear();
+	_nRECOAntiS.clear();
+	_nGENAntiS.push_back(nTotalUniqueGenS_weighted);
+	_nRECOAntiS.push_back(weighedRecoAntiS);
+	_tree_counter->Fill();
 
 	std::cout << "non weighed number of generated antiS (unique): " << nTotalUniqueGenS_Nonweighted << std::endl;
 	std::cout << "non weighed number of reconstructed antiS: " << nonweighedRecoAntiS << std::endl;

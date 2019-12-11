@@ -17,7 +17,7 @@ LambdaKshortVertexFilter::LambdaKshortVertexFilter(edm::ParameterSet const& pset
   genCollectionToken_    = consumes<std::vector<reco::GenParticle> > (genCollectionTag_);
   //producer
   produces<std::vector<reco::VertexCompositeCandidate> >("sParticles");
-  produces<std::vector<reco::VertexCompositeCandidate> >("sParticlesXEvent");
+//  produces<std::vector<reco::VertexCompositeCandidate> >("sParticlesXEvent");
 
 }
 
@@ -36,7 +36,7 @@ bool LambdaKshortVertexFilter::filter(edm::Event & iEvent, edm::EventSetup const
 
   //these are for the producer
   auto sParticles = std::make_unique<std::vector<reco::VertexCompositeCandidate> >();
-  auto sParticlesXEvent = std::make_unique<std::vector<reco::VertexCompositeCandidate> >();
+//  auto sParticlesXEvent = std::make_unique<std::vector<reco::VertexCompositeCandidate> >();
 
 
   // collections
@@ -155,7 +155,7 @@ bool LambdaKshortVertexFilter::filter(edm::Event & iEvent, edm::EventSetup const
 
        //adding Sparticles to the event
       if(S.vertexNdof() != 999.){
-	sParticlesXEvent->push_back(std::move(S)); 
+//	sParticlesXEvent->push_back(std::move(S)); 
 	//std::cout << "S candidate mass prev event " << S.mass() << std::endl;
       }
     }//end loop over kshort
@@ -169,7 +169,7 @@ bool LambdaKshortVertexFilter::filter(edm::Event & iEvent, edm::EventSetup const
   
   int ns = sParticles->size();
   iEvent.put(std::move(sParticles),"sParticles"); 
-  iEvent.put(std::move(sParticlesXEvent),"sParticlesXEvent"); 
+//  iEvent.put(std::move(sParticlesXEvent),"sParticlesXEvent"); 
   return (ns > 0);
 
 }//end filter

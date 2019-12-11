@@ -113,6 +113,9 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     edm::EDGetTokenT<reco::TrackToTrackingParticleAssociator>  m_trackAssociatorToken;
     edm::EDGetTokenT<vector<TrackingParticle> > m_TPToken;
 //    edm::EDGetTokenT<vector<PileupSummaryInfo> > m_PileupInfoToken;
+
+    TTree* _tree_counter;
+    std::vector<float> _nGENAntiS,_nRECOAntiS;
    
     TTree* _tree_PV;   
     std::vector<float> _goodPVxPOG,_goodPVyPOG,_goodPVzPOG,_goodPV_weightPU;
