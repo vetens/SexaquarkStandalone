@@ -6,7 +6,7 @@ import sys
 sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
 import  CMS_lumi, tdrstyle 
 
-sys.path.insert(1, '/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_9/src/TMVA')
+sys.path.insert(1, '../../../TMVA')
 import configBDT as config
 config_dict = config.config_dict
 
