@@ -15,22 +15,13 @@ config.JobType.psetName = 'treeproducer_data_cfg_SEXAQ_ONLY.py'
 config.JobType.priority = 150
 
 config.section_('Data') 
-config.Data.unitsPerJob = 1 #10
-config.Data.totalUnits = 1# 9690
+config.Data.unitsPerJob = 1 
+config.Data.totalUnits = 1
 config.Data.publication = False 
 config.Data.splitting = 'FileBased' #FileBased 
 config.Data.outLFNDirBase = '/store/user/jdeclerc/crmc_Sexaq/Skimmed/DataMCComparison' 
 config.Data.userInputFiles = open('/user/jdeclerc/CMSSW_8_0_30/src/SexaQAnalysis/RunManySkimming/crab/inputFiles_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ADAPTED_VO_ALREADY_RAN_slimmed.txt').readlines() 
 #config.Data.inputDataset = '/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM'
-#config.Data.inputDataset = '/SingleMuon/Run2016B-07Aug17_ver2-v1/AOD'
-
-#config.Data.inputDataset = '/MinBias_TuneCUETP8M1_13TeV-pythia8/RunIISummer16FSPremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/GEN-SIM-RECO'
-#config.Data.inputDataset = '/MinimumBias/PARun2016B-PromptReco-v1/RECO'
-
-#config.Data.inputDataset = '/ttZJets_13TeV_madgraphMLM-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM'--> taperecall
-#config.Data.inputDataset = '/ttZJets_13TeV_madgraphMLM/RunIISummer16DR80-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM' --> running
-#config.Data.inputDataset = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/AODSIM'
-#config.Data.inputDataset = '/DoubleMuon/Run2016C-07Aug17-v1/AOD'
 
 
 #config.Data.inputDBS = 'global'

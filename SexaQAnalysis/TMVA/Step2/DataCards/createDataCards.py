@@ -7,7 +7,7 @@ def truncate(n, decimals=0):
 
 #extract some info from the histograms. The info which you need to extract is from the BDT distribution on MC how much events lie behind a certain cut. And from the BDT distribution of the S in data also the number of events which pass a certain cut
 def extractInfo(BDT_cut):
-	f_fIn  = TFile.Open('../Results_OverLapBDTDistributions/Results_bkgReference_overlapCheckApplied/OverLapBDTDistributions.root')
+	f_fIn  = TFile.Open('../Results_bkgReference_overlapCheckApplied/OverLapBDTDistributions.root')
         h_BDT_S_Data = f_fIn.Get('h_BDT_ALL_Data')
         h_BDT_S_MC   = f_fIn.Get('h_BDT_32_MC-S-BKG-DYJets')
         h_BDT_AntiS_MC = f_fIn.Get('h_BDT_31_MC-AntiS-BKG-DYJets')
@@ -21,8 +21,6 @@ def extractInfo(BDT_cut):
 	return l_counts
 
 def extractSignalEff(BDT_cut):
-	f_fIn  = TFile.Open('../Results_OverLapBDTDistributions/Results_bkgReference/OverLapBDTDistributions.root')	
-	
 	fIn = TFile('../../Step1/BDTOutput_2016_dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing.root', 'read')
 	fIn.cd()
 	dir_name = 'dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing/Method_BDT/BDT/'

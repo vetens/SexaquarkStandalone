@@ -17,6 +17,7 @@ LambdaKshortVertexFilter::LambdaKshortVertexFilter(edm::ParameterSet const& pset
   genCollectionToken_    = consumes<std::vector<reco::GenParticle> > (genCollectionTag_);
   //producer
   produces<std::vector<reco::VertexCompositeCandidate> >("sParticles");
+  //the reconstruction of X events S and Sbar is disabled for now as it was giving a mysterious seg violation
 //  produces<std::vector<reco::VertexCompositeCandidate> >("sParticlesXEvent");
 
 }

@@ -1,3 +1,5 @@
+#simle script to make a bit nicer looking plots for the BDT efficiency and the BDT overtraining check
+
 from ROOT import *
 import sys
 

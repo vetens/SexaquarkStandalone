@@ -1,16 +1,13 @@
 from CRABClient.UserUtilities import config
-trial = "trialXEventSReco"
+trial = "trialR"
 config = config()
 
 pyCfgParams = ['isData=True']
 
-#config.General.requestName = 'SexaQ_SingleMuon'
-#config.General.workArea = 'crab_projects'
 config.General.transferOutputs = True
 config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
-#config.JobType.psetName = '../treeproducer_data_cfg.py'
 config.JobType.psetName = '../treeproducer_data_cfg.py'
 
 
@@ -23,15 +20,6 @@ config.Data.outLFNDirBase = '/store/user/jdeclerc/data_Sexaq/trial'+trial
 config.Data.publication = False
 
 config.Site.storageSite = 'T2_BE_IIHE'
-#if only using the below whitelist then a lot of jobs which cannot find the datasets
-#config.Site.whitelist = ['T2_BE_IIHE','T2_HU_Budapest','T2_ES_CIEMAT','T2_EE_Estonia','T1_IT_CNAF','T2_US_Caltech','T2_US_MIT','T2_US_Nebraska','T2_US_Florida','T2_US_Wisconsin','T2_US_Vanderbilt','T2_CH_CERN','T2_PK_NCP','T1_US_FNAL','T2_UK_London_IC','T2_UK_SGrid_RALPP','T2_CN_Beijing','T2_DE_RWTH','T2_US_Purdue','T2_AT_Vienna']
-#very thight blacklist:
-#config.Site.blacklist = ['T1_DE_KIT','T2_GR_Ioannina','T2_IT_Legnaro','T1_UK_RAL','T1_RU_JINR','T1_FR_CCIN2P3','T2_IT_Bari','T2_IN_TIFR','T2_US_UCSD','T2_IT_Rome','T2_BR_UERJ','T2_FR_GRIF_LLR','T1_FR_CCIN2P3']
-#loosened blacklist
-#config.Site.blacklist = ['T2_GR_Ioannina','T2_IT_Legnaro','T2_IT_Bari','T2_IN_TIFR','T2_IT_Rome','T2_BR_UERJ','T2_FR_GRIF_LLR']
-
-#blacklist IIHE, because you want to keep your quota free at this site to run the MC production
-#config.Site.blacklist = ['T2_BE_IIHE']
 
 def submit_single_run(arg1, arg2):
 
@@ -68,11 +56,16 @@ if __name__ == '__main__':
     #############################################################################################
     ## From now on that's what users should modify: this is the a-la-CRAB2 configuration part. ##
     #############################################################################################
+#the below ZeroBias samples are not part of the standard Primary Datasets
 #submit_single_run("ZeroBias","Run2016B-07Aug17-v1")
 #submit_single_run("ZeroBias","Run2016C-07Aug17-v1")
 #submit_single_run("ZeroBias","Run2016E-07Aug17-v1")
 #submit_single_run("ZeroBias","Run2016F-07Aug17-v1")
 #submit_single_run("ZeroBias","Run2016H-07Aug17-v1")
+
+
+#below the PDs are listed. The comments saying "only availalbe on TAPE" might have been snapshots at a particular time for sites being down. Maybe the datasets are available again...
+
 
 ###submit_single_run("BTagCSV","Run2016B-07Aug17_ver2-v1") #--> only availalbe on TAPE
 #submit_single_run("BTagCSV","Run2016C-07Aug17-v1")

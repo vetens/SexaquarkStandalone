@@ -131,9 +131,9 @@ void loop_macro_exc_inc_dataSignalToBKGPartialUnblind(){
 
    for(int i_h = 0; i_h < v_hist_data_bkgRef.size(); i_h++){
 
-      TFile *f1   = TFile::Open("Results_OverLapBDTDistributions/Results_bkgReference_overlapCheckApplied/OverLapBDTDistributions.root");
-      TFile *f2   = TFile::Open("Results_OverLapBDTDistributions/Results_partialUnblinging_overlapCheckApplied/OverLapBDTDistributions.root");
-      TFile *f3   = TFile::Open("Results_OverLapBDTDistributions/Results_10%Unblinging_overlapCheckApplied/OverLapBDTDistributions.root");
+      TFile *f1   = TFile::Open("../Results_OverLapBDTDistributions/Results_bkgReference_overlapCheckApplied/OverLapBDTDistributions.root");
+      TFile *f2   = TFile::Open("../Results_OverLapBDTDistributions/Results_partialUnblinging_overlapCheckApplied/OverLapBDTDistributions.root");
+      TFile *f3   = TFile::Open("../Results_OverLapBDTDistributions/Results_10%Unblinging_overlapCheckApplied/OverLapBDTDistributions.root");
 
       std::cout << v_hist_data_bkgRef[i_h] << std::endl;
 

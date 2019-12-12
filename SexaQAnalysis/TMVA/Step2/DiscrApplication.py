@@ -1,3 +1,5 @@
+#script to take the ntuples and add a leaf to it with the BDT variable
+
 import os
 import array
 import numpy
@@ -11,7 +13,10 @@ import configBDT as config
 
 config_dict = config.config_dict
 
+#select the configuration which you want to apply, depends if you are looking at BKG, signal,...
 config = "bkgReference" #"partialUnblinding" (use antiS data, but do not look at stuff with BDT > 0.1), "bkgReference" (use the S as bkg reference) or unblind (use the antiS data fully) or unblindMC (use the antiS data fully, because it is MC so it is fine), 10%Unblind (unblind 10% of the data)
+
+#to make a check if there are duplicate S or Sbar due to duplicate events. This check runs pretty fast once you applied the pre-BDT cuts, but if not it is verry slow.
 performOverlapCheck = True
 
 #pointer to the results of the training:
@@ -28,7 +33,7 @@ input_directory_data = "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialR/ALL
 #input_directory_data = "/pnfs/iihe/cms/store/user/jdeclerc/data_Sexaq/trialtrialXEventSReco/SingleMuon/SingleMuon_Run2016H-07Aug17-v1_trialtrialXEventSReco/191123_211600/FlatTreeBDT/XEventSReco"
 
 overlapList = []
-def checkInOverlapList(eta,S_lxy_interaction_vertex,BDT,fileIn):
+def checkInOverlapList(eta,S_lxy_interaction_vertex,BDT,fileIn): #checks if the S/Sbar under consideration is already in the list by comparing with the prev ones by looking at eta and lxy of interaction vertex
 	entryFound = False
 	for e in overlapList:#loop over the overlap list
 		if (e[0] == eta and e[1] == S_lxy_interaction_vertex): #if the eta has already been found count plus 1 and append the file list to this entry
@@ -53,7 +58,7 @@ class TreeCloner(object):
 	#get the reader
 	getBDTSexaqReader    = TMVA.Reader();
 
-	#just define some variables
+	#define some variables
         var1 = array.array('f',[0])
         var2 = array.array('f',[0])
         var3 = array.array('f',[0])
@@ -75,7 +80,7 @@ class TreeCloner(object):
         var19 = array.array('f',[0])
         var20 = array.array('f',[0])
         var21 = array.array('f',[0])
-	#add these variables to the reader 
+	#add these variables to the reader, these should be the variables also used in the BDT.py script 
         getBDTSexaqReader.AddVariable("_S_vz_interaction_vertex",           (var1))   
         getBDTSexaqReader.AddVariable("_S_lxy_interaction_vertex_beampipeCenter",           (var2))   
         getBDTSexaqReader.AddVariable("_S_daughters_deltaphi",      (var3))   
@@ -115,17 +120,11 @@ class TreeCloner(object):
 		fileH  = TFile.Open(fileIn)
 		inTree = fileH.Get('FlatTreeProducerBDT/FlatTree')
 		gROOT.cd()
-		##The below line is very important. If I change Alt$(_S_charge,0) == 1 to Alt$(_S_charge,0) == -1 I am looking at signal and unblinding OMG
 
-		#to select from the input trees the S bkg and apply the pre BDT cuts
+
+		#by default look at background:
 		inTreeSelected = inTree.CopyTree(config_dict["config_SelectionBkgS"] + ' && ' + config_dict["config_pre_BDT_cuts"])
-		#if you want to look at MC-antiS-BKG in a sample which contains antiS signal, so you want to look away from those true antiS, so you need to request config_SelectionBkgAntiS
-		#inTreeSelected = inTree.CopyTree( config_dict["config_SelectionBkgAntiS"] + ' && '+ config_dict["config_pre_BDT_cuts"])
-		#if you are not running on MC which does not containt antiS signal you only have to select the charge of the S to do a separate study on S or antiS
-		#inTreeSelected = inTree.CopyTree( 'Alt$(_S_charge,0) == -1 && ' + config_dict["config_pre_BDT_cuts"])
-
-
-		#unblinding here:
+		#(partial) unblinding here:
 		if(config == "partialUnblinding" or config == "unblind" or config == "10%Unblind"):
 			inTreeSelected = inTree.CopyTree(config_dict["config_SelectionAntiS"] + ' && ' + config_dict["config_pre_BDT_cuts"])
 		if(config == "unblindMC"):
@@ -134,6 +133,8 @@ class TreeCloner(object):
 		#inTreeSelected.Show(18)
 		#inTreeSelected.Print()
                 print "number of entries in the inTreeSelected: ", inTreeSelected.GetEntries()
+		
+		#now add the leave with the BDT variable
                 fileOut = cwd+'/'+dirname+'/DiscrApplied_'+fileIn.rsplit('/', 1)[-1]
                 ofile   = TFile(fileOut, 'recreate')
 		#clone the input tree
@@ -146,8 +147,6 @@ class TreeCloner(object):
                 for i in range(inTreeSelected.GetEntries()):		      	
 		     if(config == "10%Unblind" and i > float(inTreeSelected.GetEntries())/10.): continue
 
-		     #if(i%1000 == 0):
-			#print "Reached event: ",i, " of ",inTreeSelected.GetEntries()
                      inTreeSelected.GetEntry(i)
 
 		     var1[0] = inTreeSelected._S_vz_interaction_vertex[0]
@@ -176,11 +175,6 @@ class TreeCloner(object):
 		     isDuplicate = False
 		     if(performOverlapCheck): isDuplicate = checkInOverlapList(inTreeSelected._S_eta[0],inTreeSelected._S_lxy_interaction_vertex[0],SexaqBDT[0],fileIn.split('/')[-1][12:-23])
 
-		     #if(SexaqBDT[0] > 0.2):
-		     #	print 'found an event with SexaqBDT[0] > 0.2: SexaqBDT, _S_eta, _S_lxy_interaction_vertex, _S_vz_interaction_vertex', SexaqBDT[0] ,", ", inTreeSelected._S_eta[0], ", ", inTreeSelected._S_lxy_interaction_vertex[0], ", ", inTreeSelected._S_vz_interaction_vertex[0]
-		     #print 'SexaqBDT: ', SexaqBDT[0]
-		     #outTree.Fill()	
-		     
 		     if(not isDuplicate):
 			     if(config  == "unblind" or config == "bkgReference" or config == "unblindMC" or config == "10%Unblind"):
 				outTree.Fill()
@@ -193,10 +187,3 @@ class TreeCloner(object):
 		ofile.Close()
 
 
-nOverlaps = 0
-for e in overlapList:
-	if(e[3] > 1):
-		nOverlaps = nOverlaps + e[3]-1 #the overlap is the total times this events occurs (e[2]), with a -1 because one you should keep as the original one
-		print e
-print 'number of unique events: ', len(overlapList)
-print 'number of overlaps: ', nOverlaps

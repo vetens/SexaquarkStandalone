@@ -5,7 +5,7 @@
 // 
 /**\class InitialProducer InitialProducer.cc SexaQAnalysis/Skimming/plugins/InitialProducer.cc
 
- Description: [one line class summary]
+ Description: class to write some very basic info on the event into the EDM file before running the Sexaq reconstruction where you start to drop events.
 
  Implementation:
      [Notes on implementation]

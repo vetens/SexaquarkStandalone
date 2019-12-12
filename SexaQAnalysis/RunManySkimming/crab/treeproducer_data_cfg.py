@@ -31,11 +31,6 @@ collections_to_keep = cms.untracked.vstring(
   )
 
 
-#collections_to_keep = cms.untracked.vstring(
-#   'keep *'
-# )
-
-
 
 ## data or MC options
 options.register(
@@ -97,8 +92,6 @@ process.generalV0Candidates.kShortMassCut = 0.03
 process.generalV0Candidates.lambdaMassCut = 0.015
 
 
-#process.load("SexaQAnalysis.Skimming.InitialProducer_cfi")
-#process.InitialProducer = cms.EDProducer('InitialProducer')
 
 process.load("SexaQAnalysis.Skimming.LambdaKshortFilter_cfi")
 process.lambdaKshortFilter.genCollection = cms.InputTag("genParticlePlusGEANT")
@@ -125,10 +118,6 @@ process.sMassFilter.targetMass = 0.939565
 process.load("SexaQAnalysis.Skimming.InitialProducer_cfi")
 
 process.load("SexaQAnalysis.TreeProducer.Treeproducer_AOD_cfi")
-#process.tree.genCollection = cms.InputTag("genParticlePlusGEANT")
-#process.tree.sCollection = cms.InputTag("lambdaKshortVertexFilter","sParticles")
-#process.tree.sTrackCollection = cms.InputTag("lambdaKshortVertexFilter","sParticlesTracks")
-#process.tree.isData = cms.untracked.bool(options.isData)
 
 process.p = cms.Path(
   process.generalV0Candidates* 

@@ -1,3 +1,5 @@
+#script to combine the results from running the DiscrApplication.py script over multiple datasets 
+
 from ROOT import * 
 import os
 
@@ -12,50 +14,15 @@ CMS_lumi.writeExtraText = 0
 CMS_lumi.extraText = "Simulation"
 tdrstyle.setTDRStyle()
 
-OutputDir = "Results_10%Unblinging_overlapCheckApplied/" #Results_bkgReference or Results_bkgReference_overlapCheckApplied or Results_partialUnblinging or Results_partialUnblinging_overlapCheckApplied 
+#define here a proper name for the OutputDir
+OutputDir = "Results_bkgReference_overlapCheckApplied/" #Results_bkgReference or Results_bkgReference_overlapCheckApplied or Results_partialUnblinging or Results_partialUnblinging_overlapCheckApplied 
 
 colours = [1,2,4,7,8]
 
-#fIn_dir = "BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_overlapCheckApplied/" 
-fIn_dir = "BDTApplied/10%Unblind/BDTApplied_10%Unblind_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckTrue/" 
+#define here the directory which has the results from DiscrApplication.py which you want to combine
+fIn_dir = "BDTApplied/BkgReference/BDTApplied_bkgReference_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckTrue/"
+#fIn_dir = "BDTApplied/10%Unblind/BDTApplied_10%Unblind_dataset_BDT_2016dataset_BDT_2016vSelected19Parameters_CutFiducialRegion_CutDeltaPhi_CutLxy_CutDxyOverLxy_SignalWeighing_OverlapCheckTrue/" 
 fOut = TFile(OutputDir+'OverLapBDTDistributions.root','RECREATE')
-
-
-nEventsPDs= [
-100014471.,
-64209667,
-27342838,
-28329985,
-61398862,
-70124218,
-18006002,
-19433403,
-76538905,
-82569062,
-44182144, #DoubleMuon Run 2016H should come behind this one
-44835919,
-52461380,
-30133219,
-33060229,
-118152949,
-120597407,
-25726953,
-37033146,
-34955119,
-37575978,
-33573015,
-28812785,
-15098617,
-12093812,
-14945745,
-17137991,
-31884899,
-33674739,
-78733260,
-75409819,
--1,
--1
-]
 
 
 gROOT.SetBatch(kTRUE)
@@ -65,7 +32,7 @@ for fIn in sorted(os.listdir(fIn_dir)):
 	if(not fIn.endswith(".root")): continue
 	nFilesToRunOver += 1
 
-zoom = False
+zoom = False #to make the BDT classifier plots zoomed in on the tail of the distribution
 min_BDT_var = -0.7
 max_BDT_var = 0.5
 bins_BDT_var = 120
@@ -73,41 +40,43 @@ if(zoom):
 	min_BDT_var = 0.
 	max_BDT_var = 0.4
 	bins_BDT_var = 40
-h_BDT_ALL_Data = TH1F('h_BDT_ALL_Data','; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
 
-h_BDT_0 = TH1F('h_BDT_0','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_1 = TH1F('h_BDT_1','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_2 = TH1F('h_BDT_2','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_3 = TH1F('h_BDT_3','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_4 = TH1F('h_BDT_4','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_5 = TH1F('h_BDT_5','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_6 = TH1F('h_BDT_6','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_7 = TH1F('h_BDT_7','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_8 = TH1F('h_BDT_8','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_9 = TH1F('h_BDT_9','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_10 = TH1F('h_BDT_10','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_11 = TH1F('h_BDT_11','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_12 = TH1F('h_BDT_12','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_13 = TH1F('h_BDT_13','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_14 = TH1F('h_BDT_14','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_15 = TH1F('h_BDT_15','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_16 = TH1F('h_BDT_16','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_17 = TH1F('h_BDT_17','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_18 = TH1F('h_BDT_18','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_19 = TH1F('h_BDT_19','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_20 = TH1F('h_BDT_20','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_21 = TH1F('h_BDT_21','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_22 = TH1F('h_BDT_22','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_23 = TH1F('h_BDT_23','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_24 = TH1F('h_BDT_24','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_25 = TH1F('h_BDT_25','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_26 = TH1F('h_BDT_26','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_27 = TH1F('h_BDT_27','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_28 = TH1F('h_BDT_28','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_29 = TH1F('h_BDT_29','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_30 = TH1F('h_BDT_30','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_31 = TH1F('h_BDT_31','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
-h_BDT_32 = TH1F('h_BDT_32','h_BDT; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+#one histo to combine all the data in the BDT classifier distributions from all Data you are running over
+h_BDT_ALL_Data = TH1F('h_BDT_ALL_Data','; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+#one histo for each of the input files (31 data files + some MC BKG files)
+h_BDT_0 = TH1F('h_BDT_0','h_BDT_0; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_1 = TH1F('h_BDT_1','h_BDT_1; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_2 = TH1F('h_BDT_2','h_BDT_2; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_3 = TH1F('h_BDT_3','h_BDT_3; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_4 = TH1F('h_BDT_4','h_BDT_4; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_5 = TH1F('h_BDT_5','h_BDT_5; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_6 = TH1F('h_BDT_6','h_BDT_6; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_7 = TH1F('h_BDT_7','h_BDT_7; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_8 = TH1F('h_BDT_8','h_BDT_8; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_9 = TH1F('h_BDT_9','h_BDT_9; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_10 = TH1F('h_BDT_10','h_BDT_10; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_11 = TH1F('h_BDT_11','h_BDT_11; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_12 = TH1F('h_BDT_12','h_BDT_12; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_13 = TH1F('h_BDT_13','h_BDT_13; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_14 = TH1F('h_BDT_14','h_BDT_14; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_15 = TH1F('h_BDT_15','h_BDT_15; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_16 = TH1F('h_BDT_16','h_BDT_16; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_17 = TH1F('h_BDT_17','h_BDT_17; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_18 = TH1F('h_BDT_18','h_BDT_18; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_19 = TH1F('h_BDT_19','h_BDT_19; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_20 = TH1F('h_BDT_20','h_BDT_20; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_21 = TH1F('h_BDT_21','h_BDT_21; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_22 = TH1F('h_BDT_22','h_BDT_22; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_23 = TH1F('h_BDT_23','h_BDT_23; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_24 = TH1F('h_BDT_24','h_BDT_24; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_25 = TH1F('h_BDT_25','h_BDT_25; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_26 = TH1F('h_BDT_26','h_BDT_26; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_27 = TH1F('h_BDT_27','h_BDT_27; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_28 = TH1F('h_BDT_28','h_BDT_28; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_29 = TH1F('h_BDT_29','h_BDT_29; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_30 = TH1F('h_BDT_30','h_BDT_30; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_31 = TH1F('h_BDT_31','h_BDT_31; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
+h_BDT_32 = TH1F('h_BDT_32','h_BDT_32; BDT classifier;',bins_BDT_var,min_BDT_var,max_BDT_var)
 
 l_h_BDT = [
 h_BDT_0, 
@@ -148,10 +117,12 @@ h_BDT_32
 l_h_BDT_names = []
 l_nevents_total = [0.]*nFilesToRunOver
 
+fOut.cd()
+
+#run over all the input files and do some stuff with the BDT classifier value
 i_File = 0
 for fIn in sorted(os.listdir(fIn_dir)):
 	if(not fIn.endswith(".root")): continue
-#	if(i_File > 2): continue
 	boolData = "Run" in fIn
 	print i_File, ",", fIn, ' . Is this a data file? ', boolData
 	f_fIn  = TFile.Open(fIn_dir + fIn)
@@ -170,7 +141,7 @@ for fIn in sorted(os.listdir(fIn_dir)):
 		h2_BDT_mass.Fill(inTree._S_mass[0],inTree.SexaqBDT)
 		l_h_BDT[i_File].Fill(inTree.SexaqBDT)
 		if(boolData): #the last two files are MC
-			if(inTree.SexaqBDT>0.1):
+			#if(inTree.SexaqBDT>0.1):
 				h_BDT_ALL_Data.Fill(inTree.SexaqBDT)
 
 	fOut.cd()
@@ -179,27 +150,18 @@ for fIn in sorted(os.listdir(fIn_dir)):
 	i_File+=1
 
 
-
-#h_BDT_ALL_Data_normalized = h_BDT_ALL_Data.Clone()
-#h_BDT_ALL_Data_normalized.SetName(h_BDT_ALL_Data_normalized.GetName()+'_normalized')
-#h_BDT_ALL_Data_normalized.Scale(1./h_BDT_ALL_Data_normalized.Integral(),"width")
-
 fOut.cd()
 
 h_BDT_ALL_Data.Write()
 
-#h_BDT_ALL_Data_normalized.Write()
 
 c_BDT_Normalized = TCanvas("c_BDT_Normalized","c_BDT_Normalized",800,800)
 c_BDT_Normalized.Divide(6,6)
 print 'len l_h_BDT', len(l_h_BDT)
 print 'l_h_BDT_names', len(l_h_BDT_names)
 
-lCuts = [0.1,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45]
-NEventsAboveCut = [[0.]*nFilesToRunOver for x in xrange(len(lCuts))] 
 
 for i in range(0,len(l_h_BDT_names)):
-#	c_BDT_Normalized.cd(i+1)
 	p = c_BDT_Normalized.cd(i+1)
 	p.cd()
 	p.SetLogy()
@@ -212,9 +174,6 @@ for i in range(0,len(l_h_BDT_names)):
 	p.Update()
 	c_BDT_Normalized.Update()
 
-	for j in range(0,len(lCuts)):
-		bmin = l_h_BDT[i].GetXaxis().FindBin( lCuts[j] )
-		NEventsAboveCut[j][i] = l_h_BDT[i].Integral(bmin,9999)
 
 #c_BDT_Normalized.SaveAs("CanvasDivideBDTDistributionsBkg.pdf")
 c_BDT_Normalized.Write()
@@ -272,43 +231,6 @@ c_BDT_all_combined.Write()
 c_BDT_all_combined.SaveAs(OutputDir+c_BDT_all_combined.GetName()+"_zoom"+str(zoom)+".pdf")
 
 
-h_total_events_PDs = TH1F("h_total_events_PDs", ";;Total N Events PDs", nFilesToRunOver, -0.5, nFilesToRunOver-0.5)
-h_total_events_PDs_scaled = TH1F("h_total_events_PDs_scaled", ";;Total N Events PDs / 1000", nFilesToRunOver, -0.5, nFilesToRunOver-0.5)
-h_total_events = TH1F("h_total_events", ";;S surviving pre-BDT cuts", nFilesToRunOver, -0.5, nFilesToRunOver-0.5)
-for i in range(0,len(l_h_BDT_names)):
-	h_total_events_PDs.SetBinContent(i+1,nEventsPDs[i])
-	h_total_events_PDs_scaled.SetBinContent(i+1,nEventsPDs[i]/1000)
-	h_total_events.SetBinContent(i+1,l_nevents_total[i])
-
-h_totalEvents_TotalEventsPDsScaled = TH1F("h_totalEvents_TotalEventsPDsScaled", ";;(S surviving pre-BDT cut)/(events)", nFilesToRunOver, -0.5, nFilesToRunOver-0.5)
-for i in range(0,len(l_h_BDT_names)):
-	h_totalEvents_TotalEventsPDsScaled.SetBinContent(i+1,h_total_events[i+1]/h_total_events_PDs[i+1])
-
-xax0 = h_total_events_PDs.GetXaxis()
-xax1 = h_total_events_PDs_scaled.GetXaxis()
-xax2 = h_total_events.GetXaxis()
-xax3 = h_totalEvents_TotalEventsPDsScaled.GetXaxis()
-for i in range(0,len(l_h_BDT_names)):
-	xax0.SetBinLabel(i+1,l_h_BDT_names[i][25:-23])
-	xax1.SetBinLabel(i+1,l_h_BDT_names[i][25:-23])
-	xax2.SetBinLabel(i+1,l_h_BDT_names[i][25:-23])
-	xax3.SetBinLabel(i+1,l_h_BDT_names[i][25:-23])
-xax0.LabelsOption("v")
-xax1.LabelsOption("v")
-xax2.LabelsOption("v")
-xax3.LabelsOption("v")
-
-
-for j in range(0,len(lCuts)):
-	print lCuts[j], " gives following events surviving: ",NEventsAboveCut[j]
-	h_events_surviving = TH1F("h_events_surviving_cutBDT_"+str(lCuts[j]), ";;(S surviving pre-BDT and BDT cut)/(events)", nFilesToRunOver, -0.5, nFilesToRunOver-0.5)
-	for i in range(0,len(l_h_BDT_names)):
-		h_events_surviving.SetBinContent(i+1,NEventsAboveCut[j][i]/nEventsPDs[i])
-	xax = h_events_surviving.GetXaxis()
-	for i in range(0,len(l_h_BDT_names)):
-		xax.SetBinLabel(i+1,l_h_BDT_names[i][25:-23])
-	xax.LabelsOption("v")
-	h_events_surviving.Write()
 
 fOut.Write()
 fOut.Close()

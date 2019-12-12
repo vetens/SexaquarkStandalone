@@ -1,3 +1,4 @@
+#this file contains common settings used in the BDT scripts and also in the macros to generate plots
 import numpy as np
 
 #BDT classifier cut
@@ -12,14 +13,13 @@ GENRECO_matcher_AntiL_deltaL = 3.
 GENRECO_matcher_AntiL_deltaR = 0.03
 
 #cuts to be applied pre BDT:
-#some cuts which are quite obvious:
-pre_BDT_noCut = "Alt$(_S_lxy_interaction_vertex_beampipeCenter,0) < 99999999." #essentially no cut
+pre_BDT_noCut = "Alt$(_S_lxy_interaction_vertex_beampipeCenter,0) < 99999999." #essentially no cut, this is just for testing
+#the 3 below cuts are the ones used pre-BDT (see AN for the explanation). The numbering is historical and not necessarily the order in which they are explained in the AN
 pre_BDT_cut1 =  "Alt$(_S_lxy_interaction_vertex_beampipeCenter,0) > 2.02 && Alt$(_S_lxy_interaction_vertex_beampipeCenter,0) < 2.4"
-#pre_BDT_cut2 = "Alt$(_S_error_lxy_interaction_vertex_beampipeCenter,0) < 0.015"
 pre_BDT_cut3 = "Alt$(_S_dxy_over_lxy,0) >= 0 && Alt$(_S_dxy_over_lxy,0) <= 0.5"
 pre_BDT_cut4 = "(Alt$(_S_daughters_deltaphi,0) < -0.5 || Alt$(_S_daughters_deltaphi,0) > 0.5)"
 
-#part of these cuts are the fiducial region in which we understand the systematics:
+#pre-BDT cuts also include the fiducial region in which we understand the systematics, this is defined by:
 FiducialRegionptMin = 0.33
 FiducialRegionptMax = 999999999.
 
@@ -87,7 +87,6 @@ config_dict = {
 "fiducial_region_cuts":fiducial_region_cuts,
 "pre_BDT_noCut":pre_BDT_noCut,
 "pre_BDT_cut1":pre_BDT_cut1,
-#"pre_BDT_cut2":pre_BDT_cut2,
 "pre_BDT_cut3":pre_BDT_cut3,
 "pre_BDT_cut4":pre_BDT_cut4,
 "config_pre_BDT_cuts":fiducial_region_cuts + " && "+pre_BDT_cut4 + " && "+pre_BDT_cut1 + " && " + pre_BDT_cut3,
@@ -113,7 +112,7 @@ config_dict = {
 }
 
 
-#to calculate the reweighing factor:
+#to calculate the reweighing factor for the pathlength through the beampipe (normally not needed any more as this weigh factor is now also stored in the ntuple):
 def calc_reweighing_factor(eta_S,isMCSignal):
         reweighing_factor = 1
         if(isMCSignal):
