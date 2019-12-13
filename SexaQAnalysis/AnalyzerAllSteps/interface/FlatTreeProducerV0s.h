@@ -22,7 +22,6 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     bool IsolationCriterium(reco::Muon muon);
     void FillBranchesV0(const reco::VertexCompositeCandidate * V0, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, edm::Handle<vector<reco::GenParticle>> h_genParticles, std::string V0Type);    
 
-
   private:
     bool m_lookAtAntiS;
     bool m_runningOnData; 
@@ -36,6 +35,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+    //initialization of the different trees
     void InitGENKs();
     void InitKs();
     void InitLambda();
@@ -46,7 +46,7 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
 
     edm::Service<TFileService> m_fs;
 
- 
+    //the collections
     edm::InputTag m_bsTag;
     edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
@@ -72,9 +72,8 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
 
     edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescalesToken_;
     edm::EDGetTokenT<edm::TriggerResults> HLTTagToken_;
-
-
-   
+  
+    //the trees in the ntuples  
     TTree* _tree_Ks;   
     TTree* _tree_Lambda;   
     TTree* _tree_Z;   
@@ -82,7 +81,6 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     TTree* _tree_beamspot;
     TTree* _tree_GEN_Ks; 
     TTree* _tree_general; 
-
 
     //definition of variables which should go to tree
     //GEN Ks
@@ -92,24 +90,20 @@ class FlatTreeProducerV0s : public edm::EDAnalyzer
     std::vector<float> _Ks_deltaRBestMatchingGENParticle,_Ks_trackPair_mindeltaR,_Ks_trackPair_mass,_Ks_Track1Track2_openingsAngle, _Ks_Track1Track2_deltaR,_Ks_Track1_openingsAngle,_Ks_Track2_openingsAngle,_Ks_Track1_deltaR,_Ks_Track2_deltaR;
     std::vector<float> _Ks_daughterTrack1_eta,_Ks_daughterTrack1_phi,_Ks_daughterTrack1_pt,_Ks_daughterTrack1_pz,_Ks_daughterTrack1_dxy,_Ks_daughterTrack1_dz,_Ks_daughterTrack1_charge,_Ks_daughterTrack1_chi2,_Ks_daughterTrack1_ndof,_Ks_daughterTrack1_dxy_beamspot,_Ks_daughterTrack1_dz_beamspot,_Ks_daughterTrack1_dz_min_PV,_Ks_daughterTrack1_dz_PV0,_Ks_daughterTrack1_dz_000;
     std::vector<float> _Ks_daughterTrack2_eta,_Ks_daughterTrack2_phi,_Ks_daughterTrack2_pt,_Ks_daughterTrack2_pz,_Ks_daughterTrack2_charge,_Ks_daughterTrack2_chi2,_Ks_daughterTrack2_ndof,_Ks_daughterTrack2_dxy_beamspot,_Ks_daughterTrack2_dz_beamspot,_Ks_daughterTrack2_dz_min_PV,_Ks_daughterTrack2_dz_PV0,_Ks_daughterTrack2_dz_000;
-
    //Lambda
     std::vector<float> _Lambda_mass,_Lambda_pt,_Lambda_pz,_Lambda_Lxy,_Lambda_vz,_Lambda_eta,_Lambda_phi,_Lambda_dxy_beamspot,_Lambda_dxy_min_PV,_Lambda_dxy_PV0,_Lambda_dxy_000,_Lambda_dz_beamspot,_Lambda_dz_min_PV,_Lambda_dz_PV0,_Lambda_dz_000,_Lambda_vz_dz_min_PV;
     std::vector<float> _Lambda_deltaRBestMatchingGENParticle,_Lambda_trackPair_mindeltaR,_Lambda_trackPair_mass,_Lambda_Track1Track2_openingsAngle, _Lambda_Track1Track2_deltaR,_Lambda_Track1_openingsAngle,_Lambda_Track2_openingsAngle,_Lambda_Track1_deltaR,_Lambda_Track2_deltaR;
     std::vector<float> _Lambda_daughterTrack1_eta,_Lambda_daughterTrack1_phi,_Lambda_daughterTrack1_pt,_Lambda_daughterTrack1_pz,_Lambda_daughterTrack1_dxy,_Lambda_daughterTrack1_dz,_Lambda_daughterTrack1_charge,_Lambda_daughterTrack1_chi2,_Lambda_daughterTrack1_ndof,_Lambda_daughterTrack1_dxy_beamspot,_Lambda_daughterTrack1_dz_beamspot,_Lambda_daughterTrack1_dz_min_PV,_Lambda_daughterTrack1_dz_PV0,_Lambda_daughterTrack1_dz_000;
     std::vector<float> _Lambda_daughterTrack2_eta,_Lambda_daughterTrack2_phi,_Lambda_daughterTrack2_pt,_Lambda_daughterTrack2_pz,_Lambda_daughterTrack2_charge,_Lambda_daughterTrack2_chi2,_Lambda_daughterTrack2_ndof,_Lambda_daughterTrack2_dxy_beamspot,_Lambda_daughterTrack2_dz_beamspot,_Lambda_daughterTrack2_dz_min_PV,_Lambda_daughterTrack2_dz_PV0,_Lambda_daughterTrack2_dz_000;
-
-
-
+    //Z
     std::vector<float> _Z_mass,_Z_dz_PV_muon1,_Z_dz_PV_muon2,_Z_ptMuMu;
+    //PV
     std::vector<float> _PV_n,_PV0_lxy,_PV0_vz;
+    //beamspot
     std::vector<float> _beampot_lxy,_beampot_vz;
     std::vector<int> _general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ,_general_eventTrackMultiplicity,_general_eventTrackMultiplicity_highPurity;
-   
 
-
-
-     };
+    };
 
 #endif
 

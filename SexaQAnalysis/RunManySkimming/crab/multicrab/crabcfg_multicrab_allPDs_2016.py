@@ -1,5 +1,6 @@
 from CRABClient.UserUtilities import config
-trial = "trialR"
+trial = "test"
+#trial = "trialR"
 config = config()
 
 pyCfgParams = ['isData=True']
@@ -17,7 +18,7 @@ config.Data.splitting = 'Automatic'
 config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
 config.Data.runRange = ''
 config.Data.outLFNDirBase = '/store/user/jdeclerc/data_Sexaq/trial'+trial
-config.Data.publication = False
+config.Data.publication = True
 
 config.Site.storageSite = 'T2_BE_IIHE'
 
@@ -136,7 +137,7 @@ if __name__ == '__main__':
 #submit_single_run("MET","Run2016E-07Aug17-v1")
 #submit_single_run("MET","Run2016F-07Aug17-v1")
 #submit_single_run("MET","Run2016G-07Aug17-v1")
-#submit_single_run("MET","Run2016H-07Aug17-v1")
+submit_single_run("MET","Run2016H-07Aug17-v1")
 #submit_single_run("MuOnia","Run2016B-07Aug17_ver2-v1")
 #submit_single_run("MuOnia","Run2016C-07Aug17-v1")
 #submit_single_run("MuOnia","Run2016D-07Aug17-v1")
@@ -165,7 +166,7 @@ if __name__ == '__main__':
 #submit_single_run("SingleMuon","Run2016E-07Aug17-v1")
 #submit_single_run("SingleMuon","Run2016F-07Aug17-v1")
 #submit_single_run("SingleMuon","Run2016G-07Aug17-v1")
-submit_single_run("SingleMuon","Run2016H-07Aug17-v1")
+#submit_single_run("SingleMuon","Run2016H-07Aug17-v1")
 
 #submit_single_run("SinglePhoton","Run2016B-07Aug17_ver2-v1")
 #submit_single_run("SinglePhoton","Run2016C-07Aug17-v1")

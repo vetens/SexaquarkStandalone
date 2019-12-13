@@ -19,23 +19,18 @@ void FlatTreeProducerGEN::beginJob() {
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
+
+	//very basic info on the charged pions in events
 	_tree_pi = fs->make <TTree>("FlatTreeGENLevelPi","treePi");
 	_tree_pi->Branch("_pi_eta",&_pi_eta);
 
-
+	//some GEN Sbar kinematics
         _tree = fs->make <TTree>("FlatTreeGENLevel","tree");
-
-
-        // Declare tree's branches
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_mass",&_S_mass);
-
 	_tree->Branch("_S_eta",&_S_eta);
-
 	_tree->Branch("_S_pt",&_S_pt);
-
 	_tree->Branch("_S_pz",&_S_pz);
-
 	_tree->Branch("_S_vx",&_S_vx);
 	_tree->Branch("_S_vy",&_S_vy);
 	_tree->Branch("_S_vz",&_S_vz);
@@ -67,7 +62,7 @@ void FlatTreeProducerGEN::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
   nEvents++;
 
-  //first find the GEN particles which are proper antiS
+  //first find the GEN particles which are proper antiS, and also save some info on charged pions
   if(!m_runningOnData && m_lookAtAntiS){
 	  if(h_genParticles.isValid()){
 	      int nPionsThisEvent = 0;
@@ -94,7 +89,6 @@ void FlatTreeProducerGEN::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
 	      _tree_pi->Fill();
-	      std::cout << "nPionsThisEvent: " << nPionsThisEvent << std::endl;
 	      nPions = nPions + nPionsThisEvent;
 	      nPionsEtaSmaller4 = nPionsEtaSmaller4 + nPionsThisEventEtaSmaller4;
 	  }//if(h_genParticles.isValid())
@@ -109,27 +103,14 @@ void FlatTreeProducerGEN::FillBranchesPion(double eta){
 }
 
 void FlatTreeProducerGEN::FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance){
-  
-
-		
-	//calculate some kinematic variables for the GEN AntiS
-	TVector3 GENAntiSMomentumVertex(genParticle->px(),genParticle->py(),genParticle->pz());
-
-
-	//the dxy of the Ks and Lambda
-	reco::Candidate::Vector vGENAntiSMomentum(genParticle->px(),genParticle->py(),genParticle->pz());
-	//dxy and dz of the AntiS itself
 	
 	Init(); 
 
 	_S_charge.push_back(genParticle->charge());
 	_S_mass.push_back(genParticle->mass());
-
 	_S_eta.push_back(genParticle->eta());
-
 	_S_pt.push_back(genParticle->pt());
 	_S_pz.push_back(genParticle->pz());
-
 	_S_vx.push_back(genParticle->vx());	
 	_S_vy.push_back(genParticle->vy());	
 	_S_vz.push_back(genParticle->vz());	
@@ -202,22 +183,14 @@ void FlatTreeProducerGEN::InitPi()
 void FlatTreeProducerGEN::Init()
 {
 
-
     	_S_charge.clear();
     	_S_mass.clear();
-
 	_S_eta.clear();
-
-
 	_S_pt.clear();
-
 	_S_pz.clear();
-
-
 	_S_vx.clear();
 	_S_vy.clear();
 	_S_vz.clear();
-
 
 }
 

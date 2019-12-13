@@ -1,3 +1,5 @@
+#script to make, amongst others, the reco efficiency plots for the Sbar, V0s and final state particles
+
 import numpy as np
 from ROOT import *
 import random
@@ -172,7 +174,8 @@ h_GENRECO_matcher2_AntiLambda = TH1F("h_GENRECO_matcher2_AntiLambda",";#DeltaR(#
 #reconstruction efficiencies of the antiS, based on the lxyz between the RECO and GEN interaction vertex
 h_AntiS_deltaLInteractionVertexAntiSmin = TH1F("h_AntiS_deltaLInteractionVertexAntiSmin",";min #DeltaL_{xyz}(RECO #bar{S},simulated #bar{S}) interaction vertex;Events/mm",1000,0,100) 
 
-
+#below I create histograms for several kinematic parameters of all the particles in an Sbar event: the order of the kinematic variables for each of the particle types is important: the same kin variables are used for each particle. I use histograms here, as I need to be able to apply weights (with teff this is not possible)
+#reco eff of the antiS
 h_teff_nomAntiS_RECO_eff_eta_antiS= TH1F('h_teff_nomAntiS_RECO_eff_eta_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiS_RECO_eff_eta_antiS_antiS= TH1F('h_teff_nomAntiS_RECO_eff_eta_antiS_antiS',";#eta simulated #bar{S};Efficiency or 1/N_{ev} Events/0.1#eta",100,-5,5) 
 h_teff_nomAntiS_RECO_eff_vz_antiS= TH1F('h_teff_nomAntiS_RECO_eff_vz_antiS',";absolute v_{z} interaction vertex simulated #bar{S} (cm);Efficiency or 1/N_{ev} Events/4cm",100,-200,200) 
@@ -298,7 +301,7 @@ h_teff_nomAntiLambdaAntiProton_RECO_eff_dz_antiS= TH1F('h_teff_nomAntiLambdaAnti
 h_teff_nomAntiLambdaAntiProton_RECO_eff_numberOfTrackerHits_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_numberOfTrackerHits_antiS',";numberOfTrackerHits simulated #bar{#Lambda}^{0}-#bar{p};Efficiency ",40,0-0.5,40-0.5) 
 h_teff_nomAntiLambdaAntiProton_RECO_eff_phi_antiS= TH1F('h_teff_nomAntiLambdaAntiProton_RECO_eff_phi_antiS',";#phi simulated #bar{#Lambda}^{0}-#bar{p};Efficiency",100,-5,5) 
 h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS= TH2F('h2_teff_nomAntiLambdaAntiProton_RECO_eff_vz_lxy_antiS',";absolute v_{z} cv simulated #bar{#Lambda}^{0}-#bar{p} (cm);l_{0}(bs) cv simulated #bar{#Lambda}^{0}-#bar{p} (cm); Efficiency",80,-200,200,40,0,80)
-
+#now create a list of list of the above histograms: list 1 in the list contains the Sbar plots, list 2 in the list the Ks plots and so on.
 ll_efficiencies_nom = [
 [h_teff_nomAntiS_RECO_eff_eta_antiS,h_teff_nomAntiS_RECO_eff_eta_antiS_antiS,h_teff_nomAntiS_RECO_eff_vz_antiS,h_teff_nomAntiS_RECO_eff_lxy_antiS,h_teff_nomAntiS_RECO_eff_lxy_barrel_antiS,h_teff_nomAntiS_RECO_eff_lxy_transition_antiS,h_teff_nomAntiS_RECO_eff_lxy_endcap_antiS,h_teff_nomAntiS_RECO_eff_lxy_antiS_reco,h_teff_nomAntiS_RECO_eff_vz_antiS_reco,h_teff_nomAntiS_RECO_eff_pt_antiS,h_teff_nomAntiS_RECO_eff_pt_barrel_antiS,h_teff_nomAntiS_RECO_eff_pt_transition_antiS,h_teff_nomAntiS_RECO_eff_pt_endcap_antiS,h_teff_nomAntiS_RECO_eff_pz_antiS,h_teff_nomAntiS_RECO_eff_p_antiS,h_teff_nomAntiS_RECO_eff_dxy_antiS,h_teff_nomAntiS_RECO_eff_dz_antiS,h_teff_nomAntiS_RECO_eff_numberOfTrackerHits_antiS,h_teff_nomAntiS_RECO_eff_phi_antiS,h2_teff_nomAntiS_RECO_eff_vz_lxy_antiS],
 
@@ -452,9 +455,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			KsReconstructed = True
 		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[2] < config_dict["GENRECO_matcher_AntiL_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[2] < config_dict["GENRECO_matcher_AntiL_deltaR"]):
 			antiLambdaReconstructed = True
-		#if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
-		#	antiSReconstructed = True	
-		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"]):
+		if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
 			antiSReconstructed = True	
 	
 		printProgress(i)
@@ -577,7 +578,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				FillHistosEfficiency(tree,ll_efficiencies_nom,i_particle,index,weightFactor,i)
 			FillHistosEfficiency(tree,ll_efficiencies_denom,i_particle,index,weightFactor,i)
 			#fill reconstruction efficiency plots for events within acceptance
-			if(particleReconstructed and boolNGrandDaughtersWithTrackerHitsLargerThan6):
+			if(particleReconstructed and boolNGrandDaughtersWithTrackerHitsLargerThan6): #actually for now the ll_efficiencies_acceptance_nom and ll_efficiencies_nom will containt the same info as I already have a continue statement on boolNGrandDaughtersWithTrackerHitsLargerThan6 before
 				FillHistosEfficiency(tree,ll_efficiencies_acceptance_nom,i_particle,index,weightFactor,i)
 			if(boolNGrandDaughtersWithTrackerHitsLargerThan6):
 				FillHistosEfficiency(tree,ll_efficiencies_acceptance_denom,i_particle,index,weightFactor,i)
@@ -615,6 +616,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 
 
 
+#write out the plots
 
 #plot kinematics of final state particles for which the antiS got reconstructed
 granddaughterkinematics_dir_of_RECO_AntiS = fOut.mkdir("granddaughterkinematics_of_RECO_AntiS") 

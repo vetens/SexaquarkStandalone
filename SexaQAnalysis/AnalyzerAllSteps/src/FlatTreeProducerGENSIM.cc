@@ -22,12 +22,14 @@ FlatTreeProducerGENSIM::FlatTreeProducerGENSIM(edm::ParameterSet const& pset):
 
 
 void FlatTreeProducerGENSIM::beginJob() {
-
     
         // Initialize when class is created
         edm::Service<TFileService> fs ;
 
-
+	//tree containing info on the Sbar, also for Sbar that do not go to all correct final state particles.
+	//a tree like this is needed to have a full scope of the Sbar kinematics. Sbar which are produced very 
+	//forward will anyway not have the correct final state particles as these will have high eta and are
+	//by construction not stored in the genParticlesPlusGEANT collection 
 	_treeAllAntiS = fs->make <TTree>("FlatTreeGENLevelAllAntiS","treeAllAntiS");
 	_treeAllAntiS->Branch("_S_eta_all",&_S_eta_all);
 	_treeAllAntiS->Branch("_S_reconstructable_all",&_S_reconstructable_all);
@@ -38,8 +40,8 @@ void FlatTreeProducerGENSIM::beginJob() {
 	_treeAllAntiS->Branch("_S_pt_all",&_S_pt_all);
 	_treeAllAntiS->Branch("_S_pz_all",&_S_pz_all);
 
+	//tree containing info on the Sbar which go to correct final state particles
         _tree = fs->make <TTree>("FlatTreeGENLevel","tree");
-        // Declare tree's branches
 	_tree->Branch("_S_n_loops",&_S_n_loops);
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_nGoodPV",&_S_nGoodPV);
@@ -180,8 +182,6 @@ void FlatTreeProducerGENSIM::beginJob() {
 
 void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup) {
 
- 
-
   //beamspot
   edm::Handle<reco::BeamSpot> h_bs;
   iEvent.getByToken(m_bsToken, h_bs);
@@ -189,8 +189,6 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   //primary vertex
   edm::Handle<vector<reco::Vertex>> h_offlinePV;
   iEvent.getByToken(m_offlinePVToken, h_offlinePV);
-  int nPVs = h_offlinePV->size();
-
 
   //SIM particles: normal Gen particles or PlusGEANT
   edm::Handle<vector<reco::GenParticle>> h_genParticles;
@@ -217,13 +215,14 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
   unsigned int nGoodPV = 0;
   if(h_offlinePV.isValid()){
         for(unsigned int i = 0; i < h_offlinePV->size(); i++){
-                if(h_offlinePV->at(i).isValid() && h_offlinePV->at(i).tracksSize() >= 4){
+		double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
+                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){
                         nGoodPV++;
                 }
         }
   }
 
-  //loop over the gen particles, check for this antiS if there are any antiS with the same eta, so duplicates
+  //loop over the gen particles, check for this antiS if there are any antiS with the same eta, so duplicates. These duplicates are the result of the looping mechanism.
   //save the number of duplicates in a vector of vectors. Each vector has  as a first element the eta of the antiS and 2nd element the # of antiS with this eta. 
   vector<vector<float>> v_antiS_momenta_and_itt; 
   for(unsigned int i = 0; i < h_genParticles->size(); ++i){
@@ -239,7 +238,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 		}
 	}
 
-	if(duplicateIt>-1){	
+	if(duplicateIt>-1){//this AntiS is already in the list	
 			v_antiS_momenta_and_itt[duplicateIt][1]++;
 	}
 	else{//this is a new antiS
@@ -249,10 +248,8 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 		nTotalUniqueGenS_weighted = nTotalUniqueGenS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
 		vector<float> dummyVec; 
 		dummyVec.push_back(genParticle->eta());
-		dummyVec.push_back(1.);
+		dummyVec.push_back(1.);//encountered this antiS once
 		v_antiS_momenta_and_itt.push_back(dummyVec);
-
-
 	}
   }
 
@@ -261,13 +258,9 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 	std::cout << v_antiS_momenta_and_itt[j][1] << " with eta " << v_antiS_momenta_and_itt[j][0] << std::endl;
   }
 
-  //first find the GEN particles which are proper antiS
+  //first find the GEN particles which are proper (i.e. with the correct final state particles) antiS
   if(!m_runningOnData && m_lookAtAntiS){
 	  if(h_genParticles.isValid()){
-	      //double etaPrevious = 999;
-	      //double eventWeighingPrevious = 999;
-	      //bool reconstructablePrevious = false;
-	      //vector of vectors containing for each of the unique antiS a vector and this vector has as first element the eta of the antiS and as second entry if it is reconstructable
 	      std::vector<std::vector<double>> v_antiS_eta_reconstructable; 
 	      for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT
 
@@ -277,7 +270,8 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 			//check if you already have an entry for this antiS in v_antiS_eta_reconstructable
 			bool newAntiS = true;
 			int antiS_it = -1;
-			for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){//check for all the entries in v_antiS_eta_reconstructable if there is an eta match, if there is an eta match this antiS has already been encountered
+			//check for all the entries in v_antiS_eta_reconstructable if there is an eta match, if there is an eta match this antiS has already been encountered
+			for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){
 				if(v_antiS_eta_reconstructable[j][0] == genParticle->eta() ){ newAntiS = false;antiS_it = j;}
 			}
 			//if there was no eta match newAntiS is still true and I should make an new entry in the vector for this guy
@@ -302,7 +296,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 			double weight_PU = 0.;
                 	if(nGoodPV < AnalyzerAllSteps::v_mapPU.size()) weight_PU = AnalyzerAllSteps::PUReweighingFactor(AnalyzerAllSteps::v_mapPU[nGoodPV],genParticle->vz());
 			//check if this is a reconstructable antiS, so should have 2 daughters of correct type, each daughter should have 2 daughters with the correct type
-			//the below implicitely neglects the duplitcate antiS due to looping, because only 1 of the duplicates will interact and give daughters
+			//the below implicitely neglects the duplitcate antiS due to looping, because only 1 of the duplicates will interact and give daughters. The others do not have any daughters.
 			if(genParticle->numberOfDaughters()==2){
 
 				nTotalGiving2DaughtersGENS++;
@@ -322,21 +316,20 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 						nTotalCorrectGENS_weighted = nTotalCorrectGENS_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
 						if(genParticle->eta()>0) {nTotalGENSPosEta++; nTotalGENSPosEta_weighted = nTotalGENSPosEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;}
 						if(genParticle->eta()<0) {nTotalGENSNegEta++; nTotalGENSNegEta_weighted = nTotalGENSNegEta_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;}
+						//fill the tree with kinematics of Sbar events which go to all correct final state particles
 						AntiSReconstructable = FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP,nGoodPV);
 						if(AntiSReconstructable)nTotalCorrectGENS_Reconstructable_weighted = nTotalCorrectGENS_Reconstructable_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
-						
 					}
-
 				}
-
-				
 			}
 
-			//now save for this antiS in v_antiS_eta_reconstructable the or of the reconstructability flag which was already in this vector and the the current AntiSReconstructable, like that you will check for any of the duplicates if it was reconstructable
+			//now save for this antiS in v_antiS_eta_reconstructable the or of the reconstructability flag which was already in this vector and the the current AntiSReconstructable, 
+			//like that you will check for any of the duplicates if it was reconstructable
 			v_antiS_eta_reconstructable[antiS_it][1] = (int)v_antiS_eta_reconstructable[antiS_it][1] | AntiSReconstructable;
 		
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
 
+	     //now save this info to the _treeAllAntiS tree
 	    for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){
 		std::cout << "v_antiS_eta_reconstructable: " << v_antiS_eta_reconstructable[j][1] << ", " << v_antiS_eta_reconstructable[j][0] << std::endl;
 
@@ -391,17 +384,18 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 		}
 	} 
 
-	std::cout << "number of daughters of the GEN antiS: " << genParticle->numberOfDaughters() << " pdgID daughter0 and daughter1: " <<  genParticle->daughter(0)->pdgId() << " " << genParticle->daughter(1)->pdgId()  << std::endl;
 	
 	//calculate some kinematic variables for the GEN AntiS
 	TVector3 GENAntiSInteractionVertex(genParticle->daughter(0)->vx(),genParticle->daughter(0)->vy(),genParticle->daughter(0)->vz());//this is the interaction vertex of the antiS and the neutron.
 	TVector3 GENAntiSMomentumVertex(genParticle->px(),genParticle->py(),genParticle->pz());
 	TVector3 ZeroZeroZero(0.,0.,0.);
+	//lxy of the Sbar interaction vertex wrt several reference points
 	double GENLxy_interactionVertex= AnalyzerAllSteps::lxy(ZeroZeroZero,GENAntiSInteractionVertex);
 	double GENLxy_interactionVertex_beamspot = AnalyzerAllSteps::lxy(beamspot,GENAntiSInteractionVertex);
 	TVector3 BeampipeCenterData(AnalyzerAllSteps::center_beampipe_x,AnalyzerAllSteps::center_beampipe_y,0);
 	double GENLxy_interactionVertex_beampipeCenterData = AnalyzerAllSteps::lxy(BeampipeCenterData,GENAntiSInteractionVertex);
 	double GENLxyz_interactionVertex = AnalyzerAllSteps::lxyz(beamspot,GENAntiSInteractionVertex);
+	//angular separation between the V0s
 	double GENDeltaPhiDaughters = reco::deltaPhi(genParticle->daughter(0)->phi(),genParticle->daughter(1)->phi());
 	double GENDeltaEtaDaughters = genParticle->daughter(0)->eta()-genParticle->daughter(1)->eta();
 	double GENDeltaRDaughters = pow(GENDeltaPhiDaughters*GENDeltaPhiDaughters+GENDeltaEtaDaughters*GENDeltaEtaDaughters,0.5);
@@ -416,27 +410,32 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 
 	reco::LeafCandidate::LorentzVector n_(0,0,0,0.939565);
 	double GEN_Smass = ((genParticle->daughter(0)->daughter(0)->p4()+genParticle->daughter(0)->daughter(1)->p4()+genParticle->daughter(1)->daughter(0)->p4()+genParticle->daughter(1)->daughter(1)->p4())-n_).mass();
+	//transverse mass
 	double GEN_Smass_trans = ((genParticle->daughter(0)->daughter(0)->p4()+genParticle->daughter(0)->daughter(1)->p4()+genParticle->daughter(1)->daughter(0)->p4()+genParticle->daughter(1)->daughter(1)->p4())-n_).Mt();
 
 	//calculate properties of the neutron. This is interesting when running over simulation with neutrons with a Fermi momentum
 	double GEN_n_invM =  ( genParticle->daughter(0)->p4() + genParticle->daughter(1)->p4() - genParticle->p4() ).mass();
-	double GEN_n_p =  ( genParticle->daughter(0)->p4() + genParticle->daughter(1)->p4() - genParticle->p4() ).P();
+	double GEN_n_p =  ( genParticle->daughter(0)->p4() + genParticle->daughter(1)->p4() - genParticle->p4() ).P(); //this will give you back the neutron momentum distribution which you put into GEANT
 
-	//the dxy of the Ks and Lambda
 	TVector3 GENAntiSDaug0Momentum(genParticle->daughter(0)->px(),genParticle->daughter(0)->py(),genParticle->daughter(0)->pz());
 	TVector3 GENAntiSDaug1Momentum(genParticle->daughter(1)->px(),genParticle->daughter(1)->py(),genParticle->daughter(1)->pz());
 	reco::Candidate::Vector vGENAntiSMomentum(genParticle->px(),genParticle->py(),genParticle->pz());
 	reco::Candidate::Vector vGENAntiSDaug0Momentum(genParticle->daughter(0)->px(),genParticle->daughter(0)->py(),genParticle->daughter(0)->pz());
 	reco::Candidate::Vector vGENAntiSDaug1Momentum(genParticle->daughter(1)->px(),genParticle->daughter(1)->py(),genParticle->daughter(1)->pz());
+	//angles between Sbar and Ks
 	double GENOpeningsAngleAntiSKs = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSMomentum);
+	//angle between Sbar and Lambdabar
 	double GENOpeningsAngleAntiSLambda = AnalyzerAllSteps::openings_angle(vGENAntiSDaug1Momentum,vGENAntiSMomentum);
-	//the openingsangle between the GEN AntiS and the sum of the momenta of the daughters. Normally these should be pointing exactly in the direction of the mother, but due to the momentum of the neutron this is no longer the case
+	//angle between the V0s
+	double GENOpeningsAngleDaughters = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSDaug1Momentum);
+	//The openingsangle between the GEN AntiS and the sum of the momenta of the daughters. Normally these should be pointing 
+	//exactly in the direction of the mother, but due to the momentum of the neutron this is not the case
 	double S_sumDaughters_openingsangle = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum,vGENAntiSMomentum);	
 	double S_sumDaughters_deltaPhi = reco::deltaPhi((vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum).phi(),vGENAntiSMomentum.phi());	
 	double S_sumDaughters_deltaEta = (vGENAntiSDaug0Momentum+vGENAntiSDaug1Momentum).eta()-vGENAntiSMomentum.eta();	
 	double S_sumDaughters_deltaR =  sqrt(S_sumDaughters_deltaPhi*S_sumDaughters_deltaPhi+S_sumDaughters_deltaEta*S_sumDaughters_deltaEta);
-
-	double GENOpeningsAngleDaughters = AnalyzerAllSteps::openings_angle(vGENAntiSDaug0Momentum,vGENAntiSDaug1Momentum);
+	
+	//dxy of the Ks and Lambda	
 	double GEN_dxy_daughter0 = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex, GENAntiSDaug0Momentum,beamspot);
 	double GEN_dxy_daughter1 = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex, GENAntiSDaug1Momentum,beamspot);
 	//the dz of the Ks and Lambda
@@ -446,7 +445,8 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double GEN_dxy_antiS = AnalyzerAllSteps::dxy_signed_line_point(GENAntiSInteractionVertex,GENAntiSMomentumVertex,beamspot);
 	double GEN_dz_antiS = AnalyzerAllSteps::dz_line_point(GENAntiSInteractionVertex,GENAntiSMomentumVertex,beamspot);
 
-	//now look at the deltaR between the sum of the antiS daughters and antiS momentum. If the neutron momentum is zero then this should be a delta peak at zero, but if the neutron does not have zero momentum, then the sum of the momenta of the daughters might not be pointing to the antiS
+	//now look at the deltaR between the sum of the antiS daughters and antiS momentum. If the neutron momentum is zero then this should be a delta peak 
+	//at zero, but if the neutron does not have zero momentum, then the sum of the momenta of the daughters might not be pointing to the antiS
 	reco::Candidate::Vector vGENAntiSSumDaug0and1Momentum = vGENAntiSDaug0Momentum + vGENAntiSDaug1Momentum;
 	double deltaPhi_sumDaughterMomenta_antiSMomentum = reco::deltaPhi(vGENAntiSSumDaug0and1Momentum.Phi(), GENAntiSMomentumVertex.Phi());
 	double deltaEta_sumDaughterMomenta_antiSMomentum = vGENAntiSSumDaug0and1Momentum.Eta() - GENAntiSMomentumVertex.Eta();
@@ -460,7 +460,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	double Lambda_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GENAntiSInteractionVertex_beamspot,GENAntiSDaug1Momentum_vector);
 
 	//now look at the granddaughters:
-	//For the Ks:
+	//For the Ks daughter 0:
 	double GEN_Ks_daughter0_px = genParticle->daughter(0)->daughter(0)->px();
 	double GEN_Ks_daughter0_py = genParticle->daughter(0)->daughter(0)->py();
 	double GEN_Ks_daughter0_pz = genParticle->daughter(0)->daughter(0)->pz();
@@ -479,7 +479,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	reco::Candidate::Vector GEN_Ks_daughter0_creation_vertex_beamspot_vector(genParticle->daughter(0)->daughter(0)->vx()-beamspot.X(),genParticle->daughter(0)->daughter(0)->vy()-beamspot.Y(),genParticle->daughter(0)->daughter(0)->vz()-beamspot.Z());
 	reco::Candidate::Vector GEN_Ks_daughter0_momentum_vertex_vector(genParticle->daughter(0)->daughter(0)->px(),genParticle->daughter(0)->daughter(0)->py(),genParticle->daughter(0)->daughter(0)->pz());
 	double GEN_Ks_daughter0_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GEN_Ks_daughter0_creation_vertex_beamspot_vector,GEN_Ks_daughter0_momentum_vertex_vector);
-
+	//For the Ks daughter 1:
 	double GEN_Ks_daughter1_px = genParticle->daughter(0)->daughter(1)->px();
 	double GEN_Ks_daughter1_py = genParticle->daughter(0)->daughter(1)->py();
 	double GEN_Ks_daughter1_pz = genParticle->daughter(0)->daughter(1)->pz();
@@ -498,13 +498,14 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	reco::Candidate::Vector GEN_Ks_daughter1_momentum_vertex_vector(genParticle->daughter(0)->daughter(1)->px(),genParticle->daughter(0)->daughter(1)->py(),genParticle->daughter(0)->daughter(1)->pz());
 	double GEN_Ks_daughter1_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(GEN_Ks_daughter1_creation_vertex_beamspot_vector,GEN_Ks_daughter1_momentum_vertex_vector);
 
-	//For the AntiLambda: first find the antiproton by finding the one with the highest momentum
+	//For the AntiLambda: first find the antiproton by finding the one with the highest momentum in the lab frame
 	const reco::Candidate  * AntiLambdaAntiProton = genParticle->daughter(1)->daughter(1);	
 	const reco::Candidate  * AntiLambdaPion = genParticle->daughter(1)->daughter(0);
 	if(genParticle->daughter(1)->daughter(0)->p() > genParticle->daughter(1)->daughter(1)->p()){
 		AntiLambdaAntiProton = genParticle->daughter(1)->daughter(0);
 		AntiLambdaPion = genParticle->daughter(1)->daughter(1);
 	}
+	//for the antiproton from the antiLambda
 	double GEN_AntiLambda_AntiProton_px = AntiLambdaAntiProton->px();
 	double GEN_AntiLambda_AntiProton_py = AntiLambdaAntiProton->py();
 	double GEN_AntiLambda_AntiProton_pz = AntiLambdaAntiProton->pz();
@@ -524,7 +525,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	reco::Candidate::Vector GEN_AntiLambda_AntiProton_momentum_vector(AntiLambdaAntiProton->px(),AntiLambdaAntiProton->py(),AntiLambdaAntiProton->pz());
 	double GEN_AntiLambda_AntiProton_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(  GEN_AntiLambda_AntiProton_creation_vertex_beamspot_vector,GEN_AntiLambda_AntiProton_momentum_vector);
 
-
+	//for the pion from the antiLambda
 	double GEN_AntiLambda_Pion_px = AntiLambdaPion->px();
 	double GEN_AntiLambda_Pion_py = AntiLambdaPion->py();
 	double GEN_AntiLambda_Pion_pz = AntiLambdaPion->pz();
@@ -543,8 +544,8 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	reco::Candidate::Vector GEN_AntiLambda_Pion_momentum_vector(AntiLambdaPion->px(),AntiLambdaPion->py(),AntiLambdaPion->pz());
 	double GEN_AntiLambda_Pion_openings_angle_displacement_momentum = AnalyzerAllSteps::openings_angle(  GEN_AntiLambda_Pion_creation_vertex_beamspot_vector,GEN_AntiLambda_Pion_momentum_vector);  
 
-
-	//loop over the trackingparticles and find the one with the same px, py, pz as the granddaughters of this AntiS. For these trackingparticles it would be interesting to get the numberOfTrackerLayers() and numberOfTrackerHits() to have an idea how many layers the granddaughters cross
+	//loop over the trackingparticles and find the one with the same px, py, pz as the granddaughters of this AntiS. 
+	//For these trackingparticles it would be interesting to get the numberOfTrackerLayers() and numberOfTrackerHits() to know how many layers the granddaughters cross
 	int tp_Ks_daughter0_found = -1;
 	int tp_Ks_daughter1_found = -1;
 	int tp_AntiLambda_AntiProton_found = -1;
@@ -573,6 +574,7 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!trackingparticle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	}
 
+	//assign the correct one to the proton and to the pion in the lambda decay
 	if(tp_AntiLambda_AntiProton_found > -1 && tp_AntiLambda_Pion_found > -1){
 		if(h_TP->at(tp_AntiLambda_AntiProton_found).p() < h_TP->at(tp_AntiLambda_Pion_found).p()){
 			int tmp = tp_AntiLambda_AntiProton_found ;
@@ -591,10 +593,13 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 	int AntiLambda_AntiProton_numberOfTrackerHits = 0;
 	int AntiLambda_Pion_numberOfTrackerHits = 0;
 
+	//geet the numberOfTrackerLayers and numberOfTrackerHits for the final state particles
 	if(tp_Ks_daughter0_found > -1){Ks_daughter0_numberOfTrackerLayers = h_TP->at(tp_Ks_daughter0_found).numberOfTrackerLayers(); Ks_daughter0_numberOfTrackerHits = h_TP->at(tp_Ks_daughter0_found).numberOfTrackerHits();}
 	if(tp_Ks_daughter1_found > -1){Ks_daughter1_numberOfTrackerLayers = h_TP->at(tp_Ks_daughter1_found).numberOfTrackerLayers(); Ks_daughter1_numberOfTrackerHits = h_TP->at(tp_Ks_daughter1_found).numberOfTrackerHits();}
 	if(tp_AntiLambda_AntiProton_found > -1){AntiLambda_AntiProton_numberOfTrackerLayers = h_TP->at(tp_AntiLambda_AntiProton_found).numberOfTrackerLayers(); AntiLambda_AntiProton_numberOfTrackerHits = h_TP->at(tp_AntiLambda_AntiProton_found).numberOfTrackerHits();}
 	if(tp_AntiLambda_Pion_found > -1){AntiLambda_Pion_numberOfTrackerLayers = h_TP->at(tp_AntiLambda_Pion_found).numberOfTrackerLayers(); AntiLambda_Pion_numberOfTrackerHits = h_TP->at(tp_AntiLambda_Pion_found).numberOfTrackerHits();}
+
+	//now save the kinematic variables into the ntuple
 
 	Init(); 
 

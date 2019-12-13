@@ -1,3 +1,5 @@
+#macro to plot the kinemaics of the generated Sbar of different masses
+
 #from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT
 from ROOT import *
 import numpy as np
@@ -14,14 +16,6 @@ tdrstyle.setTDRStyle()
 
 colours = [1,2,4,35,38,41]
 
-# Set TDR styles
-#gROOT.LoadMacro("../tdrStyle/tdrstyle.C")
-#gROOT.ProcessLine("setTDRStyle();")
-
-# Add CMS text
-#gROOT.LoadMacro("../tdrStyle/CMS_lumi.C")
-
-#fIn = TFile('/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_7/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_TrackMatchingOnHits.root', 'read')
 fIn = [
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial20/FlatTree/FlatTree_GEN_trial20.root', 'read'),
 TFile('/pnfs/iihe/cms/store/user/jdeclerc/crmc_Sexaq/crmc/Sexaquark_13TeV_trial19/FlatTree/FlatTree_GEN_trial19.root', 'read'),
@@ -129,13 +123,6 @@ for l in TH2_ll:
 		c.Write()
 	iMass += 1
 
-#c_antiS_eta_pt = TCanvas("c_antiS_eta_pt","")
-#h_antiS_eta_pt.DrawNormalized()
-#c_antiS_eta_pt.Write()
-#
-#c_antiS_eta_pz = TCanvas("c_antiS_eta_pz","")
-#h_antiS_eta_pz.DrawNormalized()
-#c_antiS_eta_pz.Write()
 
 fOut.Write()
 fOut.Close()

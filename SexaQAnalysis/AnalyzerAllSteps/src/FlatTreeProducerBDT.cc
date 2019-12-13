@@ -13,8 +13,6 @@ FlatTreeProducerBDT::FlatTreeProducerBDT(edm::ParameterSet const& pset):
   m_V0KsTag(pset.getParameter<edm::InputTag>("V0KsCollection")),
   m_V0LTag(pset.getParameter<edm::InputTag>("V0LCollection")),
 
-
-
   m_bsToken    (consumes<reco::BeamSpot>(m_bsTag)),
   m_offlinePVToken    (consumes<vector<reco::Vertex>>(m_offlinePVTag)),
   m_genParticlesToken_GEN(consumes<vector<reco::GenParticle> >(m_genParticlesTag_GEN)),
@@ -23,8 +21,6 @@ FlatTreeProducerBDT::FlatTreeProducerBDT(edm::ParameterSet const& pset):
   m_sCandsToken(consumes<vector<reco::VertexCompositeCandidate> >(m_sCandsTag)),
   m_V0KsToken(consumes<vector<reco::VertexCompositeCandidate> >(m_V0KsTag)),
   m_V0LToken(consumes<vector<reco::VertexCompositeCandidate> >(m_V0LTag))
-  
-
 
 {
 
@@ -38,6 +34,7 @@ void FlatTreeProducerBDT::beginJob() {
 
 	//PV information
         _tree_PV = fs->make <TTree>("FlatTreePV","tree_PV");
+
 	_tree_PV->Branch("_nPV",&_nPV);
 	_tree_PV->Branch("_nGoodPV",&_nGoodPV);
 	_tree_PV->Branch("_nGoodPVPOG",&_nGoodPVPOG);
@@ -50,13 +47,10 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree_PV->Branch("_goodPVxPOG",&_goodPVxPOG);
 	_tree_PV->Branch("_goodPVyPOG",&_goodPVyPOG);
 	_tree_PV->Branch("_goodPVzPOG",&_goodPVzPOG);
-    
-        // Initialize when class is created
+
+	//Sbar event information to be (potentially) used in the BDT    
         _tree = fs->make <TTree>("FlatTree","tree");
 
-        // Declare tree's branches
-        // Event
-        //just for checking you are looking at the correct one: S or antiS
 	_tree->Branch("_S_charge",&_S_charge);
 	_tree->Branch("_S_deltaLInteractionVertexAntiSmin",&_S_deltaLInteractionVertexAntiSmin);
 	_tree->Branch("_S_deltaRAntiSmin",&_S_deltaRAntiSmin);
@@ -147,6 +141,7 @@ void FlatTreeProducerBDT::beginJob() {
 	_tree->Branch("_RECO_Ks_daughter1_dxy_beamspot",&_RECO_Ks_daughter1_dxy_beamspot);
 	_tree->Branch("_RECO_Ks_daughter1_dz_beamspot",&_RECO_Ks_daughter1_dz_beamspot);
 
+	//to keep the ntuples small I do not save the S or Sbar candidates which have an lxy of the interaction vertex below AnalyzerAllSteps::MinLxyCut, these are for sure not signal, because there is no material there 
         _tree_counter = fs->make <TTree>("FlatTreeCounter","tree_counter");
 	_tree_counter->Branch("_RECO_S_total_lxy_beampipeCenter",&_RECO_S_total_lxy_beampipeCenter);
 	_tree_counter->Branch("_RECO_S_saved_lxy_beampipeCenter",&_RECO_S_saved_lxy_beampipeCenter);
@@ -167,7 +162,6 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
   //SIM particles: normal Gen particles or PlusGEANT
   edm::Handle<vector<reco::GenParticle>> h_genParticles;
-  //iEvent.getByToken(m_genParticlesToken_GEN, h_genParticles);
   iEvent.getByToken(m_genParticlesToken_SIM_GEANT, h_genParticles);
 
   //General tracks particles
@@ -188,20 +182,20 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
   edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L;
   iEvent.getByToken(m_V0LToken, h_V0L);
 
-  //PV
+  //first store some info on the PV
   int nPVs = 0;
   int ngoodPVs = 0;
   unsigned int ngoodPVsPOG = 0;
   Init_PV();
   if(h_offlinePV.isValid()){
 	for(unsigned int i = 0; i < h_offlinePV->size(); i++ ){
-		if(h_offlinePV->at(i).isValid()){
+		if(h_offlinePV->at(i).isValid()){//all PV
 			nPVs++;
 			_PVx.push_back(h_offlinePV->at(i).x());
 			_PVy.push_back(h_offlinePV->at(i).y());
 			_PVz.push_back(h_offlinePV->at(i).z());
 		}
-		if(h_offlinePV->at(i).isValid() && h_offlinePV->at(i).tracksSize() >= 4){
+		if(h_offlinePV->at(i).isValid() && h_offlinePV->at(i).tracksSize() >= 4){//valid PV definition by Pascal
 			ngoodPVs++;
 			_goodPVx.push_back(h_offlinePV->at(i).x());
 			_goodPVy.push_back(h_offlinePV->at(i).y());
@@ -209,20 +203,18 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 		}
 
                 double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
-                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){
+                if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){//valid PV definition from POG (https://twiki.cern.ch/twiki/bin/view/CMSPublic/TrackingPOGPerformance2017MC#Vertex_Reconstruction_Performanc)
 			ngoodPVsPOG++;
                         _goodPVxPOG.push_back(h_offlinePV->at(i).x());
                         _goodPVyPOG.push_back(h_offlinePV->at(i).y());
                         _goodPVzPOG.push_back(h_offlinePV->at(i).z());
 		}
-
-
 	}
   }
-//  srand(time(NULL));
+
+  //for background use a random PV to do the reweighing
   int randomIndexPV = rand()%(ngoodPVsPOG);
   double randomPVz = _goodPVzPOG[randomIndexPV];
-  
 
   _nPV.push_back(nPVs);
   _nGoodPV.push_back(ngoodPVs);
@@ -237,7 +229,6 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
 
-  int nGENAntiSWithCorrectGranddaughtersThisEvent = 0;
   
   //for both data and MC: loop over all entries in h_sCands, both the ones with positive and the ones with negative charge. For the MC ones with negative charge I will check if they have a matching GEN antiS 
   if(h_sCands.isValid()){
@@ -251,37 +242,45 @@ void FlatTreeProducerBDT::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
  } //end of analyzer
 
-
-
-
+//fill the ntuple branches
 void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RECO_S, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV, bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, unsigned int ngoodPVsPOG, double randomPVz){
 
-	TVector3 RECOAntiSInteractionVertex(RECO_S->vx(),RECO_S->vy(),RECO_S->vz());//this is the interaction vertex of the antiS and the neutron. Check in the skimming code if you want to check.
+	//below calculate some kinematic variables on the event and then fill them in the branches	
+
+	//this is the interaction vertex of the antiS and the neutron. (Check in the skimming code if you want to check)
+	TVector3 RECOAntiSInteractionVertex(RECO_S->vx(),RECO_S->vy(),RECO_S->vz());
 	double RECOLxy_interactionVertex_beampipeCenter = sqrt(RECOAntiSInteractionVertex.X()*RECOAntiSInteractionVertex.X() + RECOAntiSInteractionVertex.Y()*RECOAntiSInteractionVertex.Y() );
-	//indeed, if you are running on MC then the above calculation, which is with respect to (0,0,0) is correct for RECOLxy_interactionVertex_beampipeCenter, but if you run on data then you should actually calculate wrt the center of the beampipe, which is offsset wrt (0,0,0)
+	//indeed, if you are running on MC then the above calculation, which is with respect to (0,0,0) is correct 
+	//for RECOLxy_interactionVertex_beampipeCenter, but if you run on data then you should actually calculate wrt 
+	//the center of the beampipe, which is offsset wrt (0,0,0)
 	if(m_runningOnData) RECOLxy_interactionVertex_beampipeCenter = sqrt( pow(RECOAntiSInteractionVertex.X()-AnalyzerAllSteps::center_beampipe_x , 2) + pow(RECOAntiSInteractionVertex.Y()-AnalyzerAllSteps::center_beampipe_y, 2) ) ;
-	
+	//error on RECOLxy_interactionVertex_beampipeCenter
 	double RECOLxy_interactionVertex_beampipeCenter_error = 1/RECOLxy_interactionVertex_beampipeCenter*sqrt( pow(RECOAntiSInteractionVertex.X(),2)*pow(RECO_S->vertexCovariance(0,0),2 ) + pow(RECOAntiSInteractionVertex.Y(),2)*pow(RECO_S->vertexCovariance(1,1),2 ) );
+
+	//lxy interaction vertex wrt to the beamspot instead of the bpc
 	double RECOLxy_interactionVertex = AnalyzerAllSteps::lxy(beamspot,RECOAntiSInteractionVertex);
 
-	//if running on MC and the RECO_S charge is negative and the RECO_S has an interaction vertex which is far enough in lxy, check if this is a real AntiS by looking at the difference in lxyz between the RECO and the GEN antiS. Save this deltaLInteractionVertexAntiSmin in the tree, like this later I can easily select in the tree on signal antiS and background antiS
+	//if running on MC and the RECO_S charge is negative and the RECO_S has an interaction vertex which is far enough in lxy, check if this is a real AntiS 
+	//by looking at the difference in lxyz between the RECO and the GEN antiS. Save this deltaLInteractionVertexAntiSmin in the tree, like this later I can 
+	//easily select in the tree on signal antiS and background antiS
         double deltaLInteractionVertexAntiSmin = 999.;
         double deltaRAntiSmin = 999.;
 	int bestMatchingAntiS = -1;
 	if(!m_runningOnData && RECO_S->charge() == -1  && RECOLxy_interactionVertex >= AnalyzerAllSteps::MinLxyCut){
 		if(h_genParticles.isValid()){
-			for(unsigned int i = 0; i < h_genParticles->size(); ++i){//loop all genparticlesPlusGEANT and only for the ones with the correct pdgId check if this RECO antiS is matching a GEN particle and is thus not a fake antiS
+			//loop all genparticlesPlusGEANT and only for the ones with the correct pdgId check 
+			//if this RECO antiS is matching a GEN particle and is thus not a fake antiS
+			for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 				if(h_genParticles->at(i).pdgId() != AnalyzerAllSteps::pdgIdAntiS) continue;
 				if(h_genParticles->at(i).numberOfDaughters() != 2) continue;
-				//have to use the vertex of the daughter Ks (at GEN level) as the interaction vertex of the AntiS and compare it to the vertex of the RECO antiS which is the annihilation vertex
+				//have to use the vertex of the daughter Ks (at GEN level) as the interaction vertex of the AntiS 
+				//and compare it to the vertex of the RECO antiS which is the annihilation vertex
 				double deltaLInteractionVertexAntiS = sqrt( pow(h_genParticles->at(i).daughter(0)->vx() - RECO_S->vx(),2) + pow(h_genParticles->at(i).daughter(0)->vy() - RECO_S->vy(),2) +  pow(h_genParticles->at(i).daughter(0)->vz() - RECO_S->vz(),2)  );
 				if(deltaLInteractionVertexAntiS < deltaLInteractionVertexAntiSmin){
 					deltaLInteractionVertexAntiSmin = deltaLInteractionVertexAntiS;
 					deltaRAntiSmin = AnalyzerAllSteps::deltaR(h_genParticles->at(i).phi(), h_genParticles->at(i).eta(),RECO_S->phi(),RECO_S->eta());
 					bestMatchingAntiS = i;
 				}
-
-
 		       }
 		}
 	}
@@ -297,15 +296,19 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		event_weighting_factorPU = event_weighting_factorPU * ngoodPVsPOG / 18.479;
 	}
 
+	//some counter
 	nTotalRECOS++;
 	nTotalRECOSWeighed = nTotalRECOSWeighed + event_weighting_factor*event_weighting_factorPU;
+
 	//calculate some kinematic variables for the RECO AntiS
 	TVector3 RECOAntiSMomentumVertex(RECO_S->px(),RECO_S->py(),RECO_S->pz());
 	double RECOErrorLxy_interactionVertex = AnalyzerAllSteps::std_dev_lxy(RECO_S->vx(), RECO_S->vy(), RECO_S->vertexCovariance(0,0), RECO_S->vertexCovariance(1,1), beamspot.X(), beamspot.Y(), beamspotVariance.X(), beamspotVariance.Y());
+	//angular differences between the V0s
 	double RECODeltaPhiDaughters = reco::deltaPhi(RECO_S->daughter(0)->phi(),RECO_S->daughter(1)->phi());
 	double RECODeltaEtaDaughters = RECO_S->daughter(0)->eta()-RECO_S->daughter(1)->eta();
 	double RECODeltaRDaughters = pow(RECODeltaPhiDaughters*RECODeltaPhiDaughters+RECODeltaEtaDaughters*RECODeltaEtaDaughters,0.5);
 
+	//to get the best mass estimate of the Sbar you still need to compensate for the neutron mass. The Sbars which are reconstructed are actually S+n
 	reco::LeafCandidate::LorentzVector n_(0,0,0,0.939565);
 	double RECO_Smass = (RECO_S->p4()-n_).mass();
 
@@ -331,25 +334,10 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	//the dz of the Ks and Lambda
 	double RECO_dz_daughter0 = AnalyzerAllSteps::dz_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug0Momentum,beamspot);
 	double RECO_dz_daughter1 = AnalyzerAllSteps::dz_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug1Momentum,beamspot);
-	//the dxyz of the Ks and Lambda
-//	double RECO_dxyz_daughter0 = AnalyzerAllSteps::dxyz_signed_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug0Momentum,beamspot);
-//	double RECO_dxyz_daughter1 = AnalyzerAllSteps::dxyz_signed_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug1Momentum,beamspot);
-	//collapse the RECO_dxy, RECO_dz, RECO_dxyz variables on one variable
-//	double relDiff_RECO_dxy_daughters = (abs(RECO_dxy_daughter0)-abs(RECO_dxy_daughter1))/(abs(RECO_dxy_daughter0)+abs(RECO_dxy_daughter1));
-//	double relDiff_RECO_dz_daughters = (abs(RECO_dz_daughter0)-abs(RECO_dz_daughter1))/(abs(RECO_dz_daughter0)+abs(RECO_dz_daughter1));
-//	double relDiff_RECO_dxyz_daughters = (abs(RECO_dxyz_daughter0)-abs(RECO_dxyz_daughter1))/(abs(RECO_dxyz_daughter0)+abs(RECO_dxyz_daughter1));
 	//dxy and dz of the AntiS itself
 	double RECO_dxy_antiS = AnalyzerAllSteps::dxy_signed_line_point(RECOAntiSInteractionVertex,RECOAntiSMomentumVertex,beamspot);
 	double RECO_dz_antiS = AnalyzerAllSteps::dz_line_point(RECOAntiSInteractionVertex,RECOAntiSMomentumVertex,beamspot);
 	
-
-	//calculate the sign of the dot product between the displacement vector and the dxy vector for both the Ks and the Lambda
-//	double signLxyDotdxy_daughter0 = AnalyzerAllSteps::sgn(AnalyzerAllSteps::vec_dxy_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug0Momentum,beamspot)*RECOAntiSInteractionVertex);
-//	double signLxyDotdxy_daughter1 = AnalyzerAllSteps::sgn(AnalyzerAllSteps::vec_dxy_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug1Momentum,beamspot)*RECOAntiSInteractionVertex);
-	//calculate the sign of the dot product between the displacement vector and the pt of both the Ks and the Lambda
-//	double signPtDotdxy_daughter0 = AnalyzerAllSteps::sgn(AnalyzerAllSteps::vec_dxy_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug0Momentum,beamspot)*RECOAntiSDaug0Momentum);
-//	double signPtDotdxy_daughter1 = AnalyzerAllSteps::sgn(AnalyzerAllSteps::vec_dxy_line_point(RECOAntiSInteractionVertex, RECOAntiSDaug1Momentum,beamspot)*RECOAntiSDaug1Momentum);
-
 	//loop over all PVs and find the one which minimises the dz of the antiS
 	double RECOdzAntiSPVmin = 999.;
 	double dxyAntiSPVmin = 999.;
@@ -360,6 +348,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		dxyAntiSPVmin = AnalyzerAllSteps::dxy_signed_line_point(RECOAntiSInteractionVertex,RECOAntiSMomentumVertex,bestPVdzAntiS);
 	}
 
+	//loop over all PVs and find the one which minimises the dz of the Lambda
 	double RECOdzLambdaPVmin = 999.;
 	double dxyLambdaPVmin = 999.;
 	TVector3  bestPVdzLambda;
@@ -369,7 +358,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		dxyLambdaPVmin = AnalyzerAllSteps::dxy_signed_line_point(RECOAntiSInteractionVertex,RECOAntiSDaug0Momentum,bestPVdzLambda);
 	}
 
-
+	//loop over all PVs and find the one which minimises the dz of the Ks
 	double RECOdzKsPVmin = 999.;
 	double dxyKsPVmin = 999.;
 	TVector3  bestPVdzKs;
@@ -379,11 +368,9 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		dxyKsPVmin = AnalyzerAllSteps::dxy_signed_line_point(RECOAntiSInteractionVertex,RECOAntiSDaug1Momentum,bestPVdzKs);
 	}
 
-
 	//for the granddaughters: problem is the Ks and Lambda as daughter of the AntiS do not have daughters, so I need to go through the reconstructed Ks and Lambda collection and find the best matching ones
 	//for the Lambda
 	const reco::Candidate* Lambda_fromAntiS = RECO_S->daughter(0);
-	const reco::Candidate* Ks_fromAntiS = RECO_S->daughter(1);
 
 	double deltaRMinLambda = 999;
 	double bestMatchingLambda = 0;
@@ -396,6 +383,9 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	const reco::VertexCompositeCandidate Lambda = h_V0L->at(bestMatchingLambda); 
 
+	//for the Ks
+	const reco::Candidate* Ks_fromAntiS = RECO_S->daughter(1);
+
 	double deltaRMinKs = 999;
 	double bestMatchingKs = 0;
 	for(unsigned int i_k = 0; i_k <  h_V0Ks->size(); i_k++){
@@ -405,7 +395,8 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 		if(deltaR < deltaRMinKs){deltaRMinKs=deltaR;bestMatchingKs=i_k;}
 	}
 	const reco::VertexCompositeCandidate Ks = h_V0Ks->at(bestMatchingKs);
-	 
+
+	//for the Lambda: het info on the tracks
 	//track1
 	double RECO_Lambda_daughter0_charge = Lambda.daughter(0)->charge();
 	double RECO_Lambda_daughter0_pt = Lambda.daughter(0)->pt();
@@ -423,7 +414,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	double RECO_Lambda_daughter1_dxy_beamspot = AnalyzerAllSteps::dxy_signed_line_point(RECO_Lambda_Daughter1Vertex, RECO_Lambda_Daughter1Momentum, beamspot);
 	double RECO_Lambda_daughter1_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Lambda_Daughter1Vertex, RECO_Lambda_Daughter1Momentum, beamspot);
 
-	//for the Ks
+	//for the Ks: get info on the tracks
 	//track1
 	double RECO_Ks_daughter0_charge = Ks.daughter(0)->charge();
 	double RECO_Ks_daughter0_pt = Ks.daughter(0)->pt();
@@ -442,8 +433,7 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	double RECO_Ks_daughter1_dz_beamspot = AnalyzerAllSteps::dz_line_point(RECO_Ks_Daughter1Vertex, RECO_Ks_Daughter1Momentum, beamspot);
 
 
-	//if the RECO S particle fails one of the below cuts than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice for computational reasons
-	//if(RECOLxy_interactionVertex < AnalyzerAllSteps::MinLxyCut || RECOErrorLxy_interactionVertex > AnalyzerAllSteps::MaxErrorLxyCut)return;
+	//if the RECO S particle fails the below cut than don't fill the tree. These already cut the majority of the background, so the background trees will be much smaller, which is nice for computational reasons
 
 	Init_Counter();
 	if(RECO_S->charge()==1)_RECO_S_total_lxy_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
@@ -551,27 +541,6 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 	_RECO_Ks_daughter1_dz_beamspot.push_back(RECO_Ks_daughter1_dz_beamspot);
 
   	_tree->Fill();
-
-
-	//very temporary: for the SingleElectron2016 RunG I found some S which have a high BDT variable. Now try to find exactly the events where these S occur
-	bool foundHighBDTS = false;
-	if(_S_eta[0] == -2.99413752556) foundHighBDTS = true;
-	if(_S_eta[0] == 1.80451142788) foundHighBDTS = true;
-	if(_S_eta[0] == 2.85730171204) foundHighBDTS = true;
-	if(_S_eta[0] == 2.88255834579) foundHighBDTS = true;
-	if(_S_eta[0] == 2.62389588356)  foundHighBDTS = true;
-	if(_S_eta[0] == 1.38479459286) foundHighBDTS = true;
-	if(_S_eta[0] == 1.48003470898) foundHighBDTS = true;
-	//if(_S_eta[0] == -2.99413752556 &&  _S_lxy_interaction_vertex[0] == 2.0698633194 && _S_vz_interaction_vertex[0] == -9.11111164093) foundHighBDTS = true;
-	//if(_S_eta[0] == 1.80451142788 &&  _S_lxy_interaction_vertex[0] == 2.48056674004 && _S_vz_interaction_vertex[0] == 12.9399452209) foundHighBDTS = true;
-	//if(_S_eta[0] == 2.85730171204 &&  _S_lxy_interaction_vertex[0] == 2.09732484818 && _S_vz_interaction_vertex[0] == 11.9825458527) foundHighBDTS = true;
-	//if(_S_eta[0] == 2.88255834579 &&  _S_lxy_interaction_vertex[0] == 2.19579172134 && _S_vz_interaction_vertex[0] == 14.0933685303) foundHighBDTS = true;
-	//if(_S_eta[0] == 2.62389588356 &&  _S_lxy_interaction_vertex[0] == 2.3096203804 && _S_vz_interaction_vertex[0] == 9.77902030945) foundHighBDTS = true;
-	//if(_S_eta[0] == 1.38479459286 &&  _S_lxy_interaction_vertex[0] == 2.16217327118 && _S_vz_interaction_vertex[0] == 4.99546194077) foundHighBDTS = true;
-	//if(_S_eta[0] == 1.48003470898 &&  _S_lxy_interaction_vertex[0] == 2.01532459259 && _S_vz_interaction_vertex[0] == 9.65248298645) foundHighBDTS = true;
-
-	if(foundHighBDTS)std::cout << "found an S which matches the S with high BDT _S_eta, _S_lxy_interaction_vertex, _S_vz_interaction_vertex: " << _S_eta[0] << ", " << _S_lxy_interaction_vertex[0] << "," << _S_vz_interaction_vertex[0]  << std::endl; 
-
 
 }
 

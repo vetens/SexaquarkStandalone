@@ -1,3 +1,5 @@
+#script to calculate the "correction factor" (see AN) for the reconstructed Sbar in MC: you find the reconstructed ones in the ntuple, go look at their final state particles, check the 6 parameters which we chose to parametrize these tracks and for these get the Data/MC ratios which were obtained by running ../MCToData/AnalyzerFlatTreeV0s.py and ../MCToData/loop_macro_exc_inc.C 
+
 import numpy as np
 from ROOT import *
 import pandas as pd
@@ -34,7 +36,7 @@ def printProgress(i):
 	if(i%10000 == 0):
 		print 'reached track: ', i, ': ', float(i)/float(min(maxEvents,tree.GetEntries()))*100, '%'
 
-#define the fiducial region
+#define the fiducial region, the cuts are defined in ../../../TMVA/configBDT.py 
 FidReg_minPt = config_dict["config_fidRegion_FiducialRegionptMin"] 
 FidReg_maxPt = config_dict["config_fidRegion_FiducialRegionptMax"]
 
@@ -53,7 +55,7 @@ FidReg_mindz = config_dict["config_fidRegion_FiducialRegiondzMin"]
 FidReg_maxdz = config_dict["config_fidRegion_FiducialRegiondzMax"]
 
 
-#the files with the correction factors
+#the files with the correction factors, produced by ../MCToData/loop_macro_exc_inc.C
 corr_factors_pt = pd.read_csv("../MCToData/Data_MC_plots_8_final/h_RECO_Ks_pt_tracks1_and_2.dat") 
 corr_factors_pz = pd.read_csv("../MCToData/Data_MC_plots_8_final/h_RECO_Ks_pz_tracks1_and_2.dat") 
 corr_factors_dxy = pd.read_csv("../MCToData/Data_MC_plots_8_final/h_RECO_Ks_Track1_and_2_dxy_beamspot.dat") 
@@ -70,7 +72,7 @@ h_corr_factor_lxy = TH1F("corr_factor_lxy",";correction factor lxy;",100,0.2,1.8
 h_corr_factor_vz = TH1F("corr_factor_vz",";correction factor vz;",100,0.2,1.8)
 h_corr_factor_this_antiS = TH1F("h_corr_factor_this_antiS",";correction factor (C_{k});#Events;",16,0.2,1.8)
 
-#for each kinematic variable plot the correction factor of that kinematic variable versus the correction parameters of the others.
+#for each kinematic variable plot the correction factor of that kinematic variable versus the correction parameters of the others to investigate if there are any correlations between the correction factors of hte two parameters
 nbins_corr_par = 60
 min_bin_corr_par = 0.7
 max_bin_corr_par = 1.3
@@ -81,7 +83,6 @@ h_corr_pt_dxy = TH2F("h_corr_pt_dxy",";pt correction factor; dxy correction fact
 h_corr_pt_dz = TH2F("h_corr_pt_dz",";pt correction factor; dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pt_lxy = TH2F("h_corr_pt_lxy",";pt correction factor; lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pt_vz = TH2F("h_corr_pt_vz",";pt correction factor; vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-
 #pz against the others
 h_corr_pz_pt = TH2F("h_corr_pz_pt",";pz correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pz_pz = TH2F("h_corr_pz_pz",";pz correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -89,7 +90,6 @@ h_corr_pz_dxy = TH2F("h_corr_pz_dxy",";pz correction factor;dxy correction facto
 h_corr_pz_dz = TH2F("h_corr_pz_dz",";pz correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pz_lxy = TH2F("h_corr_pz_lxy",";pz correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_pz_vz = TH2F("h_corr_pz_vz",";pz correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-
 #dxy against the others
 h_corr_dxy_pt = TH2F("h_corr_dxy_pt",";dxy correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dxy_pz = TH2F("h_corr_dxy_pz",";dxy correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -97,7 +97,6 @@ h_corr_dxy_dxy = TH2F("h_corr_dxy_dxy",";dxy correction factor;dxy correction fa
 h_corr_dxy_dz = TH2F("h_corr_dxy_dz",";dxy correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dxy_lxy = TH2F("h_corr_dxy_lxy",";dxy correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dxy_vz = TH2F("h_corr_dxy_vz",";dxy correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-
 #dz against the others
 h_corr_dz_pt = TH2F("h_corr_dz_pt",";dz correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dz_pz = TH2F("h_corr_dz_pz",";dz correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -105,7 +104,6 @@ h_corr_dz_dxy = TH2F("h_corr_dz_dxy",";dz correction factor;dxy correction facto
 h_corr_dz_dz = TH2F("h_corr_dz_dz",";dz correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dz_lxy = TH2F("h_corr_dz_lxy",";dz correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_dz_vz = TH2F("h_corr_dz_vz",";dz correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-
 #lxy against the others
 h_corr_lxy_pt = TH2F("h_corr_lxy_pt",";lxy correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_lxy_pz = TH2F("h_corr_lxy_pz",";lxy correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -113,7 +111,6 @@ h_corr_lxy_dxy = TH2F("h_corr_lxy_dxy",";lxy correction factor;dxy correction fa
 h_corr_lxy_dz = TH2F("h_corr_lxy_dz",";lxy correction factor;dz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_lxy_lxy = TH2F("h_corr_lxy_lxy",";lxy correction factor;lxy correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_lxy_vz = TH2F("h_corr_lxy_vz",";lxy correction factor;vz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
-
 #dxy against the others
 h_corr_vz_pt = TH2F("h_corr_vz_pt",";vz correction factor;pt correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
 h_corr_vz_pz = TH2F("h_corr_vz_pz",";vz correction factor;pz correction factor;",nbins_corr_par,min_bin_corr_par,max_bin_corr_par,nbins_corr_par,min_bin_corr_par,max_bin_corr_par)
@@ -131,15 +128,14 @@ ll_corr_eff = [
 [h_corr_vz_pt,h_corr_vz_pz,h_corr_vz_dxy,h_corr_vz_dz,h_corr_vz_lxy,h_corr_vz_vz]
 ]
 
-#for each final state particle check which are the cuts for the fiducial region where it gets killed
+#for each final state particle check which are the cuts for the fiducial region where it gets killed. To investigate which one of the fiducial region cuts introduces the strongest inneficiency.
 h_FiducialRegionCuts_1 = TH1I("h_FiducialRegionCuts_1",";Failing fiducial region cuts;",13,-0.5,12.5)
 h_FiducialRegionCuts_2 = TH1I("h_FiducialRegionCuts_2",";Failing fiducial region cuts;",13,-0.5,12.5)
 h_FiducialRegionCuts_3 = TH1I("h_FiducialRegionCuts_3",";Failing fiducial region cuts;",13,-0.5,12.5)
 h_FiducialRegionCuts_4 = TH1I("h_FiducialRegionCuts_4",";Failing fiducial region cuts;",13,-0.5,12.5)
 l_h_FiducialRegionCuts = [h_FiducialRegionCuts_1,h_FiducialRegionCuts_2,h_FiducialRegionCuts_3,h_FiducialRegionCuts_4]
 
-
-#a list with counters for the reconstructed particles, so there are 7 entries for each of the 7 particles
+#some counters for  efficiencies
 nAntiS_reconstructable = 0.
 nAntiSRecoAlsoOutsideFiducialRegion = 0.
 nAntiSRecoInsideFiducialRegion = 0.
@@ -162,11 +158,8 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 
 		weightFactor = tree._tpsAntiS_event_weighting_factor[0]*tree._tpsAntiS_event_weighting_factorPU[0]
 
-		boolNGrandDaughtersWithTrackerHitsLargerThan6 = False
-#		if(tree._tpsAntiS_numberOfTrackerHits[3] >= 7 and tree._tpsAntiS_numberOfTrackerHits[4] >= 7 and tree._tpsAntiS_numberOfTrackerHits[5] >= 7 and tree._tpsAntiS_numberOfTrackerHits[6] >= 7): 
-#			boolNGrandDaughtersWithTrackerHitsLargerThan6 = True
-
-
+	
+		#check the reconstructability requirement for the AntiS, all 4 final state particles (these aer particles 3,4,5,6 in the vector) should have more than 6 hits
 		NGrandDaughtersWithTrackerHitsLargerThan6 = 0
 		for j in range(0,len(tree._tpsAntiS_type)):
 			#now look at _tpAntiS_type from 3 to 6, this are the granddaughters:
@@ -174,8 +167,10 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				if(tree._tpsAntiS_numberOfTrackerHits[j] >= 7):
 					NGrandDaughtersWithTrackerHitsLargerThan6 += 1
 
+		boolNGrandDaughtersWithTrackerHitsLargerThan6 = False
 		boolNGrandDaughtersWithTrackerHitsLargerThan6 =  NGrandDaughtersWithTrackerHitsLargerThan6==4
 
+		#check the requirements for calling a GEN particle 'reconstructed'
 		antiSReconstructed = False
 		KsReconstructed = False
 		antiLambdaReconstructed = False
@@ -186,7 +181,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
                 if(tree._tpsAntiS_deltaLInteractionVertexAntiSmin[0] < config_dict["GENRECO_matcher_AntiS_deltaL"] and tree._tpsAntiS_bestDeltaRWithRECO[0] < config_dict["GENRECO_matcher_AntiS_deltaR"] and tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1 and tree._tpsAntiS_reconstructed[5] == 1 and tree._tpsAntiS_reconstructed[6] == 1 and KsReconstructed and antiLambdaReconstructed):
                         antiSReconstructed = True
 
-		#only evaluate the below for reconstructable antiS
+		#only evaluate the below for reconstructable antiS, indeed for the others you are not interested to evaluate the correction factor.
 		if(not boolNGrandDaughtersWithTrackerHitsLargerThan6): continue
 
 		nAntiS_reconstructable+=weightFactor
@@ -197,17 +192,16 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 
 		#define a fiducial region based on the kinematics of the final state particles. Don't look at antiS which fall outside this fiducial region because outside this region systematic uncertainties become too large
 		insideSystUncFiducialRegion = True
-		for i_par in [3,4,5,6]:
+		for i_par in [3,4,5,6]: #these are the four final state particles
 			pt = tree._tpsAntiS_pt[i_par]
 			pz = tree._tpsAntiS_pz[i_par]	
 			dxy = tree._tpsAntiS_dxy_beamspot[i_par]	
 			dz = tree._tpsAntiS_dz_beamspot[i_par]	
 			lxy = tree._tpsAntiS_Lxy_beamspot[i_par]	
 			vz = tree._tpsAntiS_vz_beamspot[i_par]	
-			#if(pt > 10 or pz > 22 or lxy > 60 or abs(vz) > 150  or dxy > 12 or abs(dz) > 35 ):
 			if(pt < FidReg_minPt or pt > FidReg_maxPt or pz < FidReg_minPz or pz > FidReg_maxPz or lxy > FidReg_maxlxy or vz < FidReg_minvz or vz > FidReg_maxvz or dxy < FidReg_mindxy  or dxy > FidReg_maxdxy or dz < FidReg_mindz or dz > FidReg_maxdz ):
 				insideSystUncFiducialRegion = False
-			if(antiSReconstructed):
+			if(antiSReconstructed): #check which cuts the particle fails
 				if(pt < FidReg_minPt):
 					l_h_FiducialRegionCuts[i_par-3].Fill(0)
 				if(pt > FidReg_maxPt):
@@ -231,12 +225,12 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				if(dz > FidReg_maxdz):
 					l_h_FiducialRegionCuts[i_par-3].Fill(11)
 
-		#only proceed with antiS events which have final state particles in the fiducial region
+		#only proceed with antiS events which have final state particles in the fiducial region, the others will contribute to the inneficiency
 		if(not insideSystUncFiducialRegion): continue
 
 		if(antiSReconstructed): nAntiSRecoInsideFiducialRegion += weightFactor		
 
-		#count the reconstructed particles with the requirement that there daughters got reconstructed
+		#count the reconstructed particles with the requirement that their daughters got reconstructed
 		if(tree._tpsAntiS_reconstructed[3] == 1 and tree._tpsAntiS_reconstructed[4] == 1):
 			if(tree._tpsAntiS_reconstructed[1] == 1):
 				nKsRECOIfBothDaughtersReco += weightFactor
@@ -261,7 +255,7 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 				corrections_factors = []
 				corrections_factors_error = []
 				
-
+				#get the data/MC ratio for each of the 6 variables
 				pt = tree._tpsAntiS_pt[i_par]
 				best_matching_variables.append(corr_factors_pt.iloc[(corr_factors_pt['kinVariable']-pt).abs().argsort()[:1]]["kinVariable"].values[0])
 				corrections_factors.append(corr_factors_pt.iloc[(corr_factors_pt['kinVariable']-pt).abs().argsort()[:1]]["DataOverMC"].values[0])
@@ -298,11 +292,13 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 						ll_corr_eff[i][j].Fill(corrections_factors[i],corrections_factors[j],weightFactor)
 				
 
+				#now mulitply all 6 correction factors for each variable
 				corr_factor_this_particle = 1	
 				error_corr_factor_this_particle = 0
 				for i_cor in range(0,len(corrections_factors)):
 					corr_factor_this_particle = corr_factor_this_particle*corrections_factors[i_cor]
 					error_corr_factor_this_particle = error_corr_factor_this_particle +  np.power(corrections_factors_error[i_cor],2)/np.power(corrections_factors[i_cor],2)
+				#multiply for each of the four final state particles
 				corr_factor_this_antiS = corr_factor_this_antiS * corr_factor_this_particle
 				error_corr_factor_this_antiS = error_corr_factor_this_antiS + error_corr_factor_this_particle 
 				if(verbose):
@@ -314,7 +310,6 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 					print "particle has vz: ", vz, " so the best found value is: ", best_matching_variables[5]," and the correction factor is: ", corrections_factors[5], " and the error is: ", corrections_factors_error[5]
 					print "The overall correction factor for this particle: ", corr_factor_this_particle
 					print "-----------------------------------------------"
-			corr_factor_this_antiS = corr_factor_this_antiS
 			error_corr_factor_this_antiS = corr_factor_this_antiS*np.sqrt(error_corr_factor_this_antiS)
 			print "The overall correction factor for this antiS: ", corr_factor_this_antiS, " with an error of: ", error_corr_factor_this_antiS
 			h_corr_factor_this_antiS.Fill(corr_factor_this_antiS,weightFactor)
@@ -325,9 +320,8 @@ for iFile, fIn in enumerate(inFiles,start = 1):
 			h_corr_factor_lxy.Fill(corrections_factors[4])
 			h_corr_factor_vz.Fill(corrections_factors[5])
 
+#write out the plots
 			
-		#now select tracks which have the antiS properly reconstructed and check for these events how the kinematics look like of the final state particles.
-		#if(antiSReconstructed):
 h_corr_factor_this_antiS.Write()
 
 c_name = "c_"+h_corr_factor_this_antiS.GetName()

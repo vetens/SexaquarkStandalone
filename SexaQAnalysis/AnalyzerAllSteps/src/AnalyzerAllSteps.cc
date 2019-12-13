@@ -1,6 +1,6 @@
 #include "../interface/AnalyzerAllSteps.h"
 
-
+//3D openingsangle between two vectors
 double AnalyzerAllSteps::openings_angle(reco::Candidate::Vector momentum1, reco::Candidate::Vector momentum2){
   double opening_angle = TMath::ACos((momentum1.Dot(momentum2))/(pow(momentum1.Mag2()*momentum2.Mag2(),0.5)));
   return opening_angle;
@@ -12,7 +12,7 @@ double AnalyzerAllSteps::deltaR(double phi1, double eta1, double phi2, double et
 	return pow(deltaPhi*deltaPhi+deltaEta*deltaEta,0.5);
 }
 
-
+//2D distance in xy
 double AnalyzerAllSteps::lxy(TVector3 v1, TVector3 v2){
 	double x1 = v1.X();
 	double x2 = v2.X();
@@ -21,6 +21,7 @@ double AnalyzerAllSteps::lxy(TVector3 v1, TVector3 v2){
 	return sqrt(pow(x1-x2,2)+pow(y1-y2,2));
 }
 
+//3D distance
 double AnalyzerAllSteps::lxyz(TVector3 v1, TVector3 v2){
 	double x1 = v1.X();
 	double x2 = v2.X();
@@ -32,7 +33,7 @@ double AnalyzerAllSteps::lxyz(TVector3 v1, TVector3 v2){
 }
 
 
-
+//point of closest approach vector between a point (Point) and a line (Point_line;Vector_along_line)
 TVector3 AnalyzerAllSteps::PCA_line_point(TVector3 Point_line, TVector3 Vector_along_line, TVector3 Point){
    //first move the vector along the line to the starting point of Point_line
    double normalise = sqrt(Vector_along_line.X()*Vector_along_line.X()+Vector_along_line.Y()*Vector_along_line.Y()+Vector_along_line.Z()*Vector_along_line.Z());
@@ -45,7 +46,7 @@ TVector3 AnalyzerAllSteps::PCA_line_point(TVector3 Point_line, TVector3 Vector_a
    return vector_PCA ;
 }
 
-//return a vector representing the dxy
+//return the PCA vector in xy between point and line
 TVector3 AnalyzerAllSteps::vec_dxy_line_point(TVector3 Point_line_in, TVector3 Vector_along_line_in, TVector3 Point_in){
   //looking at XY, so put the Z component to 0 first
   TVector3 Point_line(Point_line_in.X(),Point_line_in.Y(),0.);
@@ -57,8 +58,7 @@ TVector3 AnalyzerAllSteps::vec_dxy_line_point(TVector3 Point_line_in, TVector3 V
 	
 }
 
-
-
+//return shortest distance between point and vector in xy. The sign is given by the dot product of the vector connecting the PCA to the refernece point and the direction of the vector under study
 double AnalyzerAllSteps::dxy_signed_line_point(TVector3 Point_line_in, TVector3 Vector_along_line_in, TVector3 Point_in){
   TVector3 shortest_distance = vec_dxy_line_point(Point_line_in,Vector_along_line_in,Point_in);
   double dxy_signed_line_point = sqrt(shortest_distance.X()*shortest_distance.X()+shortest_distance.Y()*shortest_distance.Y());
@@ -74,6 +74,7 @@ double AnalyzerAllSteps::dxy_signed_line_point(TVector3 Point_line_in, TVector3 
   return dxy_signed_line_point;
 }
 
+//same as dxy_signed_line_point, but now in 3D
 double AnalyzerAllSteps::dxyz_signed_line_point(TVector3 Point_line_in, TVector3 Vector_along_line_in, TVector3 Point_in){
   TVector3 shortest_distance = PCA_line_point(Point_line_in,  Vector_along_line_in, Point_in);
   double dxyz_signed_line_point = sqrt(shortest_distance.X()*shortest_distance.X()+shortest_distance.Y()*shortest_distance.Y()+shortest_distance.Z()*shortest_distance.Z());
@@ -85,8 +86,7 @@ double AnalyzerAllSteps::dxyz_signed_line_point(TVector3 Point_line_in, TVector3
 	
 }
 
-
-
+//uncertainty on lxy
 double AnalyzerAllSteps::std_dev_lxy(double vx, double vy, double vx_var, double vy_var, double bx_x, double bx_y, double bx_x_var, double bx_y_var){
 
         double lxy_std_dev_nominator = pow(vx-bx_x,2)*(vx_var+bx_x_var) + pow(vy-bx_y,2)*(vy_var+bx_y_var);
@@ -96,7 +96,7 @@ double AnalyzerAllSteps::std_dev_lxy(double vx, double vy, double vx_var, double
 
 }
 
-//function to return the cos of the angle between the momentum of the particle and it's displacement vector. This is for a V0 particle, so you need the V0 to decay to get it's interaction vertex
+//function to return the cos of the angle between the momentum of the particle and it's displacement vector. This is for a V0 particle, so you need the V0 to decay to get it's decay vertex
 double AnalyzerAllSteps::XYpointingAngle(const reco::Candidate  * particle, TVector3 beamspot){
       double angleXY = -2;
       if(particle->numberOfDaughters() == 2){
@@ -112,22 +112,13 @@ double AnalyzerAllSteps::XYpointingAngle(const reco::Candidate  * particle, TVec
 }
 
 double AnalyzerAllSteps::CosOpeningsAngle(TVector3 vec1, TVector3 vec2){
-
   double nom = vec1.X()*vec2.X()+vec1.Y()*vec2.Y()+vec1.Z()*vec2.Z();
   double denom = sqrt(vec1.X()*vec1.X()+vec1.Y()*vec1.Y()+vec1.Z()*vec1.Z())*sqrt(vec2.X()*vec2.X()+vec2.Y()*vec2.Y()+vec2.Z()*vec2.Z());
   return nom/denom;
-	
 }
 
-
+//longitudinal impact parameter between a vector (Point_line_in;Vector_along_line_in) and a reference point (Point_in)
 double AnalyzerAllSteps::dz_line_point(TVector3 Point_line_in, TVector3 Vector_along_line_in, TVector3 Point_in){
-  //looking at Z, so put the XY component to 0 first
-//  TVector3 Point_line(0.,0., Point_line_in.Z());
-//  TVector3 Vector_along_line(0.,0., Vector_along_line_in.Z());
-//  TVector3 Point( 0., 0., Point_in.Z());
-
-//  TVector3 shortest_distance = PCA_line_point(Point_line,  Vector_along_line, Point);
-//  return shortest_distance.Z();
   Double_t vz = Point_line_in.Z();
   Double_t vx = Point_line_in.X();
   Double_t vy = Point_line_in.Y();
@@ -140,6 +131,7 @@ double AnalyzerAllSteps::dz_line_point(TVector3 Point_line_in, TVector3 Vector_a
              
 }
 
+//use the dz_line_point function here to look for the valid PV in h_offlinePV which minimises the dz
 TVector3 AnalyzerAllSteps::dz_line_point_min(TVector3 Point_line_in, TVector3 Vector_along_line_in, edm::Handle<vector<reco::Vertex>> h_offlinePV){
 
 	TVector3 bestPV;
@@ -164,9 +156,9 @@ double AnalyzerAllSteps::sgn(double input){
   double output = 1;
   if(input < 0.) output = -1;
   return output;
-
 }
 
+//return a certain integer when the gen particle under consideration has certain daughters
 int AnalyzerAllSteps::getDaughterParticlesTypes(const reco::Candidate * genParticle){
         int pdgIdDaug0 = genParticle->daughter(0)->pdgId();
         int pdgIdDaug1 = genParticle->daughter(1)->pdgId();
@@ -179,6 +171,7 @@ int AnalyzerAllSteps::getDaughterParticlesTypes(const reco::Candidate * genParti
 
 }
 
+//return certain ints as codes for the track's trackquality
 int AnalyzerAllSteps::trackQualityAsInt(const reco::Track *track){
     int myquality = -99;
     if(track->quality(reco::TrackBase::undefQuality))myquality = -1;
@@ -194,6 +187,7 @@ int AnalyzerAllSteps::trackQualityAsInt(const reco::Track *track){
     return myquality;
 }
 
+//check for a certain TrackingParticle if this TrackingParticle is a final state particle in an Sbar event. To do this you need to go through the TrackingParticle collection and try to find production vertices overlapping with decay vertices
 std::vector<double> AnalyzerAllSteps::isTpGrandDaughterAntiS(TrackingParticleCollection const & TPColl, const TrackingParticle& tp){
 
  std::vector<double> returnVector; //this vector contains as first element the number defined at the bottom of this function which tells which kind of track this is and as second number the eta of this antiS
@@ -250,10 +244,12 @@ std::vector<double> AnalyzerAllSteps::isTpGrandDaughterAntiS(TrackingParticleCol
 
 }
 
+//weight factor for the fact that Sbar with higher eta have a larger pathlength through the beampipe
 double AnalyzerAllSteps::EventWeightingFactor(double etaAntiS){
 	return 1/TMath::Sin(etaAntiS);
 }
 
+//extract the reweighing factor for PV distribution. 
 double AnalyzerAllSteps::PUReweighingFactor(map<double,double> map_PUreweighing,double MC_PV_vz){
 	double vz_map_prev = -999.;
 	double weight_map_prev = 0.;

@@ -1,3 +1,5 @@
+#macro to make plots with input the GENSIM ntuple. Plots are made to verify the looping mechanism and to understand the kinematics of the V0s, final state particles, influence of the neutron fermi momentum,...
+
 import numpy as np
 from ROOT import *
 
@@ -18,14 +20,16 @@ maxNEntries = 1e5
 
 plots_output_dir = "plots_GENSIM/"
 
+#loading input
 inputFile = '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTreeGENSIM_Skimmed_trial17_1p8GeV_17102019_v1.root'
 fIn = TFile(inputFile,'read')
 tree = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevel') 
 treeAllAntiS = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevelAllAntiS') 
 
+#define where output should go
 fOut = TFile('macro_'+inputFile.rsplit('/', 1)[-1],'RECREATE')
-#fOut = TFile('test.root','RECREATE')
 
+#defining histograms
 all_antiS_dir = fOut.mkdir("all_antiS")
 all_antiS_dir.cd()
 
@@ -42,7 +46,6 @@ h_pz_all_AntiS = TH1F('h_pz_all_AntiS','; |p_{z}| #bar{S} (GeV/c); #Entries/1GeV
 h_vz_creation_vertex_all_AntiS = TH1F('h_vz_creation_vertex_all_AntiS','; v_{z} creation vertex #bar{S}; #Entries/cm',60,-30,30)
 h_nPV_all_AntiS = TH1F('h_nPV_all_AntiS','; #PV; #Entries',60,0,60)
 
-
 #investigate the reconstructability: have to use histograms for nominator and denominator, because teff does not support weights and using tprofile the bins with y = 0 are not displayed
 h_nom_vz_antiS_reconstructable = TH1F('h_nom_vz_antiS_reconstructable','; absolute v_{z} #bar{S} interaction vertex (cm); Reconstructability',60,-150,150)
 h_nom_eta_antiS_reconstructable = TH1F('h_nom_eta_antiS_reconstructable','; #eta #bar{S}; Reconstructability',160,-8,8)
@@ -54,13 +57,11 @@ h_denom_eta_antiS_reconstructable = TH1F('h_denom_eta_antiS_reconstructable','; 
 h_denom_pt_antiS_reconstructable = TH1F('h_denom_pt_antiS_reconstructable','; p_{T} #bar{S} (GeV/c); Reconstructability',50,0,10)
 h_denom_pz_antiS_reconstructable = TH1F('h_denom_pz_antiS_reconstructable','; |p_{z}| #bar{S} (GeV/c); Reconstructability',80,0,80)
 
-
 #first do this small loop which runs over the tree containing all the antiS (i.e. also the ones which do not go the correct granddaughters)
 nAntiSReconstructable = 0.
 nAntiSTotal = 0.
 for i in range(0,treeAllAntiS.GetEntries()):
 	treeAllAntiS.GetEntry(i)
-
 	#the AntiS does not necessarily have two daughters, so I cannot get the vz through that for all antiS, so have to calculate the vz from eta assuming the beampipe is infinitely thin and at a radius of 2.21cm 
 	vz_interaction_antiS = 2.21/np.tan( 2*np.arctan( np.exp(-treeAllAntiS._S_eta_all[0]) ) ) 
 	weight_factor = treeAllAntiS._S_event_weighting_factor_all[0]*treeAllAntiS._S_event_weighting_factor_PU_all[0]
@@ -107,7 +108,6 @@ for i in range(0,len(l_nom)):
 	c.SaveAs(plots_output_dir+c.GetName()+".pdf")
 	c.Write()
 	teff.Write()
-
 	
 l_tprof  = [h_eta_all_AntiS,h_vz_interaction_all_AntiS,h_vz_interaction_all_AntiS_zoom,h_pt_all_AntiS,h_pz_all_AntiS,tprof_eta_weighting_factor,tprof_vz_weighting_factor,tprof_vz_weighting_factor_zoom]
 for h in l_tprof:
@@ -217,10 +217,7 @@ vz_n_loops_dir.cd()
 for h in l_h_vz_n_loops:
 	h.Write()
 
-
-
 #some more plots for the looping mechanism and for the interaction vertex location of the antiS
-
 
 overall_dir = fOut.mkdir("overall")
 overall_dir.cd()

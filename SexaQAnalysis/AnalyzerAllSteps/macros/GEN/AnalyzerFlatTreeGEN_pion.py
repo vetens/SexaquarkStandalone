@@ -1,3 +1,5 @@
+#really basic script to have an idea about the charged pion multiplicity per event in function of eta
+
 #from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT
 from ROOT import *
 import numpy as np

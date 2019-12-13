@@ -1,3 +1,6 @@
+#script to overlap for signal MC and different background samples the distributions of the variables used in the BDT for different steps after doing the pre-BDT cuts
+#So, first you have to prepare for a certain configuration of the pre-BDT cuts the ntuples to which a brach with the BDT classifier has been added. This can be done with the src/SexaQAnalysis/TMVA/Step2/DiscrApplication.py
+
 #from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, gROOT
 import ROOT
 from ROOT import *
@@ -24,13 +27,12 @@ markerStyle = [20,21,22,23,33,34,35]
 
 maxEvents = 1e99
 
-
-#you can use this script to compared different collections of S and antiS to eachother. The most common one is comparing Data-S-BKG to MC-AntiS-Signal. The other option is comparing MC-S-BKG to MC-AntiS-BKG to Data-S-BKG
-configuration = "all" # "MC-AntiS-Signal" "Data-S-BKG_to_MC-AntiS-Signal" or "MC-S-BKG_to_MC-AntiS-BKG_to_Data-S-BKG" or "all" 
+#the below is a bit historical, it is by default "all" now
+configuration = "all"
 #cut on the BDT parameter to select a minimal BDT, to go and look in the tail of the BDT distribution (towards the signal), put to -999 if you want all the events
 min_BDT_classifier = -999. #-999 or -0.15
 
-
+#the below lines have for different steps in the pre-BDT cuts the pointers to files with the signal MC and the different BKG samples.
 #################################################################
 #With FiducialRegionCut applied
 #################################################################
@@ -177,16 +179,12 @@ TH1_ll = [] #list of list of 1D histos
 TH2_ll = [] #list of list of 2D histos
 
 iTree = 0
-for inTree in l_tree:
+for tree in l_tree:
 
 	gROOT.cd()
-	nEntries1 = inTree.GetEntries()
-#	tree = inTree.CopyTree(config_dict["config_pre_BDT_cuts"])
-	tree = inTree.CopyTree(config_dict["pre_BDT_noCut"])
-	nEntries2 = tree.GetEntries()
+	nEntries1 = tree.GetEntries()
 	print "---------------------------------------------------"
 	print "running for ", Legend[iTree]
-	print "ratio of the number of events surviving the config_pre_BDT_cuts, just as a check. This should be = 1: ", float(nEntries2) ,"/",float(nEntries1), " = ", float(nEntries2)/float(nEntries1)
 
 	h_S_vz_interaction_vertex= TH1F('h_S_vz_interaction_vertex','; absolute v_{z} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/3cm',20,-40,40)
 	h_S_lxy_interaction_vertex = TH1F('h_S_lxy_interaction_vertex','; l_{0,bpc} iv ^{(}#bar{S} ^{)} (cm); 1/N_{ev} Events/0.2mm',31,1.9,2.52)
@@ -223,7 +221,7 @@ for inTree in l_tree:
 	h_S_BDT = TH1F('h_S_BDT','; BDT classifier; 1/N_{ev} Events/0.05 BDT class.',40,-1,1)
 	tprof_reweighing_factor = TProfile('tprof_reweighing_factor',';#eta ^{(}#bar{S} ^{)};reweighing factor',20,-5,5,0,50)
 
-	for i in range(0,nEntries2):
+	for i in range(0,nEntries1):
 		if(i==0): print 'charge of the S/antiS: ', tree._S_charge[0]
 		if(i==maxEvents):
 			break
@@ -241,7 +239,6 @@ for inTree in l_tree:
 			reweighing_factor = tree._S_event_weighting_factor[0]*tree._S_event_weighting_factorPU[0]
 		elif('MC-S-BKG' in Legend[iTree] or 'MC-#bar{S}-BKG' in Legend[iTree]):#if MC background only reweigh for the z location of the PV and PU
 			reweighing_factor = tree._S_event_weighting_factorPU[0]
-			#reweighing_factor = 1.
 
 
 		h_S_vz_interaction_vertex.Fill(tree._S_vz_interaction_vertex[0],reweighing_factor)
@@ -368,13 +365,6 @@ for l in TH2_ll:
 		c.Write()
 	i += 1
 
-#c_antiS_eta_pt = TCanvas("c_antiS_eta_pt","")
-#h_antiS_eta_pt.DrawNormalized()
-#c_antiS_eta_pt.Write()
-#
-#c_antiS_eta_pz = TCanvas("c_antiS_eta_pz","")
-#h_antiS_eta_pz.DrawNormalized()
-#c_antiS_eta_pz.Write()
 
 fOut.Write()
 fOut.Close()

@@ -1,6 +1,6 @@
 #ifndef FlatTreeProducerBDT_h
 #define FlatTreeProducerBDT_h
-#include <stdio.h>      /* printf, scanf, puts, NULL */
+#include <stdio.h>     
 #include <stdlib.h> 
 #include <time.h> 
  
@@ -13,17 +13,17 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     explicit FlatTreeProducerBDT(edm::ParameterSet const& cfg);
     virtual ~FlatTreeProducerBDT();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
     void FillBranches(const reco::VertexCompositeCandidate * antiS, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV,  bool m_runningOnData, edm::Handle<vector<reco::GenParticle>> h_genParticles, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, unsigned int ngoodPVsPOG, double randomPVz);    
 
   private:
-//    srand(time(NULL));
 
+    //some counters
     int nTotalRECOS=0;
     int nSavedRECOS=0;
     double nTotalRECOSWeighed=0.;
     double nSavedRECOSWeighed=0.;
     int nGENAntiSWithCorrectGranddaughters=0;
+
     bool m_lookAtAntiS;
     bool m_runningOnData; 
 
@@ -36,12 +36,14 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+    //initialization of the different trees
     void Init_PV();
     void Init();
     void Init_Counter();
 
     edm::Service<TFileService> m_fs;
- 
+
+    //the collections 
     edm::InputTag m_bsTag;
     edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
@@ -50,7 +52,6 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     edm::InputTag m_sCandsTag;
     edm::InputTag m_V0KsTag;
     edm::InputTag m_V0LTag;
-
 
     edm::EDGetTokenT<reco::BeamSpot> m_bsToken;
     edm::EDGetTokenT<vector<reco::Vertex>> m_offlinePVToken;
@@ -61,6 +62,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0KsToken;
     edm::EDGetTokenT<vector<reco::VertexCompositeCandidate> > m_V0LToken;
    
+    //the trees in the ntuples
     TTree* _tree_PV;   
     TTree* _tree;   
     TTree* _tree_counter;
@@ -68,6 +70,7 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     //definition of variables which should go to _tree_PV
     std::vector<int> _nPV,_nGoodPV,_nGoodPVPOG;
     std::vector<float> _PVx,_PVy,_PVz,_goodPVx,_goodPVy,_goodPVz,_goodPVxPOG,_goodPVyPOG,_goodPVzPOG;
+
     //definition of variables which should go to tree
     std::vector<float> _S_charge;
     std::vector<float> _S_deltaLInteractionVertexAntiSmin,_S_deltaRAntiSmin,_S_deltaRKsAntiSmin,_S_deltaRLambdaAntiSmin;
@@ -81,16 +84,15 @@ class FlatTreeProducerBDT : public edm::EDAnalyzer
     std::vector<float> _S_vz_interaction_vertex,_Ks_vz_decay_vertex,_Lambda_vz_decay_vertex;
     std::vector<float> _S_vx,_S_vy,_S_vz;
     std::vector<float> _Lambda_mass,_Ks_mass;
-
     std::vector<float> _RECO_Lambda_daughter0_charge,_RECO_Lambda_daughter0_pt,_RECO_Lambda_daughter0_pz,_RECO_Lambda_daughter0_dxy_beamspot,_RECO_Lambda_daughter0_dz_beamspot;   
     std::vector<float> _RECO_Lambda_daughter1_charge,_RECO_Lambda_daughter1_pt,_RECO_Lambda_daughter1_pz,_RECO_Lambda_daughter1_dxy_beamspot,_RECO_Lambda_daughter1_dz_beamspot;   
     std::vector<float> _RECO_Ks_daughter0_charge,_RECO_Ks_daughter0_pt,_RECO_Ks_daughter0_pz,_RECO_Ks_daughter0_dxy_beamspot,_RECO_Ks_daughter0_dz_beamspot;   
     std::vector<float> _RECO_Ks_daughter1_charge,_RECO_Ks_daughter1_pt,_RECO_Ks_daughter1_pz,_RECO_Ks_daughter1_dxy_beamspot,_RECO_Ks_daughter1_dz_beamspot;   
 
+    //definition of variables which should go to _tree_counter
     std::vector<float> _RECO_S_total_lxy_beampipeCenter, _RECO_S_saved_lxy_beampipeCenter;
 
-
-     };
+    };
 
 #endif
 

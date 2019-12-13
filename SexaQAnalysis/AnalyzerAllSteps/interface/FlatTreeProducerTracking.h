@@ -29,14 +29,12 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
     virtual void endJob();
 
-
     virtual void beginRun(edm::Run const&, edm::EventSetup const&);
     virtual void endRun(edm::Run const&, edm::EventSetup const&);
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
     virtual ~FlatTreeProducerTracking();
-
 
     void FillTreesTracks(const TrackingParticle& tp, TVector3 beamspot, int nPVs, const reco::Track *matchedTrackPointer, bool matchingTrackFound, std::vector<double> tpIsGrandDaughterAntiS);
     int FillTreesAntiSAndDaughters(const TrackingParticle& tp, TVector3 beamspot, reco::BeamSpot::Point beamspotPoint, TVector3 beamspotVariance,int nPVs, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TrackingParticleCollection const & TPColl, reco::SimToRecoCollection const & simRecColl, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField , unsigned int nGoodPV);
@@ -47,31 +45,10 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     int V0Fitter_trackSelection(const reco::Track *matchedTrackPointer1, const reco::BeamSpot* theBeamSpot);
     int V0Fitter(const reco::Track *matchedTrackPointer1, const reco::Track *matchedTrackPointer2, const reco::BeamSpot* theBeamSpot, const MagneticField* theMagneticField, bool isGENKs, bool isGENLambda, bool isGENAntiLambda);
 
- //   void FillHistosNonAntiSTracksAll(const TrackingParticle& tp, TVector3 beamspot, int nPVs, int matchedTrackQuality);
-    void FillHistosAntiSTracks(const TrackingParticle& tp, TVector3 beamspot, TrackingParticleCollection const & TPColl, edm::Handle<TrackingParticleCollection> h_TP, edm::Handle< reco::TrackToTrackingParticleAssociator> h_trackAssociator, edm::Handle<View<reco::Track>> h_generalTracks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L);
-    void FillHistosAntiSKsDaughterTracksRECO(const TrackingParticle& tp, TVector3 beamspot);
-    void FillHistosAntiSKsDaughterTracksAll(const TrackingParticle& tp, TVector3 beamspot);
-    void FillHistosAntiSAntiLAntiProtonDaughterTracksRECO(const TrackingParticle& tp, TVector3 beamspot); 
-    void FillHistosAntiSAntiLAntiProtonDaughterTracksAll(const TrackingParticle& tp, TVector3 beamspot); 
-    void FillHistosAntiSAntiLPosPionDaughterTracksRECO(const TrackingParticle& tp, TVector3 beamspot); 
-    void FillHistosAntiSAntiLPosPionDaughterTracksAll(const TrackingParticle& tp, TVector3 beamspot); 
-    void FillMajorEfficiencyPlot(std::vector<bool>granddaughterTrackMatched,const reco::Track *matchedTrackPointerKsPosPion,const reco::Track *matchedTrackPointerKsNegPion,const reco::Track *matchedTrackPointerAntiLPosPion,const reco::Track *matchedTrackPointerAntiLNegProton, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L);
-
-    void FillHistosGENAntiS(const reco::Candidate * Candidate, TVector3 beamspot);
-    void FillHistosGENInteractingAntiS(const reco::Candidate * Candidate, TVector3 beamspot);
-    void FillHistosGENKsNonAntiS(const reco::Candidate *Candidate, TVector3 beamspot );
-    void FillHistosGENAntiLambdaNonAntiS(const reco::Candidate *Candidate,TVector3 beamspot );
-    void FillHistosGENKsAntiS(const reco::Candidate *Candidate, TVector3 beamspot );
-    void FillHistosGENAntiLambdaAntiS(const reco::Candidate *Candidate,TVector3 beamspot );
-    void RecoEvaluationKsNonAntiS(const reco::Candidate  * genParticle, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks,  TVector3 beamspot);
-    void RecoEvaluationKsAntiS(const reco::Candidate  * genParticle, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0Ks,  TVector3 beamspot);
-    void RecoEvaluationAntiLambdaNonAntiS(const reco::Candidate  * genParticle, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L,  TVector3 beamspot);
-    void RecoEvaluationAntiLambdaAntiS(const reco::Candidate  * genParticle, edm::Handle<vector<reco::VertexCompositeCandidate> > h_V0L,  TVector3 beamspot);
-    void RecoEvaluationAntiS(const reco::Candidate  * genParticle, edm::Handle<vector<reco::VertexCompositeCandidate> > h_sCands, TVector3 beamspot, TVector3 beamspotVariance, edm::Handle<vector<reco::Vertex>> h_offlinePV);
-
-
+    
   private:
 
+    //some counters
     int numberOfAntiSWithCorrectGranddaughters = 0;
     int totalNumberOfUniqueAntiS_FromTrackingParticles= 0;
     double nTotalUniqueGenS_weighted = 0.;
@@ -79,15 +56,17 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     double weighedRecoAntiS = 0.;
     double nonweighedRecoAntiS= 0.;
 
-    //---- configurable parameters --------
+    //configurable parameters
     bool m_lookAtAntiS;
 
+    //initialization of the different trees 
     void InitPV();
     void InitTracking();
     void InitTrackingAntiS();
     
     edm::Service<TFileService> m_fs;
  
+    //the collections
     edm::InputTag m_bsTag;
     edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
@@ -114,6 +93,8 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     edm::EDGetTokenT<vector<TrackingParticle> > m_TPToken;
 //    edm::EDGetTokenT<vector<PileupSummaryInfo> > m_PileupInfoToken;
 
+
+    //the trees and the respective variables
     TTree* _tree_counter;
     std::vector<float> _nGENAntiS,_nRECOAntiS;
    
@@ -131,12 +112,11 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     std::vector<float> _tpsAntiS_bestRECO_mass,_tpsAntiS_bestRECO_massMinusNeutron,_tpsAntiS_bestRECO_pt,_tpsAntiS_bestRECO_eta,_tpsAntiS_bestRECO_phi,_tpsAntiS_bestRECO_pz,_tpsAntiS_bestRECO_Lxy_beampipeCenter,_tpsAntiS_bestRECO_Lxy_beamspot,_tpsAntiS_bestRECO_error_Lxy_beampipeCenter,_tpsAntiS_bestRECO_error_Lxy_beamspot,_tpsAntiS_bestRECO_vz,_tpsAntiS_bestRECO_vz_beamspot,_tpsAntiS_bestRECO_dxy_beamspot,_tpsAntiS_bestRECO_dz_beamspot,_tpsAntiS_bestRECO_dxyTrack_beamspot,_tpsAntiS_bestRECO_dzTrack_beamspot,_tpsAntiS_bestRECO_charge,_tpsAntiS_returnCodeV0Fitter;
     std::vector<int> _tpsAntiS_type,_tpsAntiS_pdgId;
 
-    //for the V0Fitter:
+    //for the evaluation of the  V0Fitter:
     bool vertexFitter_;
     bool useRefTracks_;
     bool doKShorts_;
     bool doLambdas_;
-
     // cuts on initial track selection
     double tkChi2Cut_;
     int tkNHitsCut_;
@@ -156,7 +136,6 @@ class FlatTreeProducerTracking : public edm::EDAnalyzer
     // cuts on the V0 candidate mass
     double kShortMassCut_;
     double lambdaMassCut_;
-    
     bool useVertex_;
 
      };

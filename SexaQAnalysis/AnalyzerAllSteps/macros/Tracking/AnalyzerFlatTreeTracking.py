@@ -1,3 +1,5 @@
+#With this script you can make some tracking efficiency plots for generic (not necessarily coming from Sbar events) tracks 
+
 from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, TLegend, TProfile2D, TProfile
 import numpy as np
 

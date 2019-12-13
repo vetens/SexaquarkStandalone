@@ -3,18 +3,20 @@
  
 #include "AnalyzerAllSteps.h"
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
+
 using namespace edm;
 using namespace std; 
+
 class FlatTreeProducerGENSIM : public edm::EDAnalyzer
  {
   public:
     explicit FlatTreeProducerGENSIM(edm::ParameterSet const& cfg);
     virtual ~FlatTreeProducerGENSIM();
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
     bool FillBranchesGENAntiS(const reco::Candidate  * genParticle, TVector3 beamspot, TVector3 beamspotVariance, vector<vector<float>> v_antiS_momenta_and_itt, edm::Handle<TrackingParticleCollection>  h_TP, unsigned int nGoodPV);
 
   private:
+    //some counters
     int nTotalGENS=0;
     int nTotalUniqueGenS=0;
     int nTotalGiving2DaughtersGENS=0;
@@ -25,8 +27,6 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     int nTotalGENSNegEta=0;
     int nTotalRecoconstructableGENS_negEta=0;
     int nTotalRecoconstructableGENS_posEta=0;
-    bool m_lookAtAntiS;
-    bool m_runningOnData; 
 
     double  nTotalUniqueGenS_weighted =0.;
     double  nTotalGiving2DaughtersGENS_weighted = 0.;
@@ -37,6 +37,9 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     double  nTotalGENSNegEta_weighted = 0.;
     double  nTotalCorrectGENS_Reconstructable_weighted = 0.;
 
+    bool m_lookAtAntiS;
+    bool m_runningOnData; 
+
     virtual void beginJob();
     virtual void analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup);
     virtual void endJob();
@@ -46,10 +49,12 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
     virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+    //initialization of the different trees 
     void Init();
 
     edm::Service<TFileService> m_fs;
  
+    //the collections
     edm::InputTag m_bsTag;
     edm::InputTag m_offlinePVTag;
     edm::InputTag m_genParticlesTag_GEN;
@@ -98,6 +103,7 @@ class FlatTreeProducerGENSIM : public edm::EDAnalyzer
     
     std::vector<float> _GEN_Ks_daughter0_numberOfTrackerLayers,_GEN_Ks_daughter1_numberOfTrackerLayers,_GEN_AntiLambda_AntiProton_numberOfTrackerLayers,_GEN_AntiLambda_Pion_numberOfTrackerLayers;
     std::vector<float> _GEN_Ks_daughter0_numberOfTrackerHits,_GEN_Ks_daughter1_numberOfTrackerHits,_GEN_AntiLambda_AntiProton_numberOfTrackerHits,_GEN_AntiLambda_Pion_numberOfTrackerHits;
+
      };
 
 #endif

@@ -48,7 +48,6 @@ using namespace std;
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
-
 //matching on hits specific:
 #include "SimDataFormats/Associations/interface/VertexToTrackingVertexAssociator.h"
 #include "SimDataFormats/Associations/interface/TrackToTrackingParticleAssociator.h"
@@ -57,6 +56,7 @@ using namespace std;
 class AnalyzerAllSteps : public edm::EDAnalyzer
  {
   public:
+    //cuts for defining matching between GEN and RECO V0s and AntiS
     static constexpr double deltaRCutV0RECOKs = 0.03;
     static constexpr double deltaLCutV0RECOKs = 2.;
     static constexpr double deltaRCutV0RECOLambda = 0.03;
@@ -66,31 +66,10 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
 
     //definition of the background cuts
     static constexpr double MinLxyCut = 1.9;
-    static constexpr double MaxErrorLxyCut = 0.1;
-    static constexpr double MinErrorMassCut = 0.;
-    static constexpr double MaxNormChi2Cut = 4.;
-
-    static constexpr double MinAbsDeltaPhiDaughtersCut = 1.;
-    static constexpr double MaxAbsDeltaPhiDaughtersCut = 3.;
-    static constexpr double MaxOpeningsAngleCut = 1.2;
-    static constexpr double MaxAbsDeltaEtaDaughCut = 1.5;
-    static constexpr double MinDxyOverLxyCut = 0.;
-    static constexpr double MaxDxyOverLxyCut = 0.1;
-
-    static constexpr double DxyKsExclusionRangeMinCut = 0.;
-    static constexpr double DxyKsExclusionRangeMaxCut = 0.2;
-    static constexpr double DxyAntiLExclusionRangeMinCut = 0.;
-    static constexpr double DxyAntiLExclusionRangeMaxCut = 0.2;
-
-    static constexpr double MinLambdaPtCut = 1.2;//zero background: 1.5
-    static constexpr double dzAntiSPVminCut = 2.;
-    static constexpr double vzAntiSInteractionVertexCut = 4.;//zero background: 5
-    static constexpr double antiSEtaCut = 1.3;//zero background: 1.5
 
     //the location of the center of the beampipe in x and y, from https://arxiv.org/pdf/1807.03289.pdf
     static constexpr double center_beampipe_x = 0.124; //cm
     static constexpr double center_beampipe_y = 0.27; //cm
-		
 
     //some pdgIds
     const static int pdgIdAntiS = -1020000020;
@@ -103,6 +82,7 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     //some pdg masses
     static constexpr double pdgMassChargedPion = 0.13957061;
 
+    //some functions to calculate kinematic variables which are used everywhere
     double static openings_angle(reco::Candidate::Vector momentum1, reco::Candidate::Vector momentum2);
     double static deltaR(double phi1, double eta1, double phi2, double eta2);
     double static lxy(TVector3 v1, TVector3 v2);
@@ -124,10 +104,10 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
     double static PUReweighingFactor(map<double,double>,double MC_PV_vz);
 
     //definitions of the maps for the PU reweighing. These maps are obtained with /user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/PUReweighing each map is for a certain PU, starting at PU0. Each map has as key the absolute z location and as value the 2D (PU and z location of the valid PVs) reweighing parameter. At the end it includes a vector with all the maps, so when you need the reweighing parameter you need to go to a certain location in the vector, given by the PU, and then find the best mathing z value and get that key's value --> see src/AnalyzerAllSteps.cc for the actual values
-      static  map<double,double> mapPU0,mapPU1,mapPU2,mapPU3,mapPU4,mapPU5,mapPU6,mapPU7,mapPU8,mapPU9,mapPU10,mapPU11,mapPU12,mapPU13,mapPU14,mapPU15,mapPU16,mapPU17,mapPU18,mapPU19,mapPU20,mapPU21,mapPU22,mapPU23,mapPU24,mapPU25,mapPU26,mapPU27,mapPU28,mapPU29,mapPU30,mapPU31,mapPU32,mapPU33,mapPU34,mapPU35,mapPU36,mapPU37,mapPU38,mapPU39,mapPU40,mapPU41,mapPU42,mapPU43,mapPU44,mapPU45,mapPU46,mapPU47,mapPU48,mapPU49,mapPU50,mapPU51,mapPU52,mapPU53,mapPU54,mapPU55,mapPU56,mapPU57,mapPU58,mapPU59,mapPU60; 
-      static vector<map<double, double>> v_mapPU; 
+    static  map<double,double> mapPU0,mapPU1,mapPU2,mapPU3,mapPU4,mapPU5,mapPU6,mapPU7,mapPU8,mapPU9,mapPU10,mapPU11,mapPU12,mapPU13,mapPU14,mapPU15,mapPU16,mapPU17,mapPU18,mapPU19,mapPU20,mapPU21,mapPU22,mapPU23,mapPU24,mapPU25,mapPU26,mapPU27,mapPU28,mapPU29,mapPU30,mapPU31,mapPU32,mapPU33,mapPU34,mapPU35,mapPU36,mapPU37,mapPU38,mapPU39,mapPU40,mapPU41,mapPU42,mapPU43,mapPU44,mapPU45,mapPU46,mapPU47,mapPU48,mapPU49,mapPU50,mapPU51,mapPU52,mapPU53,mapPU54,mapPU55,mapPU56,mapPU57,mapPU58,mapPU59,mapPU60; 
+    static vector<map<double, double>> v_mapPU; 
 
-	     };
+    };
 
 #endif
 

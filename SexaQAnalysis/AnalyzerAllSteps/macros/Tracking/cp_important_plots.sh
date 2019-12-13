@@ -1,5 +1,5 @@
-#cp plots_Tracking_AntiS_specific/c_teff_AntiLambdaPion_RECO_eff_lxy_antiS_acceptance_distribution_and_efficiency.pdf
-#cp 
+#copy plots from plots_Tracking_AntiS_specific to plots_Tracking_AntiS_specific_important. Only 'important' plots are selected. This is to be able to only scp the plots_Tracking_AntiS_specific_important plots ofline into the AN repository.
+
 array=( 
 'macro_combined_FlatTree_Tracking_Skimmed_trial17_acceptance.root'
 'c_teff_fractionAllEvents_numberGranddaughters_7hits_eta_antiS.pdf'

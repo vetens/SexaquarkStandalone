@@ -50,7 +50,6 @@ void FlatTreeProducerV0s::beginJob() {
         
 	//for the Ks
 	_tree_Ks = fs->make <TTree>("FlatTreeKs","treeKs");
-
 	_tree_Ks->Branch("_Ks_mass",&_Ks_mass);
 	_tree_Ks->Branch("_Ks_pt",&_Ks_pt);
 	_tree_Ks->Branch("_Ks_pz",&_Ks_pz);
@@ -62,27 +61,20 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Ks->Branch("_Ks_dxy_min_PV",&_Ks_dxy_min_PV);
 	_tree_Ks->Branch("_Ks_dxy_PV0",&_Ks_dxy_PV0);
 	_tree_Ks->Branch("_Ks_dxy_000",&_Ks_dxy_000);
-
-
 	_tree_Ks->Branch("_Ks_dz_beamspot",&_Ks_dz_beamspot);
 	_tree_Ks->Branch("_Ks_dz_min_PV",&_Ks_dz_min_PV);
 	_tree_Ks->Branch("_Ks_dz_PV0",&_Ks_dz_PV0);
 	_tree_Ks->Branch("_Ks_dz_000",&_Ks_dz_000);
 	_tree_Ks->Branch("_Ks_vz_dz_min_PV",&_Ks_vz_dz_min_PV);
 	_tree_Ks->Branch("_Ks_deltaRBestMatchingGENParticle",&_Ks_deltaRBestMatchingGENParticle);
-
 	_tree_Ks->Branch("_Ks_trackPair_mindeltaR",&_Ks_trackPair_mindeltaR);
 	_tree_Ks->Branch("_Ks_trackPair_mass",&_Ks_trackPair_mass);
-
 	_tree_Ks->Branch("_Ks_Track1Track2_openingsAngle",&_Ks_Track1Track2_openingsAngle);
 	_tree_Ks->Branch("_Ks_Track1Track2_deltaR",&_Ks_Track1Track2_deltaR);
-
 	_tree_Ks->Branch("_Ks_Track1_openingsAngle",&_Ks_Track1_openingsAngle);
 	_tree_Ks->Branch("_Ks_Track2_openingsAngle",&_Ks_Track2_openingsAngle);
 	_tree_Ks->Branch("_Ks_Track1_deltaR",&_Ks_Track1_deltaR);
 	_tree_Ks->Branch("_Ks_Track2_deltaR",&_Ks_Track2_deltaR);
-
-
 	_tree_Ks->Branch("_Ks_daughterTrack1_charge",&_Ks_daughterTrack1_charge);
 	_tree_Ks->Branch("_Ks_daughterTrack1_chi2",&_Ks_daughterTrack1_chi2);
 	_tree_Ks->Branch("_Ks_daughterTrack1_ndof",&_Ks_daughterTrack1_ndof);
@@ -95,7 +87,6 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Ks->Branch("_Ks_daughterTrack1_dz_min_PV",&_Ks_daughterTrack1_dz_min_PV);
 	_tree_Ks->Branch("_Ks_daughterTrack1_dz_PV0",&_Ks_daughterTrack1_dz_PV0);
 	_tree_Ks->Branch("_Ks_daughterTrack1_dz_000",&_Ks_daughterTrack1_dz_000);
-
 	_tree_Ks->Branch("_Ks_daughterTrack2_charge",&_Ks_daughterTrack2_charge);
 	_tree_Ks->Branch("_Ks_daughterTrack2_chi2",&_Ks_daughterTrack2_chi2);
 	_tree_Ks->Branch("_Ks_daughterTrack2_ndof",&_Ks_daughterTrack2_ndof);
@@ -111,7 +102,6 @@ void FlatTreeProducerV0s::beginJob() {
 
 	//for the Lambda
         _tree_Lambda = fs->make <TTree>("FlatTreeLambda","treeLambda");
-
 	_tree_Lambda->Branch("_Lambda_mass",&_Lambda_mass);
 	_tree_Lambda->Branch("_Lambda_pt",&_Lambda_pt);
 	_tree_Lambda->Branch("_Lambda_pz",&_Lambda_pz);
@@ -123,27 +113,20 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_dxy_min_PV",&_Lambda_dxy_min_PV);
 	_tree_Lambda->Branch("_Lambda_dxy_PV0",&_Lambda_dxy_PV0);
 	_tree_Lambda->Branch("_Lambda_dxy_000",&_Lambda_dxy_000);
-
-
 	_tree_Lambda->Branch("_Lambda_dz_beamspot",&_Lambda_dz_beamspot);
 	_tree_Lambda->Branch("_Lambda_dz_min_PV",&_Lambda_dz_min_PV);
 	_tree_Lambda->Branch("_Lambda_dz_PV0",&_Lambda_dz_PV0);
 	_tree_Lambda->Branch("_Lambda_dz_000",&_Lambda_dz_000);
 	_tree_Lambda->Branch("_Lambda_vz_dz_min_PV",&_Lambda_vz_dz_min_PV);
 	_tree_Lambda->Branch("_Lambda_deltaRBestMatchingGENParticle",&_Lambda_deltaRBestMatchingGENParticle);
-
 	_tree_Lambda->Branch("_Lambda_trackPair_mindeltaR",&_Lambda_trackPair_mindeltaR);
 	_tree_Lambda->Branch("_Lambda_trackPair_mass",&_Lambda_trackPair_mass);
-
 	_tree_Lambda->Branch("_Lambda_Track1Track2_openingsAngle",&_Lambda_Track1Track2_openingsAngle);
 	_tree_Lambda->Branch("_Lambda_Track1Track2_deltaR",&_Lambda_Track1Track2_deltaR);
-
 	_tree_Lambda->Branch("_Lambda_Track1_openingsAngle",&_Lambda_Track1_openingsAngle);
 	_tree_Lambda->Branch("_Lambda_Track2_openingsAngle",&_Lambda_Track2_openingsAngle);
 	_tree_Lambda->Branch("_Lambda_Track1_deltaR",&_Lambda_Track1_deltaR);
 	_tree_Lambda->Branch("_Lambda_Track2_deltaR",&_Lambda_Track2_deltaR);
-
-
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_charge",&_Lambda_daughterTrack1_charge);
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_chi2",&_Lambda_daughterTrack1_chi2);
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_ndof",&_Lambda_daughterTrack1_ndof);
@@ -156,7 +139,6 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_min_PV",&_Lambda_daughterTrack1_dz_min_PV);
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_PV0",&_Lambda_daughterTrack1_dz_PV0);
 	_tree_Lambda->Branch("_Lambda_daughterTrack1_dz_000",&_Lambda_daughterTrack1_dz_000);
-
 	_tree_Lambda->Branch("_Lambda_daughterTrack2_charge",&_Lambda_daughterTrack2_charge);
 	_tree_Lambda->Branch("_Lambda_daughterTrack2_chi2",&_Lambda_daughterTrack2_chi2);
 	_tree_Lambda->Branch("_Lambda_daughterTrack2_ndof",&_Lambda_daughterTrack2_ndof);
@@ -170,19 +152,15 @@ void FlatTreeProducerV0s::beginJob() {
 	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_PV0",&_Lambda_daughterTrack2_dz_PV0);
 	_tree_Lambda->Branch("_Lambda_daughterTrack2_dz_000",&_Lambda_daughterTrack2_dz_000);
 
-
 	//for the Z
         _tree_Z = fs->make <TTree>("FlatTreeZ","treeZ");
-
         _tree_Z->Branch("_Z_mass",&_Z_mass);
         _tree_Z->Branch("_Z_dz_PV_muon1",&_Z_dz_PV_muon1);
         _tree_Z->Branch("_Z_dz_PV_muon2",&_Z_dz_PV_muon2);
         _tree_Z->Branch("_Z_ptMuMu",&_Z_ptMuMu);
 
-
 	//for the PV 
         _tree_PV = fs->make <TTree>("FlatTreePV","treePV");
-
         _tree_PV->Branch("_PV_n",&_PV_n);
         _tree_PV->Branch("_PV0_lxy",&_PV0_lxy);
         _tree_PV->Branch("_PV0_vz",&_PV0_vz);
@@ -257,6 +235,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	beamspotVariance.SetXYZ(pow(h_bs->x0Error(),2),pow(h_bs->y0Error(),2),pow(h_bs->z0Error(),2));			
   }
 
+  //some very simple check to look how the pt distribution looks like for GEN Ks in the MC
   if(h_genParticles.isValid()){//loop over the gen particles, find the Ks and save some of the kinematic variables at GEN level
 	for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 		if(h_genParticles->at(i).pdgId() == AnalyzerAllSteps::pdgIdKs){
@@ -268,6 +247,7 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	}
   }
 
+  //for event selection I need to match triggers between GEN and RECO
   bool Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ = false;
   bool Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ = false;
   //std::cout << "-----------------------------------------------" << std::endl;
@@ -300,12 +280,6 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   double dz_PV_muon2 = 999.;
   double pTMuMu = 999.;
   double nLooseMuons = 0; 
-//  double ptMuon1 = 0; 
-//  double ptMuon2 = 0; 
-//  double phiMuon1 = 0; 
-//  double phiMuon2 = 0; 
-//  double etaMuon1 = 0; 
-//  double etaMuon2 = 0; 
   if(h_muons.isValid()){
 	for(unsigned int i = 0; i < h_muons->size(); ++i){
 
@@ -375,12 +349,6 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 
 			pTMuMu  = sqrt( pow( h_muons->at(i).px() + h_muons->at(j).px() , 2 ) +  pow( h_muons->at(i).py() + h_muons->at(j).py() , 2 ) );
 
-			//ptMuon1 = h_muons->at(i).pt();		
-			//ptMuon2 = h_muons->at(j).pt();		
-			//etaMuon1 = h_muons->at(i).eta();		
-			//etaMuon2 = h_muons->at(j).eta();		
-			//phiMuon1 = h_muons->at(i).phi();		
-			//phiMuon2 = h_muons->at(j).phi();		
 		}
 
 
@@ -388,18 +356,12 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
   }
 
 
-  //now that you have the phi of the Z candidate you know in which direction the hard event goes, so now look at the V0s in the underlying event, which are the V0s which are not in the deltaPhi cone of the hard event, this cone is defined as 60° around the Z and 60° around the Z in the back to back
+  //now that you have the phi of the Z candidate you know in which direction the hard event goes, so now look at the V0s in the underlying event, which are 
+  //the V0s which are not in the deltaPhi cone of the hard event, this cone is defined as 60° around the Z and 60° around the Z in the back to back
 
   if(ZCandidatePresent  &&  nLooseMuons <= 2 && abs(dz_PV_muon1)  < 0.5 && abs(dz_PV_muon2) < 0.5 && abs(ZCandidateMass - 91.1876) < 15/2){
 
 	std::cout << "ZCandMass = " << ZCandidateMass << " ZCandidatePhi " << ZCandidatePhi  << std::endl;
-
-//	std::cout << "ptMuon1 = " << ptMuon1 << std::endl;
-//	std::cout << "ptMuon2 = " << ptMuon2 << std::endl;
-//	std::cout << "etaMuon1 = " << etaMuon1 << std::endl;
-//	std::cout << "etaMuon2 = " << etaMuon2 << std::endl;
-//	std::cout << "phiMuon1 = " << phiMuon1 << std::endl;
-//	std::cout << "phiMuon2 = " << phiMuon2 << std::endl;
 	
 	//save some variables to the Z tree
 	InitZ();
@@ -421,25 +383,15 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	_tree_beamspot->Fill();       
 
 
-	//loop over the track collection and count the number of high purity tracks to have an idea 
-	//int nHighPurityTracks = 0;
-	//if(h_generalTracks.isValid()){
-	//	for(unsigned int i = 0; i < h_generalTracks->size(); ++i){
-	//		const reco::Track *ptr = &h_generalTracks->at(i);
-	//		if( AnalyzerAllSteps::trackQualityAsInt(ptr) == 2) nHighPurityTracks++;
-	//	}
-	//}
-
 	InitGeneral();
 	_general_triggerFired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ);
 	_general_triggerFired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ.push_back(Fired_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ);
-	//_general_eventTrackMultiplicity.push_back(h_generalTracks->size());
-	//_general_eventTrackMultiplicity_highPurity.push_back(nHighPurityTracks);
 	_tree_general->Fill();
 	
 
 	TVector3 PV0(h_offlinePV->at(0).x(),h_offlinePV->at(0).y(),h_offlinePV->at(0).z());
 
+	//select and save Ks in the UE
 	InitKs();
 	  if(h_V0Ks.isValid()){
 	      for(unsigned int i = 0; i < h_V0Ks->size(); ++i){//loop all RECO Ks
@@ -456,6 +408,8 @@ void FlatTreeProducerV0s::analyze(edm::Event const& iEvent, edm::EventSetup cons
 	      }
 	  }
 	_tree_Ks->Fill();
+
+	//select and save Lambda in the UE
 	InitLambda();
 	  if(h_V0L.isValid()){
 	      for(unsigned int i = 0; i < h_V0L->size(); ++i){//loop all RECO Lambdas
@@ -505,6 +459,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 		}		
 	}
 
+	//loop over the GEN particles and try to find a Lambda which mathches this RECO Kshort. Then save the status of this particle so you know from where it comes: PV, material or maybe a fake?
 	if(h_genParticles.isValid() && V0Type == "Lambda"){
 		for(unsigned int i = 0; i < h_genParticles->size(); ++i){
 
@@ -523,6 +478,7 @@ void FlatTreeProducerV0s::FillBranchesV0(const reco::VertexCompositeCandidate * 
 	}
 
 
+	//calculate some kin variables of the V0
         TVector3 V0CreationVertex(RECOV0->vx(),RECOV0->vy(),RECOV0->vz());
         double Lxy = AnalyzerAllSteps::lxy(beamspot,V0CreationVertex);
         TVector3 V0Momentum(RECOV0->px(),RECOV0->py(),RECOV0->pz());
