@@ -3,7 +3,7 @@
 from ROOT import TFile, TH1F, TH2F, TEfficiency, TH1D, TH2D, TCanvas, TLegend, TProfile2D, TProfile
 import numpy as np
 
-fIn = TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/test_FlatTreeTracking_Step2_trial11.root', 'read')
+fIn = TFile('/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerTracking/TrackingFlatTree.root', 'read')
 tree = fIn.Get('FlatTreeProducerTracking/FlatTreeTracks') 
 
 fOut = TFile('analyzed_test_FlatTreeTracking_Step2_trial11.root','RECREATE')

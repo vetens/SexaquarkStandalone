@@ -4,7 +4,8 @@
 from ROOT import *
 import numpy as np
 import sys
-sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
+#sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
+sys.path.append('/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
 import  CMS_lumi, tdrstyle
 
 gROOT.SetBatch(kTRUE)
@@ -25,10 +26,10 @@ colours = [1,2,4,35,38,41]
 
 #fIn = TFile('/user/jdeclerc/Analysis/SexaQuark/CMSSW_9_4_7/src/SexaQAnalysis/AnalyzerAllSteps/test/wihtMatchingOnHits/test_TrackMatchingOnHits.root', 'read')
 fIn = [
-TFile('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGEN/test.root', 'read'),
+TFile('/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGEN/output.root', 'read')
 ]
 
-mass = ["1.2","1.5","1.8","2.1"]
+mass = ["1.8"]
 
 plots_output_dir = "plots_GEN_pion/"
 

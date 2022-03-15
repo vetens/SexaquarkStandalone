@@ -38,7 +38,7 @@ collections_to_keep = cms.untracked.vstring(
 
 ## data or MC options
 options.register(
-	'isData',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
+	'isData',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,
 	'flag to indicate data or MC')
 
 options.register(
@@ -71,7 +71,7 @@ else:
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvts))
 
 
-inlist = open("testDataFiles.txt", "r")
+inlist = open("testMCFiles.txt", "r")
 process.source = cms.Source("PoolSource",
         #fileNames = cms.untracked.vstring(options.inputFiles),
         fileNames = cms.untracked.vstring(*(inlist.readlines())),

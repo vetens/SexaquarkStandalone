@@ -437,7 +437,13 @@ void FlatTreeProducerBDT::FillBranches(const reco::VertexCompositeCandidate * RE
 
 	Init_Counter();
 	if(RECO_S->charge()==1)_RECO_S_total_lxy_beampipeCenter.push_back(RECOLxy_interactionVertex_beampipeCenter);
-	if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut  ){
+        // Edited by Wren
+	//if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut  ){
+        //	_tree_counter->Fill();
+	//	return;
+	//}
+
+	if(RECOLxy_interactionVertex_beampipeCenter < AnalyzerAllSteps::MinLxyCut || RECOLxy_interactionVertex_beampipeCenter > AnalyzerAllSteps::MaxLxyCut){
         	_tree_counter->Fill();
 		return;
 	}
@@ -587,8 +593,8 @@ FlatTreeProducerBDT::~FlatTreeProducerBDT()
 {
 	std::cout << "total number of S or antiS found: " << nTotalRECOS << std::endl;
 	std::cout << "total number of S or antiS found, weighed: " << nTotalRECOSWeighed << std::endl;
-	std::cout << "total number of S or antiS saved: " << nSavedRECOS << std::endl;
-	std::cout << "total number of S or antiS saved, weighed: " << nSavedRECOSWeighed << std::endl;
+	std::cout << "total number of S or antiS saved (Passing min & Max Lxy cuts): " << nSavedRECOS << std::endl;
+	std::cout << "total number of S or antiS saved (Passing min & Max Lxy cuts), weighed: " << nSavedRECOSWeighed << std::endl;
 }
 
 void FlatTreeProducerBDT::Init_PV()

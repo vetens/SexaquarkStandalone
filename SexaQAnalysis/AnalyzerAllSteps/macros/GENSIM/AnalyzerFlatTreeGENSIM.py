@@ -4,7 +4,8 @@ import numpy as np
 from ROOT import *
 
 import sys
-sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
+#sys.path.append('/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
+sys.path.append('/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/macros/tdrStyle')
 import  CMS_lumi, tdrstyle
 
 gROOT.SetBatch(kTRUE)
@@ -19,15 +20,18 @@ colours = [1,2,4,35,38,41]
 maxNEntries = 1e5
 
 plots_output_dir = "plots_GENSIM/"
+#plots_output_dir = "plots_GENSIM_test/"
 
 #loading input
-inputFile = '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTreeGENSIM_Skimmed_trial17_1p8GeV_17102019_v1.root'
+#inputFile = '/user/jdeclerc/CMSSW_8_0_30_bis/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/test_FlatTreeGENSIM_Skimmed_trial17_1p8GeV_17102019_v1.root'
+#inputFile = '/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/output.root'
+inputFile = '/afs/cern.ch/work/w/wvetens/Sexaquarks/CMSSW_10_2_26/src/SexaQAnalysis/AnalyzerAllSteps/test/FlatTreeProducerGENSIM/Skimmed_Final_out.root'
 fIn = TFile(inputFile,'read')
 tree = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevel') 
 treeAllAntiS = fIn.Get('FlatTreeProducerGENSIM/FlatTreeGENLevelAllAntiS') 
 
 #define where output should go
-fOut = TFile('macro_'+inputFile.rsplit('/', 1)[-1],'RECREATE')
+fOut = TFile('Trial3_macro_'+inputFile.rsplit('/', 1)[-1],'RECREATE')
 
 #defining histograms
 all_antiS_dir = fOut.mkdir("all_antiS")
@@ -64,7 +68,9 @@ for i in range(0,treeAllAntiS.GetEntries()):
 	treeAllAntiS.GetEntry(i)
 	#the AntiS does not necessarily have two daughters, so I cannot get the vz through that for all antiS, so have to calculate the vz from eta assuming the beampipe is infinitely thin and at a radius of 2.21cm 
 	vz_interaction_antiS = 2.21/np.tan( 2*np.arctan( np.exp(-treeAllAntiS._S_eta_all[0]) ) ) 
-	weight_factor = treeAllAntiS._S_event_weighting_factor_all[0]*treeAllAntiS._S_event_weighting_factor_PU_all[0]
+# right now ignoring pileup weighting factor as this is carried out during reconstruction
+#	weight_factor = treeAllAntiS._S_event_weighting_factor_all[0]*treeAllAntiS._S_event_weighting_factor_PU_all[0]
+	weight_factor = treeAllAntiS._S_event_weighting_factor_all[0]
 
 	h_eta_all_AntiS_non_weighted.Fill(treeAllAntiS._S_eta_all[0],1)
 	h_eta_all_AntiS.Fill(treeAllAntiS._S_eta_all[0],weight_factor)
@@ -319,7 +325,9 @@ h2_interaction_vertex_vz_lxy_zoom= TH2F("h2_interaction_vertex_vz_lxy_zoom","; v
 #properties of the antiS, so these are the ones which interact and go the correct granddaughters:
 h_antiS_eta = TH1F('h_antiS_eta','; #bar{S} #eta ; Events/mm',160,-8,8)
 h_antiS_lxy_creation_vertex = TH1F('h_antiS_lxy_creation_vertex','; #bar{S} cv l_{0} (cm) ; Events/0.1mm',2000,-1,1)
+h_antiS_lxy_creation_vertex_unreweighted = TH1F('h_antiS_lxy_creation_vertex_unreweighted','; #bar{S} cv l_{0} (cm) ; Events/0.1mm',2000,-1,1)
 h_antiS_vz_creation_vertex = TH1F('h_antiS_vz_creation_vertex','; #bar{S} cv absolute v_{z} (cm); Events/cm',60,-30,30)
+h_antiS_vz_creation_vertex_unreweighted = TH1F('h_antiS_vz_creation_vertex_unreweighted','; #bar{S} cv absolute v_{z} (cm); Events/cm',60,-30,30)
 h_antiS_lxy_interaction_vertex = TH1F('h_antiS_lxy_interaction_vertex','; l_{0,bs} interaction vertex #bar{S} (cm) ; Events/0.1mm',10,2.16,2.26)
 h_antiS_vz_interaction_vertex = TH1F('h_antiS_vz_interaction_vertex','; absolute v_{z}  interaction vertex #bar{S} (cm); Events/5cm',68,-170,170)
 h_neutron_momentum = TH1F('h_neutron_momentum','; p neutron (GeV/c); Events/0.01GeV/c',85,0,0.85)
@@ -431,7 +439,9 @@ for i in range(0,tree.GetEntries()):
 
 	h_antiS_eta.Fill( tree._S_eta[0] )	
 	h_antiS_lxy_creation_vertex.Fill( np.sqrt( np.power(tree._S_vx[0],2) + np.power(tree._S_vy[0],2) ),weight_factor )	
+	h_antiS_lxy_creation_vertex_unreweighted.Fill( np.sqrt( np.power(tree._S_vx[0],2) + np.power(tree._S_vy[0],2) ), tree._S_event_weighting_factor[0])	
 	h_antiS_vz_creation_vertex.Fill(tree._S_vz[0],weight_factor)	
+	h_antiS_vz_creation_vertex_unreweighted.Fill(tree._S_vz[0], tree._S_event_weighting_factor[0])	
 	h_antiS_lxy_interaction_vertex.Fill(tree._S_lxy_interaction_vertex[0],weight_factor)
 	h_antiS_vz_interaction_vertex.Fill(tree._S_vz_interaction_vertex[0],weight_factor)
 	h_neutron_momentum.Fill(abs(tree._n_p[0]),weight_factor)
@@ -536,6 +546,8 @@ h_antiS_eta.Write()
 
 h_antiS_lxy_creation_vertex.Write()
 h_antiS_vz_creation_vertex.Write()
+h_antiS_lxy_creation_vertex_unreweighted.Write()
+h_antiS_vz_creation_vertex_unreweighted.Write()
 
 c_antiS_lxy_interaction_vertex = TCanvas("c_antiS_lxy_interaction_vertex","");
 h_antiS_lxy_interaction_vertex.DrawNormalized()
@@ -639,6 +651,7 @@ c_h2_antiS_inv_mass_p_Ks_plus_Lambda.Write()
 momenta_daughters_and_grandaughters_dir.cd()
 
 ll_TH1F = [
+[h_antiS_vz_creation_vertex,h_antiS_vz_creation_vertex_unreweighted],
 [h_pt_Ks_daug0,h_pt_Ks],
 [h_pz_Ks_daug0,h_pz_Ks],
 [h_pz_AntiLambda_Pion,h_pz_AntiLambda_AntiProton,h_pz_AntiLambda],
@@ -649,6 +662,7 @@ ll_TH1F = [
 
 
 ll_legend_text =  [
+["#bar{S} MC","#bar{S} MC reweighted"],
 ["K_{S}^{0} daughters","K_{S}^{0}"],
 ["K_{S}^{0} daughters","K_{S}^{0}"],
 ["#bar{#Lambda}^{0}-#pi^{+}","#bar{#Lambda}^{0}-#bar{p}","#bar{#Lambda}^{0}"],
@@ -758,9 +772,24 @@ for l in ll_TH1F:
 		h.SetDirectory(0)
 
 i_ll_TH1F = 0
+ixy_2 = False
+iz_2 = False
 for l in ll_TH1F:
 	legend = TLegend(0.7,0.85,0.99,0.99)
-	c = TCanvas("c_"+l[0].GetName(),"");
+        if l[0].GetName() == "h_dxy_AntiLambda_AntiProton":
+            if not ixy_2:
+	        c = TCanvas("c_"+l[0].GetName(),"")
+                ixy_2 = True
+            else:
+	        c = TCanvas("c_"+l[0].GetName()+"_2","")
+        elif l[0].GetName() == "h_dz_AntiLambda_AntiProton":
+            if not iz_2:
+	        c = TCanvas("c_"+l[0].GetName(),"")
+                iz_2 = True
+            else:
+	        c = TCanvas("c_"+l[0].GetName()+"_2","")
+        else:
+	    c = TCanvas("c_"+l[0].GetName(),"")
 	i_l_TH1F = 0
 	for h in l:
 		if(i_l_TH1F==0):

@@ -66,6 +66,8 @@ class AnalyzerAllSteps : public edm::EDAnalyzer
 
     //definition of the background cuts
     static constexpr double MinLxyCut = 1.9;
+    // Added by Wren
+    static constexpr double MaxLxyCut = 2.5;
 
     //the location of the center of the beampipe in x and y, from https://arxiv.org/pdf/1807.03289.pdf
     static constexpr double center_beampipe_x = 0.124; //cm

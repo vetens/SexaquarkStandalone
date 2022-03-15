@@ -31,7 +31,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 if(options.isData==True):
     process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v7', '')
 else:
-    process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
+    process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v15' '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvts))
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)

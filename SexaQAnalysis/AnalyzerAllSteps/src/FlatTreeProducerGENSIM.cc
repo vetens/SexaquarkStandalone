@@ -214,6 +214,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 
   unsigned int nGoodPV = 0;
   if(h_offlinePV.isValid()){
+        std::cout << "offlinepv valid" << std::endl;
         for(unsigned int i = 0; i < h_offlinePV->size(); i++){
 		double r = sqrt(h_offlinePV->at(i).x()*h_offlinePV->at(i).x()+h_offlinePV->at(i).y()*h_offlinePV->at(i).y());
                 if(h_offlinePV->at(i).ndof() > 4 && abs(h_offlinePV->at(i).z()) < 24 && r < 2){
@@ -221,6 +222,7 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
                 }
         }
   }
+  else { std::cout << "offlinepv not valid!!!!!" << std::endl;}
 
   //loop over the gen particles, check for this antiS if there are any antiS with the same eta, so duplicates. These duplicates are the result of the looping mechanism.
   //save the number of duplicates in a vector of vectors. Each vector has  as a first element the eta of the antiS and 2nd element the # of antiS with this eta. 
@@ -320,14 +322,17 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 						AntiSReconstructable = FillBranchesGENAntiS(genParticle,beamspot, beamspotVariance, v_antiS_momenta_and_itt,  h_TP,nGoodPV);
 						if(AntiSReconstructable)nTotalCorrectGENS_Reconstructable_weighted = nTotalCorrectGENS_Reconstructable_weighted + AnalyzerAllSteps::EventWeightingFactor(genParticle->theta())*weight_PU;
 					}
-				}
+                //                    else { std::cout << "Anti S Non reconstructable because there is no decay mode which would lead to a RECO AntiLambda Ks pair. Ks->pi+pi-, AntiLambda->p-pi+." << std::endl;
+		//		}
 			}
-
+                    //else { std::cout << "Anti S Non reconstructable because its daughters are not AntiLambda & Ks" << std::endl;
+                    //    }
 			//now save for this antiS in v_antiS_eta_reconstructable the or of the reconstructability flag which was already in this vector and the the current AntiSReconstructable, 
 			//like that you will check for any of the duplicates if it was reconstructable
 			v_antiS_eta_reconstructable[antiS_it][1] = (int)v_antiS_eta_reconstructable[antiS_it][1] | AntiSReconstructable;
 		
 	      }//for(unsigned int i = 0; i < h_genParticles->size(); ++i)
+            //else { std::cout << "Anti S Non reconstructable because it does not have two daughters, it has: " << genParticle->numberOfDaughters() << std::endl; }
 
 	     //now save this info to the _treeAllAntiS tree
 	    for(unsigned int j = 0; j < v_antiS_eta_reconstructable.size(); j++){
@@ -362,9 +367,11 @@ void FlatTreeProducerGENSIM::analyze(edm::Event const& iEvent, edm::EventSetup c
 	    }
 
 	  }//if(h_genParticles.isValid())
+
+	}
 	else{
 		std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!genparticle collection is not valid!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-	}
+        }
 
   }
 
@@ -742,10 +749,13 @@ bool FlatTreeProducerGENSIM::FillBranchesGENAntiS(const reco::Candidate  * genPa
 		Ks_daughter1_numberOfTrackerHits >= cutNumberOfTrackerHits && 
 		AntiLambda_AntiProton_numberOfTrackerHits >= cutNumberOfTrackerHits && 
 		AntiLambda_Pion_numberOfTrackerHits >= cutNumberOfTrackerHits){
+                std::cout<<"AntiS Reconstructable!!!" <<std::endl;
 		return true;
 	}
-	else return false;
-
+	else {
+        std::cout<<"AntiS Not Reconstructable!!!" <<std::endl;
+        return false;
+        }
 }
 
 

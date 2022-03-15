@@ -29,16 +29,19 @@ process.load('Configuration/EventContent/EventContent_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 
 if(options.isData==True):
+    #Why is this here for gen? Regardless if I need it I will update when I look at data
     process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v7', '')
 else:
-    process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
+    process.GlobalTag = GlobalTag(process.GlobalTag, '102X_upgrade2018_realistic_v15', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvts))
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
+inlist = open("genfiles.txt", "r")
 process.source = cms.Source("PoolSource",
-	fileNames = cms.untracked.vstring(options.inputFiles),
+	#fileNames = cms.untracked.vstring(options.inputFiles),
+	fileNames = cms.untracked.vstring(inlist.readlines()),
   duplicateCheckMode = cms.untracked.string ("noDuplicateCheck")
 )
 
